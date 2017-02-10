@@ -187,12 +187,12 @@ for(int i=2;i<14;i++){
 //
   error=I2Cread(0x4A,0x00,2,res);//TS1
   if (error!=0){error=I2Cread(0x18,0x05,2,res);}
-  if(error!=0){bufferH[38]=res[0];bufferH[39]=res[1];}
+  if(error==0){bufferH[38]=res[0];bufferH[39]=res[1];}
   else {bufferH[38]=0;bufferH[39]=0;}
   bitWrite(EPSStatus,2,error==0);
   error=I2Cread(0x49,0x00,2,res);//TS2
   if (error!=0){error=I2Cread(0x1C,0x05,2,res);}
-  if(error!=0){bufferH[40]=res[0];bufferH[41]=res[1];}
+  if(error==0){bufferH[40]=res[0];bufferH[41]=res[1];}
   else {bufferH[40]=0;bufferH[41]=0;}
   bitWrite(EPSStatus,1,error==0);
 ////////  DET TM 
