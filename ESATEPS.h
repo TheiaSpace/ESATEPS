@@ -19,7 +19,7 @@
 #ifndef ESATEPS_h
 #define ESATEPS_h
 #include <Energia.h>
-#include "MspFlash.h"
+#include <MspFlash.h>
 #define flash SEGMENT_C
 #define EN5V 58
 #define EN3V 60
