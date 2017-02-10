@@ -17,8 +17,8 @@
  */
 
 #include <USBSerial.h>
-#include <ESATEPS.h>
 #include <MspFlash.h>
+#include <ESATEPS.h>
 void setup()
 {
 EPS.init();  
