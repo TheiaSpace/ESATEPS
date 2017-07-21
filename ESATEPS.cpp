@@ -226,8 +226,22 @@ void ESATEPS::housekeeping()
     }
   }
   // EPS (Main) TM
-  int channels[14] = { A0, A1, A3, A4, A5, A6, A7, A2, A15, A8, A9, A13, A12, A14 };
-                  // ->I12,V12,I5,V5,I3,V3,Iin,Vin,Ip2in,Vp2,Ip2out,ip1out,Vp1,Ip1in
+  int channels[14] = {
+    I_12V,
+    V_12V,
+    I_5V,
+    V_5V,
+    I_3V3,
+    V_3V3,
+    I_IN,
+    V_IN,
+    I_P2_IN,
+    V_P2,
+    I_P2_OUT,
+    I_P1_OUT,
+    V_P1,
+    I_P1_IN
+  };
   int x[14];
   int numAvgs[14] = { 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 5 };
   for (int p = 0; p < 14; p++)
@@ -343,7 +357,7 @@ void ESATEPS::updateMPPT()
       u1 = 0;
       for (int i = 0; i < 2; i++)
       {
-        u1 += double(analogRead(A15)) / 2;
+        u1 += double(analogRead(I_P2_IN)) / 2;
       }
       if (((u1 >= previousI1) && (MPPTDelta1 > 0))
           || ((u1 < previousI1) && (MPPTDelta1 < 0)))
@@ -393,7 +407,7 @@ void ESATEPS::updateMPPT()
       u1 = 0;
       for (int i = 0; i < 2; i++)
       {
-        u1 += double(analogRead(A14)) / 2;
+        u1 += double(analogRead(I_P1_IN)) / 2;
       }
       if (((u1 >= previousI2) && (MPPTDelta2 > 0))
           || ((u1 < previousI2) && (MPPTDelta2 < 0)))
