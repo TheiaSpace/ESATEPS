@@ -22,7 +22,7 @@
 
 bool ENABLED5 = false;
 boolean ENABLED3 = true;
-boolean isOC2 = false;
+boolean isOC3V3 = false;
 
 // MPPT
 int min1 = 0;
@@ -99,9 +99,9 @@ void ESATEPS::init()
   digitalWrite(EN5V, LOW);
   pinMode(EN3V, OUTPUT);
   digitalWrite(EN3V, HIGH);
-  pinMode(OC1, INPUT_PULLUP);
-  pinMode(OC2, INPUT_PULLUP);
-  attachInterrupt(OC2, switch_fun, FALLING);
+  pinMode(OC5V, INPUT_PULLUP);
+  pinMode(OC3V3, INPUT_PULLUP);
+  attachInterrupt(OC3V3, switch_fun, FALLING);
   Wire1.begin();
   Wire.begin(2);
   Wire.onReceive(receiveEvent);
@@ -317,8 +317,8 @@ void ESATEPS::housekeeping()
   // EPS Status registers
   bitWrite(EPSStatus, 7, ENABLED5);
   bitWrite(EPSStatus, 6, ENABLED3);
-  bitWrite(EPSStatus, 5, isOC2);
-  bitWrite(EPSStatus, 4, !digitalRead(OC1));
+  bitWrite(EPSStatus, 5, isOC3V3);
+  bitWrite(EPSStatus, 4, !digitalRead(OC5V));
   bufferH[3] = EPSStatus;
   build_tm_packet(1, 2);
 }
@@ -492,17 +492,17 @@ uint16_t ESATEPS::readADC(int channel)
 
 void ESATEPS::switch_fun()
 {
-  detachInterrupt(OC2);
-  isOC2 = true;
-  attachInterrupt(OC2, switch_fun_n, RISING);
+  detachInterrupt(OC3V3);
+  isOC3V3 = true;
+  attachInterrupt(OC3V3, switch_fun_n, RISING);
 }
 
 void ESATEPS::switch_fun_n()
 {
   // Each rotation, this interrupt function is run twice
-  detachInterrupt(OC2);
-  isOC2 = false;
-  attachInterrupt(OC2, switch_fun, FALLING);
+  detachInterrupt(OC3V3);
+  isOC3V3 = false;
+  attachInterrupt(OC3V3, switch_fun, FALLING);
 }
 
 void ESATEPS::decode_tc_packet(String hexstring)
