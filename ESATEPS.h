@@ -23,8 +23,6 @@
 #include <MspFlash.h>
 
 #define flash SEGMENT_C
-#define EN5V 58
-#define EN3V 60
 #define bqAddress 0x0B
 #define soft_v 1
 
