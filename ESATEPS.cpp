@@ -97,8 +97,8 @@ void ESATEPS::init()
   EPSStatus = 0;
   pinMode(EN5V, OUTPUT);
   digitalWrite(EN5V, LOW);
-  pinMode(EN3V, OUTPUT);
-  digitalWrite(EN3V, HIGH);
+  pinMode(EN3V3, OUTPUT);
+  digitalWrite(EN3V3, HIGH);
   pinMode(OC5V, INPUT_PULLUP);
   pinMode(OC3V3, INPUT_PULLUP);
   attachInterrupt(OC3V3, switch_fun, FALLING);
@@ -143,11 +143,11 @@ void ESATEPS::handleCommand()
     ENABLED3 = !ENABLED3;
     if (ENABLED3)
     {
-      digitalWrite(EN3V, HIGH);
+      digitalWrite(EN3V3, HIGH);
     }
     else
     {
-      digitalWrite(EN3V, LOW);
+      digitalWrite(EN3V3, LOW);
     }
     EPS.command = 0;
     break;
