@@ -26,8 +26,6 @@
 #define EN5V 58
 #define EN3V 60
 #define bqAddress 0x0B
-#define PWM1  P1_2
-#define PWM2  P1_3
 #define soft_v 1
 
 class ESATEPS
