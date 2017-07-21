@@ -22,7 +22,7 @@
 
 bool ENABLED5 = false;
 boolean ENABLED3 = true;
-boolean isOC2 = false;
+boolean isOC3V3 = false;
 
 // MPPT
 int min1 = 0;
@@ -97,11 +97,11 @@ void ESATEPS::init()
   EPSStatus = 0;
   pinMode(EN5V, OUTPUT);
   digitalWrite(EN5V, LOW);
-  pinMode(EN3V, OUTPUT);
-  digitalWrite(EN3V, HIGH);
-  pinMode(OC1, INPUT_PULLUP);
-  pinMode(OC2, INPUT_PULLUP);
-  attachInterrupt(OC2, switch_fun, FALLING);
+  pinMode(EN3V3, OUTPUT);
+  digitalWrite(EN3V3, HIGH);
+  pinMode(OC5V, INPUT_PULLUP);
+  pinMode(OC3V3, INPUT_PULLUP);
+  attachInterrupt(OC3V3, switch_fun, FALLING);
   Wire1.begin();
   Wire.begin(2);
   Wire.onReceive(receiveEvent);
@@ -143,11 +143,11 @@ void ESATEPS::handleCommand()
     ENABLED3 = !ENABLED3;
     if (ENABLED3)
     {
-      digitalWrite(EN3V, HIGH);
+      digitalWrite(EN3V3, HIGH);
     }
     else
     {
-      digitalWrite(EN3V, LOW);
+      digitalWrite(EN3V3, LOW);
     }
     EPS.command = 0;
     break;
@@ -226,8 +226,22 @@ void ESATEPS::housekeeping()
     }
   }
   // EPS (Main) TM
-  int channels[14] = { A0, A1, A3, A4, A5, A6, A7, A2, A15, A8, A9, A13, A12, A14 };
-                  // ->I12,V12,I5,V5,I3,V3,Iin,Vin,Ip2in,Vp2,Ip2out,ip1out,Vp1,Ip1in
+  int channels[14] = {
+    I_12V,
+    V_12V,
+    I_5V,
+    V_5V,
+    I_3V3,
+    V_3V3,
+    I_IN,
+    V_IN,
+    I_P2_IN,
+    V_P2,
+    I_P2_OUT,
+    I_P1_OUT,
+    V_P1,
+    I_P1_IN
+  };
   int x[14];
   int numAvgs[14] = { 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 5 };
   for (int p = 0; p < 14; p++)
@@ -317,8 +331,8 @@ void ESATEPS::housekeeping()
   // EPS Status registers
   bitWrite(EPSStatus, 7, ENABLED5);
   bitWrite(EPSStatus, 6, ENABLED3);
-  bitWrite(EPSStatus, 5, isOC2);
-  bitWrite(EPSStatus, 4, !digitalRead(OC1));
+  bitWrite(EPSStatus, 5, isOC3V3);
+  bitWrite(EPSStatus, 4, !digitalRead(OC5V));
   bufferH[3] = EPSStatus;
   build_tm_packet(1, 2);
 }
@@ -343,7 +357,7 @@ void ESATEPS::updateMPPT()
       u1 = 0;
       for (int i = 0; i < 2; i++)
       {
-        u1 += double(analogRead(A15)) / 2;
+        u1 += double(analogRead(I_P2_IN)) / 2;
       }
       if (((u1 >= previousI1) && (MPPTDelta1 > 0))
           || ((u1 < previousI1) && (MPPTDelta1 < 0)))
@@ -393,7 +407,7 @@ void ESATEPS::updateMPPT()
       u1 = 0;
       for (int i = 0; i < 2; i++)
       {
-        u1 += double(analogRead(A14)) / 2;
+        u1 += double(analogRead(I_P1_IN)) / 2;
       }
       if (((u1 >= previousI2) && (MPPTDelta2 > 0))
           || ((u1 < previousI2) && (MPPTDelta2 < 0)))
@@ -492,17 +506,17 @@ uint16_t ESATEPS::readADC(int channel)
 
 void ESATEPS::switch_fun()
 {
-  detachInterrupt(OC2);
-  isOC2 = true;
-  attachInterrupt(OC2, switch_fun_n, RISING);
+  detachInterrupt(OC3V3);
+  isOC3V3 = true;
+  attachInterrupt(OC3V3, switch_fun_n, RISING);
 }
 
 void ESATEPS::switch_fun_n()
 {
   // Each rotation, this interrupt function is run twice
-  detachInterrupt(OC2);
-  isOC2 = false;
-  attachInterrupt(OC2, switch_fun, FALLING);
+  detachInterrupt(OC3V3);
+  isOC3V3 = false;
+  attachInterrupt(OC3V3, switch_fun, FALLING);
 }
 
 void ESATEPS::decode_tc_packet(String hexstring)

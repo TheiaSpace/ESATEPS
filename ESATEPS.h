@@ -23,13 +23,7 @@
 #include <MspFlash.h>
 
 #define flash SEGMENT_C
-#define EN5V 58
-#define EN3V 60
 #define bqAddress 0x0B
-#define PWM1  P1_2
-#define PWM2  P1_3
-#define OC1 P2_4
-#define OC2 P2_5
 #define soft_v 1
 
 class ESATEPS
