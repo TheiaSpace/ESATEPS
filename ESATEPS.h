@@ -18,8 +18,10 @@
 
 #ifndef ESATEPS_h
 #define ESATEPS_h
+
 #include <Energia.h>
 #include <MspFlash.h>
+
 #define flash SEGMENT_C
 #define EN5V 58
 #define EN3V 60
@@ -29,31 +31,36 @@
 #define OC1 P2_4
 #define OC2 P2_5
 #define soft_v 1
-class ESATEPS {
-public:
-byte bufferH[51];
-byte EPSStatus;
-boolean ACTIVEMPPT;
-boolean MPPTMODE;
-boolean MPPTFIXED;
-void init();
-void serialLog(String comment);
-void housekeeping();
-void updateMPPT();
-void invokeBSL();
-int command;
-int param;
-int myId;
-private:
-byte I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data);
-byte I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data);
-void handleCommand();
-String build_tm_packet(int type, int apid);
-String toHex(int i, int L);
-uint16_t readADC(int channel);
-void decode_tc_packet(String packet);
-static void switch_fun();
-static void switch_fun_n();
+
+class ESATEPS
+{
+  public:
+    byte bufferH[51];
+    byte EPSStatus;
+    boolean ACTIVEMPPT;
+    boolean MPPTMODE;
+    boolean MPPTFIXED;
+    void init();
+    void serialLog(String comment);
+    void housekeeping();
+    void updateMPPT();
+    void invokeBSL();
+    int command;
+    int param;
+    int myId;
+
+  private:
+    byte I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data);
+    byte I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data);
+    void handleCommand();
+    String build_tm_packet(int type, int apid);
+    String toHex(int i, int L);
+    uint16_t readADC(int channel);
+    void decode_tc_packet(String packet);
+    static void switch_fun();
+    static void switch_fun_n();
 };
+
 extern ESATEPS EPS;
+
 #endif

@@ -19,14 +19,15 @@
 #include <USBSerial.h>
 #include <MspFlash.h>
 #include <ESATEPS.h>
+
 void setup()
 {
-EPS.init();  
+  EPS.init();
 }
 
 void loop()
 {
   EPS.updateMPPT();
   EPS.housekeeping();
-  delay(10);//  
+  delay(10);
 }
