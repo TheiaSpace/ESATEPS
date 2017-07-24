@@ -21,6 +21,7 @@
 
 #include <Energia.h>
 #include <MspFlash.h>
+#include "ESATMaximumPowerPointTrackingDriver.h"
 
 #define flash SEGMENT_C
 #define bqAddress 0x0B
@@ -31,9 +32,10 @@ class ESATEPS
   public:
     byte bufferH[51];
     byte EPSStatus;
-    boolean ACTIVEMPPT;
-    boolean MPPTMODE;
-    boolean MPPTFIXED;
+
+    // Instantiate a new ESATEPS object.
+    ESATEPS();
+
     void init();
     void serialLog(String comment);
     void housekeeping();
@@ -44,6 +46,12 @@ class ESATEPS
     int myId;
 
   private:
+    // Maximum power point tracking driver for panel 1.
+    ESATMaximumPowerPointTrackingDriver mppt1;
+
+    // Maximum power point tracking driver for panel 2.
+    ESATMaximumPowerPointTrackingDriver mppt2;
+
     byte I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data);
     byte I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data);
     void handleCommand();
