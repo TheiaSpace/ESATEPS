@@ -24,15 +24,9 @@ bool ENABLED5 = false;
 boolean ENABLED3 = true;
 boolean isOC3V3 = false;
 
-// MPPT
-int min1 = 0;
-int max1 = 255;
-int MPPTDelta1 = 1;
-int MPPTDelta2 = 1;
-int PWMValue1 = 50;
-double previousI1 = 0;
-int PWMValue2 = 50;
-double previousI2 = 0;
+ESATEPS::ESATEPS(): mppt1(I_P2_IN, PWM1), mppt2(I_P1_IN, PWM2)
+{
+}
 
 void receiveEvent(int howMany)
 {
@@ -91,9 +85,10 @@ void ESATEPS::init()
   myId = (int) Id;
   command = 0;
   param = 0;
-  ACTIVEMPPT = true;
-  MPPTMODE = true;
-  MPPTFIXED = false;
+  mppt1.begin();
+  mppt2.begin();
+  mppt1.setMPPTMode();
+  mppt2.setMPPTMode();
   EPSStatus = 0;
   pinMode(EN5V, OUTPUT);
   digitalWrite(EN5V, LOW);
@@ -152,30 +147,21 @@ void ESATEPS::handleCommand()
     EPS.command = 0;
     break;
   case 3:
-    MPPTMODE = true;
-    MPPTFIXED = false;
-    MPPTDelta1 = 1;
-    MPPTDelta2 = 1;
-    PWMValue1 = 50;
-    previousI1 = 0;
-    PWMValue2 = 50;
-    previousI2 = 0;
+    mppt1.setMPPTMode();
+    mppt2.setMPPTMode();
     EPS.command = 0;
     break;
   case 4:
-    MPPTMODE = false;
-    MPPTFIXED = false;
-    MPPTDelta1 = 1;
-    MPPTDelta2 = 1;
+    mppt1.setSweepMode();
+    mppt2.setSweepMode();
     EPS.command = 0;
     break;
   case 5:
     EPS.param = constrain(EPS.param, 0, 255);
-    MPPTFIXED = true;
-    PWMValue1 = EPS.param;
-    PWMValue2 = EPS.param;
-    analogWrite(PWM1, PWMValue1);
-    analogWrite(PWM2, PWMValue2);
+    mppt1.setFixedMode();
+    mppt2.setFixedMode();
+    mppt1.dutyCycle = EPS.param;
+    mppt2.dutyCycle = EPS.param;
     EPS.command = 0;
     break;
   default:
@@ -349,110 +335,8 @@ String ESATEPS::toHex(int i, int L)
 
 void ESATEPS::updateMPPT()
 {
-  if (!MPPTFIXED)
-  {
-    double u1 = 0;
-    if (MPPTMODE)
-    {
-      u1 = 0;
-      for (int i = 0; i < 2; i++)
-      {
-        u1 += double(analogRead(I_P2_IN)) / 2;
-      }
-      if (((u1 >= previousI1) && (MPPTDelta1 > 0))
-          || ((u1 < previousI1) && (MPPTDelta1 < 0)))
-      {
-        MPPTDelta1 = 2;
-      }
-      else
-      {
-        MPPTDelta1 = -2;
-      }
-      PWMValue1 += MPPTDelta1;
-      if (PWMValue1 >= max1)
-      {
-        PWMValue1 = max1;
-      }
-      if (PWMValue1 <= min1)
-      {
-        PWMValue1 = min1;
-      }
-      analogWrite(PWM1, PWMValue1);
-      delay(10);
-      previousI1 = u1;
-    }
-    else
-    {
-      if (PWMValue1 >= max1)
-      {
-        MPPTDelta1 = -1;
-      }
-      if (PWMValue1 <= min1)
-      {
-        MPPTDelta1 = 1;
-      }
-      PWMValue1 += MPPTDelta1;
-      if (PWMValue1 >= max1)
-      {
-        PWMValue1 = max1;
-      }
-      if (PWMValue1 <= min1)
-      {
-        PWMValue1 = min1;
-      }
-      analogWrite(PWM1, PWMValue1);
-    }
-    if (MPPTMODE)
-    {
-      u1 = 0;
-      for (int i = 0; i < 2; i++)
-      {
-        u1 += double(analogRead(I_P1_IN)) / 2;
-      }
-      if (((u1 >= previousI2) && (MPPTDelta2 > 0))
-          || ((u1 < previousI2) && (MPPTDelta2 < 0)))
-      {
-        MPPTDelta2 = 2;
-      }
-      else
-      {
-        MPPTDelta2 = -2;
-      }
-      PWMValue2 += MPPTDelta2;
-      if (PWMValue2 >= max1)
-      {
-        PWMValue2 = max1;
-      }
-      if (PWMValue2 <= min1)
-      {
-        PWMValue2 = min1;
-      }
-      analogWrite(PWM2, PWMValue2);
-      delay(10);
-      previousI2 = u1;
-    }
-    else
-    {
-      if (PWMValue2 >= max1)
-      {
-        MPPTDelta2 = -1;
-      }
-      if (PWMValue2 <= min1)
-      {
-        MPPTDelta2 = 1;
-      }
-      PWMValue2 += MPPTDelta2;
-      if (PWMValue2 >= max1)
-      {
-        PWMValue2 = max1;
-      }
-      if (PWMValue2 <= min1)
-      {
-        PWMValue2 = min1;
-      }
-      analogWrite(PWM2, PWMValue2);
-    }
-  }
+  mppt1.update();
+  mppt2.update();
 }
 
 uint16_t ESATEPS::readADC(int channel)
