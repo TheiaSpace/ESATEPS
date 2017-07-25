@@ -19,6 +19,7 @@
 #include "ESATEPS.h"
 #include <USBSerial.h>
 #include <Wire.h>
+#include "ESATBatteryController.h"
 
 bool ENABLED5 = false;
 boolean ENABLED3 = true;
@@ -250,29 +251,29 @@ void ESATEPS::housekeeping()
   bufferH[1] = (soft_v << 3);
 
   // EPS (Bat) TM
-  byte res[4];
-  I2Cread(bqAddress, 0x09, 2, res);
-  bufferH[28] = res[1];
-  bufferH[29] = res[0]; // Vbatt
-  I2Cread(bqAddress, 0x3E, 2, res);
-  bufferH[30] = res[1];
-  bufferH[31] = res[0]; // Vb1
-  I2Cread(bqAddress,0x3F, 2, res);
-  bufferH[32] = res[1];
-  bufferH[33] = res[0]; // Vb2
-  I2Cread(bqAddress, 0x0D, 1, res);
+  const int totalBatteryVoltage = BatteryController.readTotalBatteryVoltage();
+  bufferH[28] = highByte(totalBatteryVoltage);
+  bufferH[29] = lowByte(totalBatteryVoltage);
+  const int battery1Voltage = BatteryController.readBattery1Voltage();
+  bufferH[30] = highByte(battery1Voltage);
+  bufferH[31] = lowByte(battery1Voltage);
+  const int battery2Voltage = BatteryController.readBattery2Voltage();
+  bufferH[32] = highByte(battery2Voltage);
+  bufferH[33] = lowByte(battery2Voltage);
+  const byte stateOfCharge = BatteryController.readStateOfCharge();
   bufferH[48] = 0;
-  bufferH[49] = res[0]; // SOC
-  I2Cread(bqAddress, 0x08, 2, res);
-  bufferH[34] = res[1];
-  bufferH[35] = res[0]; // Tbatt
-  byte error = I2Cread(bqAddress, 0x0a, 2, res);
-  bufferH[36] = res[1];
-  bufferH[37] = res[0]; // Ibatt
-  bitWrite(EPSStatus, 3, error == 0); // EPSStatus.BAT
+  bufferH[49] = stateOfCharge;
+  const int batteryTemperature = BatteryController.readBatteryTemperature();
+  bufferH[34] = highByte(batteryTemperature);
+  bufferH[35] = lowByte(batteryTemperature);
+  const int batteryCurrent = BatteryController.readBatteryCurrent();
+  bufferH[36] = highByte(batteryCurrent);
+  bufferH[37] = lowByte(batteryCurrent);
+  bitWrite(EPSStatus, 3, !BatteryController.error); // EPSStatus.BAT
 
   // Solar array TM
-  error = I2Cread(0x4A, 0x00, 2, res); // TS1
+  byte res[4];
+  byte error = I2Cread(0x4A, 0x00, 2, res); // TS1
   if (error != 0)
   {
     error = I2Cread(0x18, 0x05, 2, res);
