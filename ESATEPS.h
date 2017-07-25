@@ -21,7 +21,6 @@
 
 #include <Energia.h>
 #include <MspFlash.h>
-#include "ESATMaximumPowerPointTrackingDriver.h"
 
 #define flash SEGMENT_C
 #define bqAddress 0x0B
