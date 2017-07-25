@@ -64,7 +64,7 @@ byte ESATBatteryController::readByte(const byte registerName)
   const byte wireStatus = Wire1.endTransmission();
   if (wireStatus == 0)
   {
-    Wire1.requestFrom(address, 1);
+    Wire1.requestFrom((uint8_t) address, (uint8_t) 1);
     return Wire1.read();
   }
   else
@@ -80,7 +80,7 @@ int ESATBatteryController::readInteger(const byte registerName)
   const byte wireStatus = Wire1.endTransmission();
   if (wireStatus == 0)
   {
-    Wire1.requestFrom(address, 2);
+    Wire1.requestFrom((uint8_t) address, (uint8_t) 2);
     const byte lowByte = Wire1.read();
     const byte highByte = Wire1.read();
     return word(highByte, lowByte);
