@@ -20,6 +20,7 @@
 #include <USBSerial.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
+#include "ESATMaximumPowerPointTrackingDriver.h"
 #include "ESATSolarPanelThermometer.h"
 
 bool ENABLED5 = false;
