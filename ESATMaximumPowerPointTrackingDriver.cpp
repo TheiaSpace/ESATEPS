@@ -114,3 +114,6 @@ void ESATMaximumPowerPointTrackingDriver::updateSweepMode()
   dutyCycle = constrain(int(dutyCycle) + dutyCycleIncrement, 0, 255);
   analogWrite(outputPin, dutyCycle);
 }
+
+ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver1(I_P2_IN, PWM1);
+ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver2(I_P1_IN, PWM2);

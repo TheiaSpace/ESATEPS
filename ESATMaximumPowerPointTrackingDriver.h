@@ -88,4 +88,10 @@ class ESATMaximumPowerPointTrackingDriver
     void updateSweepMode();
 };
 
+// Maximum power point tracking driver for solar panel 1.
+extern ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver1;
+
+// Maximum power point tracking driver for solar panel 2.
+extern ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver2;
+
 #endif /* ESATMaximumPowerPointTrackingDriver_h */

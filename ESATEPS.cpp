@@ -26,7 +26,7 @@ bool ENABLED5 = false;
 boolean ENABLED3 = true;
 boolean isOC3V3 = false;
 
-ESATEPS::ESATEPS(): mppt1(I_P2_IN, PWM1), mppt2(I_P1_IN, PWM2)
+ESATEPS::ESATEPS()
 {
 }
 
@@ -87,10 +87,10 @@ void ESATEPS::init()
   myId = (int) Id;
   command = 0;
   param = 0;
-  mppt1.begin();
-  mppt2.begin();
-  mppt1.setMPPTMode();
-  mppt2.setMPPTMode();
+  MaximumPowerPointTrackingDriver1.begin();
+  MaximumPowerPointTrackingDriver2.begin();
+  MaximumPowerPointTrackingDriver1.setMPPTMode();
+  MaximumPowerPointTrackingDriver2.setMPPTMode();
   EPSStatus = 0;
   pinMode(EN5V, OUTPUT);
   digitalWrite(EN5V, LOW);
@@ -149,21 +149,21 @@ void ESATEPS::handleCommand()
     EPS.command = 0;
     break;
   case 3:
-    mppt1.setMPPTMode();
-    mppt2.setMPPTMode();
+    MaximumPowerPointTrackingDriver1.setMPPTMode();
+    MaximumPowerPointTrackingDriver2.setMPPTMode();
     EPS.command = 0;
     break;
   case 4:
-    mppt1.setSweepMode();
-    mppt2.setSweepMode();
+    MaximumPowerPointTrackingDriver1.setSweepMode();
+    MaximumPowerPointTrackingDriver2.setSweepMode();
     EPS.command = 0;
     break;
   case 5:
     EPS.param = constrain(EPS.param, 0, 255);
-    mppt1.setFixedMode();
-    mppt2.setFixedMode();
-    mppt1.dutyCycle = EPS.param;
-    mppt2.dutyCycle = EPS.param;
+    MaximumPowerPointTrackingDriver1.setFixedMode();
+    MaximumPowerPointTrackingDriver2.setFixedMode();
+    MaximumPowerPointTrackingDriver1.dutyCycle = EPS.param;
+    MaximumPowerPointTrackingDriver2.dutyCycle = EPS.param;
     EPS.command = 0;
     break;
   default:
@@ -312,8 +312,8 @@ String ESATEPS::toHex(int i, int L)
 
 void ESATEPS::updateMPPT()
 {
-  mppt1.update();
-  mppt2.update();
+  MaximumPowerPointTrackingDriver1.update();
+  MaximumPowerPointTrackingDriver2.update();
 }
 
 uint16_t ESATEPS::readADC(int channel)
