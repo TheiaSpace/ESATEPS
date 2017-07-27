@@ -25,20 +25,20 @@
 class ESATDirectEnergyTransferSystem
 {
   public:
-    // True after a read error, false on read success.
+    // True after a read error.  Must be reset manually.
     boolean error;
 
     // Read the current circulating through the direct energy transfer
     // system.
-    // Reassign the error flag.
+    // Set the error flag on error.
     word readCurrent();
 
     // Read the voltage drop through the shunt resistor.
-    // Reassign the error flag.
+    // Set the error flag on error.
     word readShuntVoltage();
 
     // Read the voltage through the direct energy transfer system.
-    // Reassign the error flag.
+    // Set the error flag on error.
     word readVoltage();
 
   private:
@@ -62,12 +62,12 @@ class ESATDirectEnergyTransferSystem
     static const word shuntVoltageChannelConfigurationBits = B111 << 12; // AINp = AIN3, AINn = GND.
 
     // Read a sample from the sensors.
-    // Reassign the error flag.
+    // Set the error flag on error.
     // Calls startConversion and readConvertedValue.
     word read(word channelConfigurationBits);
 
     // Read the last converted value.
-    // Reassign the error flag.
+    // Set the error flag on error.
     word readConvertedValue();
 
     // Start a conversion.

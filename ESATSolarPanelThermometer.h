@@ -25,7 +25,7 @@
 class ESATSolarPanelThermometer
 {
   public:
-    // True after a read error, false on read success.
+    // True after a read error.  Must be reset manually.
     byte error;
 
     // Instantiate a solar panel thermometer interface.
@@ -36,10 +36,13 @@ class ESATSolarPanelThermometer
                               byte SecondaryRegister);
 
     // Return the temperature measured by the thermometer.
-    // Reassign the error flag.
+    // Set the error flag on error.
     int read();
 
   private:
+    // True on read success, false otherwise.
+    boolean success;
+
     // First try to read the temperature from this I2C address/register pair.
     const byte primaryAddress;
     const byte primaryRegister;
@@ -49,7 +52,7 @@ class ESATSolarPanelThermometer
     const byte secondaryRegister;
 
     // Try to read the temperature from the given address/register pair.
-    // Reassign the error flag.
+    // Set the success flag.
     int tryToRead(byte address, byte registerNumber);
 };
 

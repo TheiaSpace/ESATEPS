@@ -254,6 +254,7 @@ void ESATEPS::housekeeping()
   bufferH[1] = (soft_v << 3);
 
   // EPS (Bat) TM
+  BatteryController.error = false;
   const int totalBatteryVoltage = BatteryController.readTotalBatteryVoltage();
   bufferH[28] = highByte(totalBatteryVoltage);
   bufferH[29] = lowByte(totalBatteryVoltage);
@@ -275,10 +276,12 @@ void ESATEPS::housekeeping()
   bitWrite(EPSStatus, 3, !BatteryController.error); // EPSStatus.BAT
 
   // Solar array TM
+  SolarPanel1Thermometer.error = false;
   const int solarPanel1Temperature = SolarPanel1Thermometer.read();
   bufferH[38] = highByte(solarPanel1Temperature);
   bufferH[39] = lowByte(solarPanel1Temperature);
   bitWrite(EPSStatus, 2, !SolarPanel1Thermometer.error);
+  SolarPanel1Thermometer.error = false;
   const int solarPanel2Temperature = SolarPanel2Thermometer.read();
   bufferH[0] = highByte(solarPanel2Temperature);
   bufferH[1] = lowByte(solarPanel2Temperature);
@@ -286,6 +289,7 @@ void ESATEPS::housekeeping()
 
   // DET TM
   uint16_t channels_ADC;
+  DirectEnergyTransferSystem.error = false;
   const int directEnergyTransferSystemCurrent =
     DirectEnergyTransferSystem.readCurrent();
   bufferH[42] = highByte(directEnergyTransferSystemCurrent);
