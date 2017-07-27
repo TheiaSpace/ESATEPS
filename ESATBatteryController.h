@@ -25,34 +25,34 @@
 class ESATBatteryController
 {
   public:
-    // True after a read error, false after a successful read.
+    // True after a read error.  Must be reset manually.
     boolean error;
 
     // Instantiate an interface with the battery controller.
     ESATBatteryController();
 
     // Read the voltage of battery number 1.
-    // Set the error flag.
+    // Set the error flag on error.
     int readBattery1Voltage();
 
     // Read the voltage of battery number 2.
-    // Set the error flag.
+    // Set the error flag on error.
     int readBattery2Voltage();
 
     // Read the current flowing through the batteries.
-    // Set the error flag.
+    // Set the error flag on error.
     int readBatteryCurrent();
 
     // Read the temperature of the batteries.
-    // Set the error flag.
+    // Set the error flag on error.
     int readBatteryTemperature();
 
     // Read the state of charge.
-    // Set the error flag.
+    // Set the error flag on error.
     byte readStateOfCharge();
 
     // Read the total battery voltage.
-    // Set the error flag.
+    // Set the error flag on error.
     int readTotalBatteryVoltage();
 
 
@@ -69,11 +69,11 @@ class ESATBatteryController
     static const byte totalBatteryVoltageRegister = 0x09;
 
     // Read a byte from the given register.
-    // Set the error flag.
+    // Set the error flag on error.
     byte readByte(byte registerName);
 
     // Read a 16-bit integer from the given register.
-    // Set the error flag.
+    // Set the error flag on error.
     int readInteger(byte registerName);
 };
 
