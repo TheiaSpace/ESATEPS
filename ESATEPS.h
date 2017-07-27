@@ -56,6 +56,25 @@ class ESATEPS
       FIXED_MODE = 5,
     };
 
+    // Set the maximum power point tracking drivers in fixed mode.
+    void handleFixedModeCommand();
+
+    // Set the maximum power point tracking drivers in maximum power
+    // point tracking mode.
+    void handleMaximumPowerPointTrackingModeCommand();
+
+    // Set and store the identifier number.
+    void handleSetIdentifierCommand();
+
+    // Set the maximum power point tracking drivers in sweep mode.
+    void handleSweepModeCommand();
+
+    // Toggle the 3V3 line.
+    void handleToggle3V3LineCommand();
+
+    // Toggle the 5V line.
+    void handleToggle5VLineCommand();
+
     byte I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data);
     byte I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data);
     void handleCommand();

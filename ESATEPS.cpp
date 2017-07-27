@@ -118,59 +118,82 @@ void ESATEPS::handleCommand()
   switch (EPS.command)
   {
   case SET_IDENTIFIER:
-    // set id and store in flash
-    Flash.erase(flash);
-    myId = param;
-    unsigned char p;
-    p = param;
-    Flash.write(flash, &p ,1);
-    EPS.command = 0;
+    handleSetIdentifierCommand();
     break;
   case TOGGLE_5V_LINE:
-    ENABLED5 = !ENABLED5;
-    if (ENABLED5)
-    {
-      digitalWrite(EN5V, HIGH);
-    }
-    else
-    {
-      digitalWrite(EN5V, LOW);
-    }
-    EPS.command = 0;
+    handleToggle5VLineCommand();
     break;
   case TOGGLE_3V3_LINE:
-    ENABLED3 = !ENABLED3;
-    if (ENABLED3)
-    {
-      digitalWrite(EN3V3, HIGH);
-    }
-    else
-    {
-      digitalWrite(EN3V3, LOW);
-    }
-    EPS.command = 0;
+    handleToggle3V3LineCommand();
     break;
   case MAXIMUM_POWER_POINT_TRACKING_MODE:
-    MaximumPowerPointTrackingDriver1.setMPPTMode();
-    MaximumPowerPointTrackingDriver2.setMPPTMode();
-    EPS.command = 0;
+    handleMaximumPowerPointTrackingModeCommand();
     break;
   case SWEEP_MODE:
-    MaximumPowerPointTrackingDriver1.setSweepMode();
-    MaximumPowerPointTrackingDriver2.setSweepMode();
-    EPS.command = 0;
+    handleSweepModeCommand();
     break;
   case FIXED_MODE:
-    EPS.param = constrain(EPS.param, 0, 255);
-    MaximumPowerPointTrackingDriver1.setFixedMode();
-    MaximumPowerPointTrackingDriver2.setFixedMode();
-    MaximumPowerPointTrackingDriver1.dutyCycle = EPS.param;
-    MaximumPowerPointTrackingDriver2.dutyCycle = EPS.param;
-    EPS.command = 0;
+    handleFixedModeCommand();
     break;
   default:
-    EPS.command = 0;
     break;
+  }
+  EPS.command = 0;
+}
+
+void ESATEPS::handleFixedModeCommand()
+{
+  EPS.param = constrain(EPS.param, 0, 255);
+  MaximumPowerPointTrackingDriver1.setFixedMode();
+  MaximumPowerPointTrackingDriver2.setFixedMode();
+  MaximumPowerPointTrackingDriver1.dutyCycle = EPS.param;
+  MaximumPowerPointTrackingDriver2.dutyCycle = EPS.param;
+}
+
+void ESATEPS::handleMaximumPowerPointTrackingModeCommand()
+{
+  MaximumPowerPointTrackingDriver1.setMPPTMode();
+  MaximumPowerPointTrackingDriver2.setMPPTMode();
+}
+
+void ESATEPS::handleSetIdentifierCommand()
+{
+  Flash.erase(flash);
+  myId = param;
+  unsigned char p;
+  p = param;
+  Flash.write(flash, &p ,1);
+}
+
+void ESATEPS::handleSweepModeCommand()
+{
+  MaximumPowerPointTrackingDriver1.setSweepMode();
+  MaximumPowerPointTrackingDriver2.setSweepMode();
+}
+
+void ESATEPS::handleToggle3V3LineCommand()
+{
+  ENABLED3 = !ENABLED3;
+  if (ENABLED3)
+  {
+    digitalWrite(EN3V3, HIGH);
+  }
+  else
+  {
+    digitalWrite(EN3V3, LOW);
+  }
+}
+
+void ESATEPS::handleToggle5VLineCommand()
+{
+  ENABLED5 = !ENABLED5;
+  if (ENABLED5)
+  {
+    digitalWrite(EN5V, HIGH);
+  }
+  else
+  {
+    digitalWrite(EN5V, LOW);
   }
 }
 
