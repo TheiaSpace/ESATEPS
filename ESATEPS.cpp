@@ -288,7 +288,6 @@ void ESATEPS::housekeeping()
   bitWrite(EPSStatus, 1, !SolarPanel2Thermometer.error);
 
   // DET TM
-  uint16_t channels_ADC;
   DirectEnergyTransferSystem.error = false;
   const int directEnergyTransferSystemCurrent =
     DirectEnergyTransferSystem.readCurrent();
