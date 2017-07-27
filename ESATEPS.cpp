@@ -276,10 +276,12 @@ void ESATEPS::housekeeping()
   bitWrite(EPSStatus, 3, !BatteryController.error); // EPSStatus.BAT
 
   // Solar array TM
+  SolarPanel1Thermometer.error = false;
   const int solarPanel1Temperature = SolarPanel1Thermometer.read();
   bufferH[38] = highByte(solarPanel1Temperature);
   bufferH[39] = lowByte(solarPanel1Temperature);
   bitWrite(EPSStatus, 2, !SolarPanel1Thermometer.error);
+  SolarPanel1Thermometer.error = false;
   const int solarPanel2Temperature = SolarPanel2Thermometer.read();
   bufferH[0] = highByte(solarPanel2Temperature);
   bufferH[1] = lowByte(solarPanel2Temperature);
