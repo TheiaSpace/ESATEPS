@@ -286,6 +286,7 @@ void ESATEPS::housekeeping()
 
   // DET TM
   uint16_t channels_ADC;
+  DirectEnergyTransferSystem.error = false;
   const int directEnergyTransferSystemCurrent =
     DirectEnergyTransferSystem.readCurrent();
   bufferH[42] = highByte(directEnergyTransferSystemCurrent);
