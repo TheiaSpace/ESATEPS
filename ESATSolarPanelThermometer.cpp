@@ -38,22 +38,24 @@ ESATSolarPanelThermometer::ESATSolarPanelThermometer(const byte primaryAddress,
   primaryRegister(primaryRegister),
   secondaryAddress(secondaryAddress),
   secondaryRegister(secondaryRegister),
-  error(false)
+  error(false),
+  success(false)
 {
 }
 
 int ESATSolarPanelThermometer::read()
 {
   const int primaryTemperature = tryToRead(primaryAddress, primaryRegister);
-  if (!error)
+  if (success)
   {
     return primaryTemperature;
   }
   const int secondaryTemperature = tryToRead(secondaryAddress, secondaryRegister);
-  if (!error)
+  if (success)
   {
     return secondaryTemperature;
   }
+  error = true;
   return 0;
 }
 
@@ -64,7 +66,7 @@ int ESATSolarPanelThermometer::tryToRead(const byte address, const byte register
   const byte wireStatus = Wire1.endTransmission();
   if (wireStatus == 0)
   {
-    error = false;
+    success = true;
     Wire1.requestFrom((uint8_t) address, (uint8_t) 2);
     const byte highByte = Wire1.read();
     const byte lowByte = Wire1.read();
@@ -72,7 +74,7 @@ int ESATSolarPanelThermometer::tryToRead(const byte address, const byte register
   }
   else
   {
-    error = true;
+    success = false;
   }
 }
 
