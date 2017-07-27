@@ -20,6 +20,7 @@
 #include <USBSerial.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
+#include "ESATDirectEnergyTransferSystem.h"
 #include "ESATMaximumPowerPointTrackingDriver.h"
 #include "ESATSolarPanelThermometer.h"
 
@@ -285,12 +286,19 @@ void ESATEPS::housekeeping()
 
   // DET TM
   uint16_t channels_ADC;
-  for (int i = 0; i < 3; i++)
-  {
-    channels_ADC = readADC(i);
-    bufferH[42+2*i+1] = (channels_ADC & 255);
-    bufferH[42+2*i] = (channels_ADC >> 8);
-  }
+  const int directEnergyTransferSystemCurrent =
+    DirectEnergyTransferSystem.readCurrent();
+  bufferH[42] = highByte(directEnergyTransferSystemCurrent);
+  bufferH[43] = lowByte(directEnergyTransferSystemCurrent);
+  const int directEnergyTransferSystemVoltage =
+    DirectEnergyTransferSystem.readVoltage();
+  bufferH[44] = highByte(directEnergyTransferSystemVoltage);
+  bufferH[45] = lowByte(directEnergyTransferSystemVoltage);
+  const int directEnergyTransferSystemShuntVoltage =
+    DirectEnergyTransferSystem.readShuntVoltage();
+  bufferH[46] = highByte(directEnergyTransferSystemShuntVoltage);
+  bufferH[47] = lowByte(directEnergyTransferSystemShuntVoltage);
+  bitWrite(EPSStatus, 0, !DirectEnergyTransferSystem.error);
 
   // EPS Status registers
   bitWrite(EPSStatus, 7, ENABLED5);
