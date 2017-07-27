@@ -26,7 +26,7 @@ class ESATSolarPanelThermometer
 {
   public:
     // True after a read error.  Must be reset manually.
-    byte error;
+    boolean error;
 
     // Instantiate a solar panel thermometer interface.
     // Support two devices for current and old thermometers.
