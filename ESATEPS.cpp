@@ -254,6 +254,7 @@ void ESATEPS::housekeeping()
   bufferH[1] = (soft_v << 3);
 
   // EPS (Bat) TM
+  BatteryController.error = false;
   const int totalBatteryVoltage = BatteryController.readTotalBatteryVoltage();
   bufferH[28] = highByte(totalBatteryVoltage);
   bufferH[29] = lowByte(totalBatteryVoltage);
