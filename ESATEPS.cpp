@@ -117,7 +117,7 @@ void ESATEPS::handleCommand()
 {
   switch (EPS.command)
   {
-  case 0:
+  case SET_IDENTIFIER:
     // set id and store in flash
     Flash.erase(flash);
     myId = param;
@@ -126,7 +126,7 @@ void ESATEPS::handleCommand()
     Flash.write(flash, &p ,1);
     EPS.command = 0;
     break;
-  case 1:
+  case TOGGLE_5V_LINE:
     ENABLED5 = !ENABLED5;
     if (ENABLED5)
     {
@@ -138,7 +138,7 @@ void ESATEPS::handleCommand()
     }
     EPS.command = 0;
     break;
-  case 2:
+  case TOGGLE_3V3_LINE:
     ENABLED3 = !ENABLED3;
     if (ENABLED3)
     {
@@ -150,17 +150,17 @@ void ESATEPS::handleCommand()
     }
     EPS.command = 0;
     break;
-  case 3:
+  case MAXIMUM_POWER_POINT_TRACKING_MODE:
     MaximumPowerPointTrackingDriver1.setMPPTMode();
     MaximumPowerPointTrackingDriver2.setMPPTMode();
     EPS.command = 0;
     break;
-  case 4:
+  case SWEEP_MODE:
     MaximumPowerPointTrackingDriver1.setSweepMode();
     MaximumPowerPointTrackingDriver2.setSweepMode();
     EPS.command = 0;
     break;
-  case 5:
+  case FIXED_MODE:
     EPS.param = constrain(EPS.param, 0, 255);
     MaximumPowerPointTrackingDriver1.setFixedMode();
     MaximumPowerPointTrackingDriver2.setFixedMode();
