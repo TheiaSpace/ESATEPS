@@ -32,16 +32,25 @@ ESATEPS::ESATEPS()
 {
 }
 
-void receiveEvent(int howMany)
+void receiveEvent(const int howMany)
 {
-  EPS.command = Wire.read();
+  const int commandCode = Wire.read();
+  if (commandCode < 0)
+  {
+    return;
+  }
   if (howMany > 1)
   {
-    EPS.param = Wire.read();
+    const int parameter = Wire.read();
+    if (parameter < 0)
+    {
+      return;
+    }
+    EPS.queueCommand(commandCode, parameter);
   }
   else
   {
-    EPS.param = 0;
+    EPS.queueCommand(commandCode, 0);
   }
 }
 
@@ -87,8 +96,7 @@ void ESATEPS::init()
   unsigned char Id;
   Flash.read(flash, &Id, 1);
   myId = (int) Id;
-  command = 0;
-  param = 0;
+  command.pending = false;
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
   MaximumPowerPointTrackingDriver1.setMPPTMode();
@@ -115,39 +123,42 @@ void ESATEPS::serialLog(String comment)
 }
 void ESATEPS::handleCommand()
 {
-  switch (EPS.command)
+  if (command.pending)
   {
-  case SET_IDENTIFIER:
-    handleSetIdentifierCommand();
-    break;
-  case TOGGLE_5V_LINE:
-    handleToggle5VLineCommand();
-    break;
-  case TOGGLE_3V3_LINE:
-    handleToggle3V3LineCommand();
-    break;
-  case MAXIMUM_POWER_POINT_TRACKING_MODE:
-    handleMaximumPowerPointTrackingModeCommand();
-    break;
-  case SWEEP_MODE:
-    handleSweepModeCommand();
-    break;
-  case FIXED_MODE:
-    handleFixedModeCommand();
-    break;
-  default:
-    break;
+    switch (command.commandCode)
+    {
+    case SET_IDENTIFIER:
+      handleSetIdentifierCommand();
+      break;
+    case TOGGLE_5V_LINE:
+      handleToggle5VLineCommand();
+      break;
+    case TOGGLE_3V3_LINE:
+      handleToggle3V3LineCommand();
+      break;
+    case MAXIMUM_POWER_POINT_TRACKING_MODE:
+      handleMaximumPowerPointTrackingModeCommand();
+      break;
+    case SWEEP_MODE:
+      handleSweepModeCommand();
+      break;
+    case FIXED_MODE:
+      handleFixedModeCommand();
+      break;
+    default:
+      break;
+    }
+    command.pending = false;
   }
-  EPS.command = 0;
 }
 
 void ESATEPS::handleFixedModeCommand()
 {
-  EPS.param = constrain(EPS.param, 0, 255);
+  const byte dutyCycle = constrain(command.parameter, 0, 255);
   MaximumPowerPointTrackingDriver1.setFixedMode();
   MaximumPowerPointTrackingDriver2.setFixedMode();
-  MaximumPowerPointTrackingDriver1.dutyCycle = EPS.param;
-  MaximumPowerPointTrackingDriver2.dutyCycle = EPS.param;
+  MaximumPowerPointTrackingDriver1.dutyCycle = dutyCycle;
+  MaximumPowerPointTrackingDriver2.dutyCycle = dutyCycle;
 }
 
 void ESATEPS::handleMaximumPowerPointTrackingModeCommand()
@@ -159,9 +170,9 @@ void ESATEPS::handleMaximumPowerPointTrackingModeCommand()
 void ESATEPS::handleSetIdentifierCommand()
 {
   Flash.erase(flash);
-  myId = param;
+  myId = command.parameter;
   unsigned char p;
-  p = param;
+  p = command.parameter;
   Flash.write(flash, &p ,1);
 }
 
@@ -225,7 +236,7 @@ String ESATEPS::build_tm_packet(int type, int apid=1)
 void ESATEPS::housekeeping()
 {
   // Check and dispatch commands
-  if(EPS.command!=0)
+  if(command.pending)
   {
     handleCommand();
   }
@@ -335,6 +346,16 @@ void ESATEPS::housekeeping()
   build_tm_packet(1, 2);
 }
 
+void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
+{
+  if (!command.pending)
+  {
+    command.commandCode = commandCode;
+    command.parameter = parameter;
+    command.pending = true;
+  }
+}
+
 String ESATEPS::toHex(int i, int L)
 {
   String ch = String(i, HEX);
@@ -417,9 +438,10 @@ void ESATEPS::switch_fun_n()
 
 void ESATEPS::decode_tc_packet(String hexstring)
 {
-  EPS.command = (int) strtol(hexstring.substring(4, 6).c_str(), 0, 16);
-  int length = (int) strtol(hexstring.substring(2, 4).c_str(), 0, 16);
-  EPS.param = hexstring.substring(6, 6 + length).toInt();
+  const byte commandCode = byte(strtol(hexstring.substring(4, 6).c_str(), 0, 16));
+  const int length = int(strtol(hexstring.substring(2, 4).c_str(), 0, 16));
+  const byte parameter = hexstring.substring(6, 6 + length).toInt();
+  queueCommand(commandCode, parameter);
   handleCommand();
 }
 
