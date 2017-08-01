@@ -40,9 +40,10 @@ class ESATEPS
     void housekeeping();
     void updateMPPT();
     void invokeBSL();
-    int command;
-    int param;
     int myId;
+
+    // Add a command to the command queue.
+    void queueCommand(byte commandCode, byte parameter);
 
   private:
     // Command codes.
@@ -55,6 +56,23 @@ class ESATEPS
       SWEEP_MODE = 4,
       FIXED_MODE = 5,
     };
+
+    // Command buffer structure.
+    struct Command
+    {
+      byte commandCode;
+      byte parameter;
+      boolean pending;
+    };
+
+    // Command queue.
+    volatile Command command;
+
+    // Last received command code.
+    byte commandCode;
+
+    // Last received command parameter.
+    byte commandParameter;
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand();
