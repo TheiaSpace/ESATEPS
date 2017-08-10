@@ -23,7 +23,6 @@
 #include <MspFlash.h>
 
 #define flash SEGMENT_C
-#define bqAddress 0x0B
 #define soft_v 1
 
 class ESATEPS
