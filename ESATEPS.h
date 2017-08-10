@@ -97,7 +97,6 @@ class ESATEPS
     void handleCommand();
     String build_tm_packet(int type, int apid);
     String toHex(int i, int L);
-    uint16_t readADC(int channel);
     void decode_tc_packet(String packet);
 };
 
