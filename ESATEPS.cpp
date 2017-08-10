@@ -23,11 +23,11 @@
 #include "ESATDirectEnergyTransferSystem.h"
 #include "ESATEPSMeasurements.h"
 #include "ESATMaximumPowerPointTrackingDriver.h"
+#include "ESATOvercurrentDetector.h"
 #include "ESATSolarPanelThermometer.h"
 
 bool ENABLED5 = false;
 boolean ENABLED3 = true;
-boolean isOC3V3 = false;
 
 ESATEPS::ESATEPS()
 {
@@ -107,9 +107,7 @@ void ESATEPS::init()
   digitalWrite(EN5V, LOW);
   pinMode(EN3V3, OUTPUT);
   digitalWrite(EN3V3, HIGH);
-  pinMode(OC5V, INPUT_PULLUP);
-  pinMode(OC3V3, INPUT_PULLUP);
-  attachInterrupt(OC3V3, switch_fun, FALLING);
+  OvercurrentDetector.begin();
   Wire1.begin();
   Wire.begin(2);
   Wire.onReceive(receiveEvent);
@@ -344,8 +342,8 @@ void ESATEPS::housekeeping()
   // EPS Status registers
   bitWrite(EPSStatus, 7, ENABLED5);
   bitWrite(EPSStatus, 6, ENABLED3);
-  bitWrite(EPSStatus, 5, isOC3V3);
-  bitWrite(EPSStatus, 4, !digitalRead(OC5V));
+  bitWrite(EPSStatus, 5, OvercurrentDetector.read3V3LineOvercurrentState());
+  bitWrite(EPSStatus, 4, OvercurrentDetector.read5VLineOvercurrentState());
   bufferH[3] = EPSStatus;
   build_tm_packet(1, 2);
 }
@@ -424,21 +422,6 @@ uint16_t ESATEPS::readADC(int channel)
   }
 }
 
-
-void ESATEPS::switch_fun()
-{
-  detachInterrupt(OC3V3);
-  isOC3V3 = true;
-  attachInterrupt(OC3V3, switch_fun_n, RISING);
-}
-
-void ESATEPS::switch_fun_n()
-{
-  // Each rotation, this interrupt function is run twice
-  detachInterrupt(OC3V3);
-  isOC3V3 = false;
-  attachInterrupt(OC3V3, switch_fun, FALLING);
-}
 
 void ESATEPS::decode_tc_packet(String hexstring)
 {

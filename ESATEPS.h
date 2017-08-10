@@ -100,8 +100,6 @@ class ESATEPS
     String toHex(int i, int L);
     uint16_t readADC(int channel);
     void decode_tc_packet(String packet);
-    static void switch_fun();
-    static void switch_fun_n();
 };
 
 extern ESATEPS EPS;
