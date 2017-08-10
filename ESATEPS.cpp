@@ -58,38 +58,6 @@ void requestEvent()
   Wire.write(EPS.bufferH, 51);
 }
 
-byte ESATEPS::I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data)
-{
-  // Set register address
-  Wire1.beginTransmission(Address);
-  Wire1.write(Register);
-  byte error = Wire1.endTransmission();
-  if (error != 0)
-  {
-  }
-  else
-  {
-    // Read Nbytes
-    Wire1.requestFrom(Address, Nbytes);
-    uint8_t index = 0;
-    for (int index=0; index < Nbytes; index++)
-    {
-      Data[index] = Wire1.read();
-    }
-  }
-  return error;
-}
-
-byte ESATEPS::I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
-{
-  // Set register address
-  Wire1.beginTransmission(Address);
-  Wire1.write(Register);
-  Wire1.write(Data);
-  byte error = Wire1.endTransmission();
-  return error;
-}
-
 void ESATEPS::init()
 {
   unsigned char Id;
@@ -356,55 +324,6 @@ void ESATEPS::updateMPPT()
   MaximumPowerPointTrackingDriver2.update();
 }
 
-uint16_t ESATEPS::readADC(int channel)
-{
-  int I2C_address = 0x48;
-  uint16_t res;
-  uint16_t config = 0x0003 | 0x0080 | 0x0100;
-  config |= 0x0200;
-  switch (channel)
-  {
-  case (0):
-    config |= 0x4000;
-    break;
-  case (1):
-    config |= 0x5000;
-    break;
-  case (2):
-    config |= 0x7000;
-    break;
-  default:
-    return 0;
-    break;
-  }
-  // Set 'start single-conversion' bit
-  config |=0x8000; // ADS1015_REG_CONFIG_OS_SINGLE;
-
-  // Write config register to the ADC
-  Wire1.beginTransmission(I2C_address);
-  Wire1.write((uint8_t) 0x01);
-  Wire1.write((uint8_t) (config >> 8));
-  Wire1.write((uint8_t) (config & 0xFF));
-  Wire1.endTransmission();
-  // Wait for the conversion to complete
-  delay(1);
-  // Read the conversion results
-  // Shift 12-bit results right 4 bits for the ADS1015
-  byte result[2];
-  byte error = I2Cread(I2C_address, 0x00, 2, result);
-  bitWrite(EPSStatus, 0, error == 0);
-  if (error==0)
-  {
-    res = ((result[0] << 8) | result[1]) >>4;
-    return (int16_t) res;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
-
 void ESATEPS::decode_tc_packet(String hexstring)
 {
   const byte commandCode = byte(strtol(hexstring.substring(4, 6).c_str(), 0, 16));
@@ -412,19 +331,6 @@ void ESATEPS::decode_tc_packet(String hexstring)
   const byte parameter = hexstring.substring(6, 6 + length).toInt();
   queueCommand(commandCode, parameter);
   handleCommand();
-}
-
-void ESATEPS::invokeBSL(){
-    SFRIE1 &= ~OFIE; /* Disable oscillator fault enable interrupt */
-    delay(500);
-    SYSBSLC &= ~(SYSBSLPE | SYSBSLOFF);
-    __disable_interrupt(); /* Ensure no application interrupts occur while in BSL */
-    /*
-     * This sends execution to the BSL. When execution returns
-     * to the user app, it will be via the reset vector, meaning
-     * execution will re-start.
-     */
-    ((void (*)()) 0x1000)();
 }
 
 ESATEPS EPS;

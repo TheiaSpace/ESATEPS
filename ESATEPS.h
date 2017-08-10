@@ -23,7 +23,6 @@
 #include <MspFlash.h>
 
 #define flash SEGMENT_C
-#define bqAddress 0x0B
 #define soft_v 1
 
 class ESATEPS
@@ -39,7 +38,6 @@ class ESATEPS
     void serialLog(String comment);
     void housekeeping();
     void updateMPPT();
-    void invokeBSL();
     int myId;
 
     // Add a command to the command queue.
@@ -93,12 +91,9 @@ class ESATEPS
     // Toggle the 5V line.
     void handleToggle5VLineCommand();
 
-    byte I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data);
-    byte I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data);
     void handleCommand();
     String build_tm_packet(int type, int apid);
     String toHex(int i, int L);
-    uint16_t readADC(int channel);
     void decode_tc_packet(String packet);
 };
 
