@@ -58,28 +58,6 @@ void requestEvent()
   Wire.write(EPS.bufferH, 51);
 }
 
-byte ESATEPS::I2Cread(uint8_t Address, uint8_t Register, uint8_t Nbytes, uint8_t* Data)
-{
-  // Set register address
-  Wire1.beginTransmission(Address);
-  Wire1.write(Register);
-  byte error = Wire1.endTransmission();
-  if (error != 0)
-  {
-  }
-  else
-  {
-    // Read Nbytes
-    Wire1.requestFrom(Address, Nbytes);
-    uint8_t index = 0;
-    for (int index=0; index < Nbytes; index++)
-    {
-      Data[index] = Wire1.read();
-    }
-  }
-  return error;
-}
-
 byte ESATEPS::I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
 {
   // Set register address
