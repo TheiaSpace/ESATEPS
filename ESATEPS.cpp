@@ -21,6 +21,7 @@
 #include <Wire.h>
 #include "ESATBatteryController.h"
 #include "ESATDirectEnergyTransferSystem.h"
+#include "ESATEPSMeasurements.h"
 #include "ESATMaximumPowerPointTrackingDriver.h"
 #include "ESATSolarPanelThermometer.h"
 
@@ -250,40 +251,43 @@ void ESATEPS::housekeeping()
     }
   }
   // EPS (Main) TM
-  int channels[14] = {
-    I_12V,
-    V_12V,
-    I_5V,
-    V_5V,
-    I_3V3,
-    V_3V3,
-    I_IN,
-    V_IN,
-    I_P2_IN,
-    V_P2,
-    I_P2_OUT,
-    I_P1_OUT,
-    V_P1,
-    I_P1_IN
-  };
-  int x[14];
-  int numAvgs[14] = { 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 5 };
-  for (int p = 0; p < 14; p++)
-  {
-    double y = 0;
-    for (int i = 0; i < numAvgs[p]; i++)
-    {
-      y += double(analogRead(channels[p])) / numAvgs[p];
-      delay(10);
-    }
-    x[p] = round(y);
-  }
+  const word current5V = EPSMeasurements.read5VLineCurrent();
+  bufferH[4] = highByte(current5V);
+  bufferH[5] = lowByte(current5V);
+  const word voltage5V = EPSMeasurements.read5VLineVoltage();
+  bufferH[6] = highByte(voltage5V);
+  bufferH[7] = lowByte(voltage5V);
+  const word current3V3 = EPSMeasurements.read3V3LineCurrent();
+  bufferH[8] = highByte(current3V3);
+  bufferH[9] = lowByte(current3V3);
+  const word voltage3V3 = EPSMeasurements.read3V3LineVoltage();
+  bufferH[10] = highByte(voltage3V3);
+  bufferH[11] = lowByte(voltage3V3);
+  const word inputCurrent = EPSMeasurements.readInputLineCurrent();
+  bufferH[12] = highByte(inputCurrent);
+  bufferH[13] = lowByte(inputCurrent);
+  const word inputVoltage = EPSMeasurements.readInputLineVoltage();
+  bufferH[14] = highByte(inputVoltage);
+  bufferH[15] = lowByte(inputVoltage);
+  const word panel1OutputCurrent = EPSMeasurements.readPanel1OutputCurrent();
+  bufferH[16] = highByte(panel1OutputCurrent);
+  bufferH[17] = lowByte(panel1OutputCurrent);
+  const word panel1Voltage = EPSMeasurements.readPanel1Voltage();
+  bufferH[18] = highByte(panel1Voltage);
+  bufferH[19] = lowByte(panel1Voltage);
+  const word panel1InputCurrent = EPSMeasurements.readPanel1InputCurrent();
+  bufferH[20] = highByte(panel1InputCurrent);
+  bufferH[21] = lowByte(panel1InputCurrent);
+  const word panel2Voltage = EPSMeasurements.readPanel2Voltage();
+  bufferH[22] = highByte(panel2Voltage);
+  bufferH[23] = lowByte(panel2Voltage);
+  const word panel2InputCurrent = EPSMeasurements.readPanel2InputCurrent();
+  bufferH[24] = highByte(panel2InputCurrent);
+  bufferH[25] = lowByte(panel2InputCurrent);
+  const word panel2OutputCurrent = EPSMeasurements.readPanel2OutputCurrent();
+  bufferH[26] = highByte(panel2OutputCurrent);
+  bufferH[27] = lowByte(panel2OutputCurrent);
 
-  for(int i = 2; i < 14; i++)
-  {
-    bufferH[2*i+1] = (x[i] & 255);
-    bufferH[2*i] = (x[i] >> 8);
-  }
   // Software version
   bufferH[1] = (soft_v << 3);
 
