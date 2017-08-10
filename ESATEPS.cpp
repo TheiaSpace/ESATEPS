@@ -24,10 +24,8 @@
 #include "ESATEPSMeasurements.h"
 #include "ESATMaximumPowerPointTrackingDriver.h"
 #include "ESATOvercurrentDetector.h"
+#include "ESATPowerLineSwitch.h"
 #include "ESATSolarPanelThermometer.h"
-
-bool ENABLED5 = false;
-boolean ENABLED3 = true;
 
 ESATEPS::ESATEPS()
 {
@@ -103,10 +101,10 @@ void ESATEPS::init()
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
   EPSStatus = 0;
-  pinMode(EN5V, OUTPUT);
-  digitalWrite(EN5V, LOW);
-  pinMode(EN3V3, OUTPUT);
-  digitalWrite(EN3V3, HIGH);
+  PowerLine5VSwitch.begin();
+  PowerLine5VSwitch.write(PowerLine5VSwitch.off);
+  PowerLine3V3Switch.begin();
+  PowerLine3V3Switch.write(PowerLine3V3Switch.on);
   OvercurrentDetector.begin();
   Wire1.begin();
   Wire.begin(2);
@@ -183,28 +181,12 @@ void ESATEPS::handleSweepModeCommand()
 
 void ESATEPS::handleToggle3V3LineCommand()
 {
-  ENABLED3 = !ENABLED3;
-  if (ENABLED3)
-  {
-    digitalWrite(EN3V3, HIGH);
-  }
-  else
-  {
-    digitalWrite(EN3V3, LOW);
-  }
+  PowerLine3V3Switch.toggle();
 }
 
 void ESATEPS::handleToggle5VLineCommand()
 {
-  ENABLED5 = !ENABLED5;
-  if (ENABLED5)
-  {
-    digitalWrite(EN5V, HIGH);
-  }
-  else
-  {
-    digitalWrite(EN5V, LOW);
-  }
+  PowerLine5VSwitch.toggle();
 }
 
 String ESATEPS::build_tm_packet(int type, int apid=1)
@@ -340,8 +322,8 @@ void ESATEPS::housekeeping()
   bitWrite(EPSStatus, 0, !DirectEnergyTransferSystem.error);
 
   // EPS Status registers
-  bitWrite(EPSStatus, 7, ENABLED5);
-  bitWrite(EPSStatus, 6, ENABLED3);
+  bitWrite(EPSStatus, 7, PowerLine5VSwitch.read());
+  bitWrite(EPSStatus, 6, PowerLine3V3Switch.read());
   bitWrite(EPSStatus, 5, OvercurrentDetector.read3V3LineOvercurrentState());
   bitWrite(EPSStatus, 4, OvercurrentDetector.read5VLineOvercurrentState());
   bufferH[3] = EPSStatus;
