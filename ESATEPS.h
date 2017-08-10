@@ -92,7 +92,6 @@ class ESATEPS
     // Toggle the 5V line.
     void handleToggle5VLineCommand();
 
-    byte I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data);
     void handleCommand();
     String build_tm_packet(int type, int apid);
     String toHex(int i, int L);

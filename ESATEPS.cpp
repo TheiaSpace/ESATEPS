@@ -58,16 +58,6 @@ void requestEvent()
   Wire.write(EPS.bufferH, 51);
 }
 
-byte ESATEPS::I2CwriteByte(uint8_t Address, uint8_t Register, uint8_t Data)
-{
-  // Set register address
-  Wire1.beginTransmission(Address);
-  Wire1.write(Register);
-  Wire1.write(Data);
-  byte error = Wire1.endTransmission();
-  return error;
-}
-
 void ESATEPS::init()
 {
   unsigned char Id;
