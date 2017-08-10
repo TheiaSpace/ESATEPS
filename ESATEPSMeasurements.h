@@ -25,12 +25,6 @@
 class ESATEPSMeasurements
 {
   public:
-    // Return the current of the 12 V line.
-    word read12VLineCurrent();
-
-    // Return the voltage of the 12 V line.
-    word read12VLineVoltage();
-
     // Return the current of the 3.3 V line.
     word read3V3LineCurrent();
 

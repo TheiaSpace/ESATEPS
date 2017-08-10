@@ -41,16 +41,6 @@ static word read(const byte line, const byte samples)
   return round(sum / samples);
 }
 
-word ESATEPSMeasurements::read12VLineCurrent()
-{
-  return read(I_12V, currentSamples);
-}
-
-word ESATEPSMeasurements::read12VLineVoltage()
-{
-  return read(V_12V, voltageSamples);
-}
-
 word ESATEPSMeasurements::read3V3LineCurrent()
 {
   return read(I_3V3, currentSamples);
