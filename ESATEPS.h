@@ -39,7 +39,6 @@ class ESATEPS
     void serialLog(String comment);
     void housekeeping();
     void updateMPPT();
-    void invokeBSL();
     int myId;
 
     // Add a command to the command queue.

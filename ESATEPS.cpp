@@ -414,17 +414,4 @@ void ESATEPS::decode_tc_packet(String hexstring)
   handleCommand();
 }
 
-void ESATEPS::invokeBSL(){
-    SFRIE1 &= ~OFIE; /* Disable oscillator fault enable interrupt */
-    delay(500);
-    SYSBSLC &= ~(SYSBSLPE | SYSBSLOFF);
-    __disable_interrupt(); /* Ensure no application interrupts occur while in BSL */
-    /*
-     * This sends execution to the BSL. When execution returns
-     * to the user app, it will be via the reset vector, meaning
-     * execution will re-start.
-     */
-    ((void (*)()) 0x1000)();
-}
-
 ESATEPS EPS;
