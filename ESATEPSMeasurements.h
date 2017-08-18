@@ -28,6 +28,9 @@ class ESATEPSMeasurements
     // Return the current of the 3.3 V line.
     word read3V3LineCurrent();
 
+    // Configure the measurement lines.
+    void begin();
+
     // Return the voltage of the 3.3 V line.
     word read3V3LineVoltage();
 

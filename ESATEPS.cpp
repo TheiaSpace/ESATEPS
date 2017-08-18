@@ -64,6 +64,7 @@ void ESATEPS::init()
   Flash.read(flash, &Id, 1);
   myId = (int) Id;
   command.pending = false;
+  EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
   MaximumPowerPointTrackingDriver1.setMPPTMode();
@@ -78,7 +79,6 @@ void ESATEPS::init()
   Wire.begin(2);
   Wire.onReceive(receiveEvent);
   Wire.onRequest(requestEvent);
-  analogReference(INTERNAL2V5);
   USB.begin();
 }
 

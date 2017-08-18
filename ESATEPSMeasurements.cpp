@@ -29,6 +29,23 @@ static const unsigned long millisecondsBetweenSamples = 10;
 // Number of samples for voltage measurements.
 static const byte voltageSamples = 1;
 
+void begin()
+{
+  analogReference(INTERNAL2V5);
+  pinMode(I_3V3, INPUT);
+  pinMode(V_3V3, INPUT);
+  pinMode(I_5V, INPUT);
+  pinMode(V_5V, INPUT);
+  pinMode(I_IN, INPUT);
+  pinMode(V_IN, INPUT);
+  pinMode(I_P1_IN, INPUT);
+  pinMode(I_P1_OUT, INPUT);
+  pinMode(I_P2_IN, INPUT);
+  pinMode(V_P1, INPUT);
+  pinMode(I_P2_OUT, INPUT);
+  pinMode(V_P2, INPUT);
+}
+
 // Return the average of a number of samples of an analog line.
 static word read(const byte line, const byte samples)
 {
