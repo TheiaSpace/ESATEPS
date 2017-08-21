@@ -40,6 +40,9 @@ class ESATEPS
     void updateMPPT();
     int myId;
 
+    // Handle the next command of the command queue.
+    void handleCommand();
+
     // Add a command to the command queue.
     void queueCommand(byte commandCode, byte parameter);
 
@@ -91,7 +94,6 @@ class ESATEPS
     // Toggle the 5V line.
     void handleToggle5VLineCommand();
 
-    void handleCommand();
     String build_tm_packet(int type, int apid);
     String toHex(int i, int L);
     void decode_tc_packet(String packet);
