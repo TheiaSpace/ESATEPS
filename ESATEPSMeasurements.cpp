@@ -29,7 +29,7 @@ static const unsigned long millisecondsBetweenSamples = 10;
 // Number of samples for voltage measurements.
 static const byte voltageSamples = 1;
 
-void begin()
+void ESATEPSMeasurements::begin()
 {
   analogReference(INTERNAL2V5);
   pinMode(I_3V3, INPUT);
