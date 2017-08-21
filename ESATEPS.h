@@ -35,7 +35,6 @@ class ESATEPS
     ESATEPS();
 
     void init();
-    void serialLog(String comment);
     void housekeeping();
     void updateMPPT();
     int myId;

@@ -83,10 +83,6 @@ void ESATEPS::init()
   USB.begin();
 }
 
-void ESATEPS::serialLog(String comment)
-{
-  USB.println("{\"type\":\"log\",\"data\":\"" + comment + "\"}");
-}
 void ESATEPS::handleCommand()
 {
   if (command.pending)
