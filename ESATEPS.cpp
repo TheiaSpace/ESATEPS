@@ -184,20 +184,6 @@ String ESATEPS::build_tm_packet(int type, int apid=1)
 
 void ESATEPS::housekeeping()
 {
-  // Check and dispatch commands
-  if(command.pending)
-  {
-    handleCommand();
-  }
-  if (USB.available())
-  {
-    String cmd = USB.readStringUntil('\r');
-    String identifier = cmd.substring(0, 1);
-    if (identifier == "@")
-    {
-      decode_tc_packet(cmd.substring(1, cmd.length() + 1));
-    }
-  }
   // EPS (Main) TM
   const word current5V = EPSMeasurements.read5VLineCurrent();
   bufferH[4] = highByte(current5V);
