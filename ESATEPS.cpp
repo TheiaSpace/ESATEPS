@@ -17,6 +17,7 @@
  */
 
 #include "ESATEPS.h"
+#include <ESATUtil.h>
 #include <USBSerial.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
@@ -184,20 +185,6 @@ String ESATEPS::build_tm_packet(int type, int apid=1)
 
 void ESATEPS::housekeeping()
 {
-  // Check and dispatch commands
-  if(command.pending)
-  {
-    handleCommand();
-  }
-  if (USB.available())
-  {
-    String cmd = USB.readStringUntil('\r');
-    String identifier = cmd.substring(0, 1);
-    if (identifier == "@")
-    {
-      decode_tc_packet(cmd.substring(1, cmd.length() + 1));
-    }
-  }
   // EPS (Main) TM
   const word current5V = EPSMeasurements.read5VLineCurrent();
   bufferH[4] = highByte(current5V);
@@ -308,6 +295,22 @@ void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
   }
 }
 
+void ESATEPS::queueIncomingUSBCommands()
+{
+  while (USB.available())
+  {
+    const String packet = USB.readStringUntil('\r');
+    const String identifier = packet.substring(0, 1);
+    if (identifier == "@")
+    {
+      const byte commandCode = Util.hexadecimalToByte(packet.substring(5, 7));
+      const byte length = Util.hexadecimalToByte(packet.substring(3, 5));
+      const byte parameter = Util.hexadecimalToByte(packet.substring(7, 7 + length));
+      queueCommand(commandCode, parameter);
+    }
+  }
+}
+
 String ESATEPS::toHex(int i, int L)
 {
   String ch = String(i, HEX);
@@ -322,6 +325,13 @@ void ESATEPS::updateMPPT()
 {
   MaximumPowerPointTrackingDriver1.update();
   MaximumPowerPointTrackingDriver2.update();
+}
+
+
+boolean ESATEPS::pendingCommands()
+{
+  queueIncomingUSBCommands();
+  return command.pending;
 }
 
 void ESATEPS::decode_tc_packet(String hexstring)

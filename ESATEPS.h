@@ -40,6 +40,13 @@ class ESATEPS
     void updateMPPT();
     int myId;
 
+    // Handle the next command of the command queue.
+    void handleCommand();
+
+    // Return true if there are pending commands;
+    // otherwise return false.
+    boolean pendingCommands();
+
     // Add a command to the command queue.
     void queueCommand(byte commandCode, byte parameter);
 
@@ -91,10 +98,12 @@ class ESATEPS
     // Toggle the 5V line.
     void handleToggle5VLineCommand();
 
-    void handleCommand();
     String build_tm_packet(int type, int apid);
     String toHex(int i, int L);
     void decode_tc_packet(String packet);
+
+    // Queue incoming USB commands.
+    void queueIncomingUSBCommands();
 };
 
 extern ESATEPS EPS;
