@@ -28,6 +28,10 @@ void setup()
 void loop()
 {
   EPS.updateMPPT();
+  while (EPS.pendingCommands())
+  {
+    EPS.handleCommand();
+  }
   EPS.housekeeping();
   delay(10);
 }
