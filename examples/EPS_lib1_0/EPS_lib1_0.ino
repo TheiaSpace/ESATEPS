@@ -22,7 +22,7 @@
 
 void setup()
 {
-  EPS.init();
+  EPS.begin();
 }
 
 void loop()

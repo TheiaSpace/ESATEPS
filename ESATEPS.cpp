@@ -59,7 +59,7 @@ void requestEvent()
   Wire.write(EPS.bufferH, 51);
 }
 
-void ESATEPS::init()
+void ESATEPS::begin()
 {
   unsigned char Id;
   Flash.read(flash, &Id, 1);

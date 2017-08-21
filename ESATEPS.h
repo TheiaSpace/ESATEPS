@@ -34,7 +34,7 @@ class ESATEPS
     // Instantiate a new ESATEPS object.
     ESATEPS();
 
-    void init();
+    void begin();
     void housekeeping();
     void updateMPPT();
     int myId;
