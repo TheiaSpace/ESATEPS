@@ -159,13 +159,13 @@ String ESATEPS::build_tm_packet(int type, int apid=1)
   // build packet with given data (hex), type
   // ID(b3)|TM/TC(b1)|APID(h1)|length(h2)|type(h2)|data|CRC(h2)
   String packet = "";
-  packet += toHex(myId, 1);
+  packet += Util.byteToHexadecimal(myId).substring(1, 2);
   packet += "2";
-  packet += toHex(51 * 2, 2);
-  packet += toHex(type, 2);
+  packet += Util.byteToHexadecimal(51 * 2);
+  packet += Util.byteToHexadecimal(type);
   for (int i = 0; i < 50; i++)
   {
-    packet += toHex(bufferH[i], 2);
+    packet += Util.byteToHexadecimal(bufferH[i]);
   }
   packet += "00000000";
   packet += "FF"; // implement CRC
