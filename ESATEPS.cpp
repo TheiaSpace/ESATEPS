@@ -17,6 +17,7 @@
  */
 
 #include "ESATEPS.h"
+#include <ESATUtil.h>
 #include <USBSerial.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
