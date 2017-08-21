@@ -294,6 +294,22 @@ void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
   }
 }
 
+void ESATEPS::queueIncomingUSBCommands()
+{
+  while (USB.available())
+  {
+    const String packet = USB.readStringUntil('\r');
+    const String identifier = packet.substring(0, 1);
+    if (identifier == "@")
+    {
+      const byte commandCode = Util.hexadecimalToByte(packet.substring(5, 7));
+      const byte length = Util.hexadecimalToByte(packet.substring(3, 5));
+      const byte parameter = Util.hexadecimalToByte(packet.substring(7, 7 + length));
+      queueCommand(commandCode, parameter);
+    }
+  }
+}
+
 String ESATEPS::toHex(int i, int L)
 {
   String ch = String(i, HEX);
