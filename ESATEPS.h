@@ -98,7 +98,6 @@ class ESATEPS
     void handleToggle5VLineCommand();
 
     String build_tm_packet(int type, int apid);
-    String toHex(int i, int L);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();

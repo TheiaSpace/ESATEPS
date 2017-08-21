@@ -307,16 +307,6 @@ void ESATEPS::queueIncomingUSBCommands()
   }
 }
 
-String ESATEPS::toHex(int i, int L)
-{
-  String ch = String(i, HEX);
-  while (ch.length() < L)
-  {
-    ch = "0" + ch;
-  }
-  return ch.substring(0, L);
-}
-
 void ESATEPS::updateMPPT()
 {
   MaximumPowerPointTrackingDriver1.update();
