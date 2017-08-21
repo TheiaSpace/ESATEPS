@@ -334,13 +334,4 @@ boolean ESATEPS::pendingCommands()
   return command.pending;
 }
 
-void ESATEPS::decode_tc_packet(String hexstring)
-{
-  const byte commandCode = byte(strtol(hexstring.substring(4, 6).c_str(), 0, 16));
-  const int length = int(strtol(hexstring.substring(2, 4).c_str(), 0, 16));
-  const byte parameter = hexstring.substring(6, 6 + length).toInt();
-  queueCommand(commandCode, parameter);
-  handleCommand();
-}
-
 ESATEPS EPS;
