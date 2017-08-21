@@ -327,6 +327,13 @@ void ESATEPS::updateMPPT()
   MaximumPowerPointTrackingDriver2.update();
 }
 
+
+boolean ESATEPS::pendingCommands()
+{
+  queueIncomingUSBCommands();
+  return command.pending;
+}
+
 void ESATEPS::decode_tc_packet(String hexstring)
 {
   const byte commandCode = byte(strtol(hexstring.substring(4, 6).c_str(), 0, 16));

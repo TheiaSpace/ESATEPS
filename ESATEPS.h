@@ -43,6 +43,10 @@ class ESATEPS
     // Handle the next command of the command queue.
     void handleCommand();
 
+    // Return true if there are pending commands;
+    // otherwise return false.
+    boolean pendingCommands();
+
     // Add a command to the command queue.
     void queueCommand(byte commandCode, byte parameter);
 
