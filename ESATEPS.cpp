@@ -83,10 +83,6 @@ void ESATEPS::init()
   USB.begin();
 }
 
-void ESATEPS::serialLog(String comment)
-{
-  USB.println("{\"type\":\"log\",\"data\":\"" + comment + "\"}");
-}
 void ESATEPS::handleCommand()
 {
   if (command.pending)
@@ -332,15 +328,6 @@ boolean ESATEPS::pendingCommands()
 {
   queueIncomingUSBCommands();
   return command.pending;
-}
-
-void ESATEPS::decode_tc_packet(String hexstring)
-{
-  const byte commandCode = byte(strtol(hexstring.substring(4, 6).c_str(), 0, 16));
-  const int length = int(strtol(hexstring.substring(2, 4).c_str(), 0, 16));
-  const byte parameter = hexstring.substring(6, 6 + length).toInt();
-  queueCommand(commandCode, parameter);
-  handleCommand();
 }
 
 ESATEPS EPS;

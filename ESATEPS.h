@@ -35,7 +35,6 @@ class ESATEPS
     ESATEPS();
 
     void init();
-    void serialLog(String comment);
     void housekeeping();
     void updateMPPT();
     int myId;
@@ -100,7 +99,6 @@ class ESATEPS
 
     String build_tm_packet(int type, int apid);
     String toHex(int i, int L);
-    void decode_tc_packet(String packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
