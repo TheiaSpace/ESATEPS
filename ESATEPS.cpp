@@ -174,7 +174,7 @@ String ESATEPS::build_tm_packet(int type, int apid=1)
   return packet;
 }
 
-void ESATEPS::housekeeping()
+void ESATEPS::updateTelemetry()
 {
   // EPS (Main) TM
   telemetry[CURRENT_5V_OFFSET] =

@@ -35,7 +35,10 @@ class ESATEPS
     ESATEPS();
 
     void begin();
-    void housekeeping();
+
+    // Update the telemetry buffer.
+    void updateTelemetry();
+
     void updateMPPT();
     int myId;
 

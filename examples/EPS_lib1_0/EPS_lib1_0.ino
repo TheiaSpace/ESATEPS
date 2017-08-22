@@ -32,6 +32,6 @@ void loop()
   {
     EPS.handleCommand();
   }
-  EPS.housekeeping();
+  EPS.updateTelemetry();
   delay(10);
 }
