@@ -103,9 +103,7 @@ void ESATEPS::handleSetIdentifierCommand()
 {
   Flash.erase(flash);
   identifier = command.parameter;
-  unsigned char p;
-  p = command.parameter;
-  Flash.write(flash, &p ,1);
+  Flash.write(flash, &identifier, sizeof(identifier));
 }
 
 void ESATEPS::handleSweepModeCommand()
