@@ -28,6 +28,7 @@
 class ESATEPS
 {
   public:
+    // Set up the EPS board.
     void begin();
 
     // Handle the next command of the command queue.
