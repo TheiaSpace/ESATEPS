@@ -266,7 +266,7 @@ void ESATEPS::updateMainTelemetry()
     EPSMeasurements.readPanel2OutputCurrent();
 }
 
-void ESATEPS::updateMPPT()
+void ESATEPS::updateMaximumPowerPointTracking()
 {
   MaximumPowerPointTrackingDriver1.update();
   MaximumPowerPointTrackingDriver2.update();
