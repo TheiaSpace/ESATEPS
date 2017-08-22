@@ -21,7 +21,7 @@
 
 #include <Energia.h>
 
-#define EPS_SOFTWARE_VERSION 1
+#define EPS_SOFTWARE_VERSION 2
 
 class ESATEPS
 {
