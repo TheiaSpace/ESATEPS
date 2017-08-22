@@ -149,31 +149,6 @@ void ESATEPS::handleToggle5VLineCommand()
   PowerLine5VSwitch.toggle();
 }
 
-String ESATEPS::build_tm_packet(int type, int apid=1)
-{
-  // build packet with given data (hex), type
-  // ID(b3)|TM/TC(b1)|APID(h1)|length(h2)|type(h2)|data|CRC(h2)
-  String packet = "";
-  packet += Util.byteToHexadecimal(myId).substring(1, 2);
-  packet += "2";
-  packet += Util.byteToHexadecimal(51 * 2);
-  packet += Util.byteToHexadecimal(type);
-  for (int i = 0; i < 50; i++)
-  {
-    packet += Util.byteToHexadecimal(bufferH[i]);
-  }
-  packet += "00000000";
-  packet += "FF"; // implement CRC
-  packet =
-    "{\"type\":\"onPacket\",\"id\":\""
-    + String(myId)
-    + "\",\"data\":\""
-    + packet
-    +"\"}";
-  USB.println(packet);
-  return packet;
-}
-
 void ESATEPS::updateTelemetry()
 {
   // EPS (Main) TM
@@ -298,6 +273,31 @@ void ESATEPS::requestEvent()
     Wire.write(highByte(EPS.telemetry[index]));
     Wire.write(lowByte(EPS.telemetry[index]));
   }
+}
+
+void ESATEPS::sendTelemetry()
+{
+  const byte type = 1;
+  // build packet with given data (hex), type
+  // ID(b3)|TM/TC(b1)|APID(h1)|length(h2)|type(h2)|data|CRC(h2)
+  String packet = "";
+  packet += Util.byteToHexadecimal(myId).substring(1, 2);
+  packet += "2";
+  packet += Util.byteToHexadecimal((TELEMETRY_BUFFER_LENGTH + 1) * 2);
+  packet += Util.byteToHexadecimal(type);
+  for (int index = 0; index < TELEMETRY_BUFFER_LENGTH; index++)
+  {
+    packet += Util.wordToHexadecimal(telemetry[index]);
+  }
+  packet += "00000000";
+  packet += "FF"; // implement CRC
+  packet =
+    "{\"type\":\"onPacket\",\"id\":\""
+    + String(myId)
+    + "\",\"data\":\""
+    + packet
+    +"\"}";
+  USB.println(packet);
 }
 
 void ESATEPS::updateMPPT()

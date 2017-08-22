@@ -52,6 +52,9 @@ class ESATEPS
     // Add a command to the command queue.
     void queueCommand(byte commandCode, byte parameter);
 
+    // Send a telemetry packet.
+    void sendTelemetry();
+
   private:
     // Command codes.
     enum CommandCode
