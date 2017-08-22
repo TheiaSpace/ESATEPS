@@ -122,6 +122,12 @@ void ESATEPS::handleToggle5VLineCommand()
   PowerLine5VSwitch.toggle();
 }
 
+boolean ESATEPS::pendingCommands()
+{
+  queueIncomingUSBCommands();
+  return command.pending;
+}
+
 void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
 {
   if (!command.pending)
@@ -318,12 +324,6 @@ void ESATEPS::updateTelemetry()
   updatePanelTelemetry();
   updateDirectEnergyTransferSystemTelemetry();
   updateStatusTelemetry();
-}
-
-boolean ESATEPS::pendingCommands()
-{
-  queueIncomingUSBCommands();
-  return command.pending;
 }
 
 ESATEPS EPS;
