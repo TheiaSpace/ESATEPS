@@ -149,97 +149,6 @@ void ESATEPS::handleToggle5VLineCommand()
   PowerLine5VSwitch.toggle();
 }
 
-void ESATEPS::updateTelemetry()
-{
-  // EPS (Main) TM
-  telemetry[CURRENT_5V_OFFSET] =
-    EPSMeasurements.read5VLineCurrent();
-  telemetry[VOLTAGE_5V_OFFSET] =
-    EPSMeasurements.read5VLineVoltage();
-  telemetry[CURRENT_3V3_OFFSET] =
-    EPSMeasurements.read3V3LineCurrent();
-  telemetry[VOLTAGE_3V3_OFFSET] =
-    EPSMeasurements.read3V3LineVoltage();
-  telemetry[INPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readInputLineCurrent();
-  telemetry[INPUT_VOLTAGE_OFFSET] =
-    EPSMeasurements.readInputLineVoltage();
-  telemetry[PANEL_1_OUTPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel1OutputCurrent();
-  telemetry[PANEL_1_VOLTAGE_OFFSET] =
-    EPSMeasurements.readPanel1Voltage();
-  telemetry[PANEL_1_INPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel1InputCurrent();
-  telemetry[PANEL_2_VOLTAGE_OFFSET] =
-    EPSMeasurements.readPanel2Voltage();
-  telemetry[PANEL_2_INPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel2InputCurrent();
-  telemetry[PANEL_2_OUTPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel2OutputCurrent();
-
-  // Software version
-  telemetry[STATUS_REGISTER_1_OFFSET] =
-    soft_v << SOFTWARE_VERSION_OFFSET;
-
-  // EPS (Bat) TM
-  BatteryController.error = false;
-  telemetry[TOTAL_BATTERY_VOLTAGE_OFFSET] =
-    BatteryController.readTotalBatteryVoltage();
-  telemetry[BATTERY_1_VOLTAGE_OFFSET] =
-    BatteryController.readBattery1Voltage();
-  telemetry[BATTERY_2_VOLTAGE_OFFSET] =
-    BatteryController.readBattery2Voltage();
-  telemetry[BATTERY_TEMPERATURE_OFFSET] =
-    BatteryController.readBatteryTemperature();
-  telemetry[BATTERY_CURRENT_OFFSET] =
-    BatteryController.readBatteryCurrent();
-  telemetry[STATE_OF_CHARGE_OFFSET] =
-    BatteryController.readStateOfCharge();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           BATTERY_STATUS_OFFSET,
-           !BatteryController.error);
-
-  // Solar array TM
-  SolarPanel1Thermometer.error = false;
-  telemetry[PANEL_1_TEMPERATURE_OFFSET] =
-    SolarPanel1Thermometer.read();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           PANEL_1_THERMOMETER_STATUS_OFFSET,
-           !SolarPanel1Thermometer.error);
-  SolarPanel2Thermometer.error = false;
-  telemetry[PANEL_2_TEMPERATURE_OFFSET] =
-    SolarPanel2Thermometer.read();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           PANEL_2_THERMOMETER_STATUS_OFFSET,
-           !SolarPanel2Thermometer.error);
-
-  // DET TM
-  DirectEnergyTransferSystem.error = false;
-  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_CURRENT_OFFSET] =
-    DirectEnergyTransferSystem.readCurrent();
-  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_VOLTAGE_OFFSET] =
-    DirectEnergyTransferSystem.readVoltage();
-  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_SHUNT_VOLTAGE_OFFSET] =
-    DirectEnergyTransferSystem.readShuntVoltage();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           DIRECT_ENERGY_TRANSFER_SYSTEM_STATUS_OFFSET,
-           !DirectEnergyTransferSystem.error);
-
-  // EPS Status registers
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           SWITCH_5V_ON_OFFSET,
-           PowerLine5VSwitch.read());
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           SWITCH_3V3_ON_OFFSET,
-           PowerLine3V3Switch.read());
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           OVERCURRENT_3V3_OFFSET,
-           OvercurrentDetector.read3V3LineOvercurrentState());
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           OVERCURRENT_5V_OFFSET,
-           OvercurrentDetector.read5VLineOvercurrentState());
-}
-
 void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
 {
   if (!command.pending)
@@ -300,12 +209,121 @@ void ESATEPS::sendTelemetry()
   USB.println(packet);
 }
 
+void ESATEPS::updateBatteryTelemetry()
+{
+  BatteryController.error = false;
+  telemetry[TOTAL_BATTERY_VOLTAGE_OFFSET] =
+    BatteryController.readTotalBatteryVoltage();
+  telemetry[BATTERY_1_VOLTAGE_OFFSET] =
+    BatteryController.readBattery1Voltage();
+  telemetry[BATTERY_2_VOLTAGE_OFFSET] =
+    BatteryController.readBattery2Voltage();
+  telemetry[BATTERY_TEMPERATURE_OFFSET] =
+    BatteryController.readBatteryTemperature();
+  telemetry[BATTERY_CURRENT_OFFSET] =
+    BatteryController.readBatteryCurrent();
+  telemetry[STATE_OF_CHARGE_OFFSET] =
+    BatteryController.readStateOfCharge();
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           BATTERY_STATUS_OFFSET,
+           !BatteryController.error);
+}
+
+void ESATEPS::updateDirectEnergyTransferSystemTelemetry()
+{
+  DirectEnergyTransferSystem.error = false;
+  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_CURRENT_OFFSET] =
+    DirectEnergyTransferSystem.readCurrent();
+  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_VOLTAGE_OFFSET] =
+    DirectEnergyTransferSystem.readVoltage();
+  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_SHUNT_VOLTAGE_OFFSET] =
+    DirectEnergyTransferSystem.readShuntVoltage();
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           DIRECT_ENERGY_TRANSFER_SYSTEM_STATUS_OFFSET,
+           !DirectEnergyTransferSystem.error);
+}
+
+void ESATEPS::updateMainTelemetry()
+{
+  telemetry[CURRENT_5V_OFFSET] =
+    EPSMeasurements.read5VLineCurrent();
+  telemetry[VOLTAGE_5V_OFFSET] =
+    EPSMeasurements.read5VLineVoltage();
+  telemetry[CURRENT_3V3_OFFSET] =
+    EPSMeasurements.read3V3LineCurrent();
+  telemetry[VOLTAGE_3V3_OFFSET] =
+    EPSMeasurements.read3V3LineVoltage();
+  telemetry[INPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readInputLineCurrent();
+  telemetry[INPUT_VOLTAGE_OFFSET] =
+    EPSMeasurements.readInputLineVoltage();
+  telemetry[PANEL_1_OUTPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel1OutputCurrent();
+  telemetry[PANEL_1_VOLTAGE_OFFSET] =
+    EPSMeasurements.readPanel1Voltage();
+  telemetry[PANEL_1_INPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel1InputCurrent();
+  telemetry[PANEL_2_VOLTAGE_OFFSET] =
+    EPSMeasurements.readPanel2Voltage();
+  telemetry[PANEL_2_INPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel2InputCurrent();
+  telemetry[PANEL_2_OUTPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel2OutputCurrent();
+}
+
 void ESATEPS::updateMPPT()
 {
   MaximumPowerPointTrackingDriver1.update();
   MaximumPowerPointTrackingDriver2.update();
 }
 
+void ESATEPS::updatePanelTelemetry()
+{
+  SolarPanel1Thermometer.error = false;
+  telemetry[PANEL_1_TEMPERATURE_OFFSET] =
+    SolarPanel1Thermometer.read();
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           PANEL_1_THERMOMETER_STATUS_OFFSET,
+           !SolarPanel1Thermometer.error);
+  SolarPanel2Thermometer.error = false;
+  telemetry[PANEL_2_TEMPERATURE_OFFSET] =
+    SolarPanel2Thermometer.read();
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           PANEL_2_THERMOMETER_STATUS_OFFSET,
+           !SolarPanel2Thermometer.error);
+}
+
+void ESATEPS::updateSoftwareVersionTelemetry()
+{
+  telemetry[STATUS_REGISTER_1_OFFSET] =
+    soft_v << SOFTWARE_VERSION_OFFSET;
+}
+
+void ESATEPS::updateStatusTelemetry()
+{
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           SWITCH_5V_ON_OFFSET,
+           PowerLine5VSwitch.read());
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           SWITCH_3V3_ON_OFFSET,
+           PowerLine3V3Switch.read());
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           OVERCURRENT_3V3_OFFSET,
+           OvercurrentDetector.read3V3LineOvercurrentState());
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           OVERCURRENT_5V_OFFSET,
+           OvercurrentDetector.read5VLineOvercurrentState());
+}
+
+void ESATEPS::updateTelemetry()
+{
+  updateMainTelemetry();
+  updateSoftwareVersionTelemetry();
+  updateBatteryTelemetry();
+  updatePanelTelemetry();
+  updateDirectEnergyTransferSystemTelemetry();
+  updateStatusTelemetry();
+}
 
 boolean ESATEPS::pendingCommands()
 {

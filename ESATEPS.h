@@ -164,6 +164,24 @@ class ESATEPS
 
     // Response when asked for telemetry by the OBC.
     static void requestEvent();
+
+    // Update the battery fields of the telemetry buffer.
+    void updateBatteryTelemetry();
+
+    // Update the direct energy transfer system fields of the telemetry buffer.
+    void updateDirectEnergyTransferSystemTelemetry();
+
+    // Update the main fields of the telemetry buffer.
+    void updateMainTelemetry();
+
+    // Update the panel fields of the telemetry buffer.
+    void updatePanelTelemetry();
+
+    // Update the software version field of the telemetry buffer.
+    void updateSoftwareVersionTelemetry();
+
+    // Update the status registers of the telemetry buffer.
+    void updateStatusTelemetry();
 };
 
 extern ESATEPS EPS;
