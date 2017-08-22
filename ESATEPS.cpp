@@ -32,7 +32,7 @@ ESATEPS::ESATEPS()
 {
 }
 
-void receiveEvent(const int howMany)
+void ESATEPS::receiveEvent(const int howMany)
 {
   const int commandCode = Wire.read();
   if (commandCode < 0)

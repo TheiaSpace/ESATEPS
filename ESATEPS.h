@@ -162,6 +162,9 @@ class ESATEPS
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
 
+    // Response to incoming telecommands sent by the OBC.
+    static void receiveEvent(int howMany);
+
     // Response when asked for telemetry by the OBC.
     static void requestEvent();
 
