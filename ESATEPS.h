@@ -37,7 +37,6 @@ class ESATEPS
     void updateTelemetry();
 
     void updateMPPT();
-    int myId;
 
     // Handle the next command of the command queue.
     void handleCommand();
@@ -128,6 +127,9 @@ class ESATEPS
 
     // Last received command parameter.
     byte commandParameter;
+
+    // Identifier number of the EPS board.
+    byte identifier;
 
     // Telemetry buffer.
     word telemetry[TELEMETRY_BUFFER_LENGTH];

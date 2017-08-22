@@ -36,7 +36,7 @@ void ESATEPS::begin()
 {
   unsigned char Id;
   Flash.read(flash, &Id, 1);
-  myId = (int) Id;
+  identifier = (int) Id;
   command.pending = false;
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
@@ -104,7 +104,7 @@ void ESATEPS::handleMaximumPowerPointTrackingModeCommand()
 void ESATEPS::handleSetIdentifierCommand()
 {
   Flash.erase(flash);
-  myId = command.parameter;
+  identifier = command.parameter;
   unsigned char p;
   p = command.parameter;
   Flash.write(flash, &p ,1);
@@ -189,7 +189,7 @@ void ESATEPS::sendTelemetry()
   // build packet with given data (hex), type
   // ID(b3)|TM/TC(b1)|APID(h1)|length(h2)|type(h2)|data|CRC(h2)
   String packet = "";
-  packet += Util.byteToHexadecimal(myId).substring(1, 2);
+  packet += Util.byteToHexadecimal(identifier).substring(1, 2);
   packet += "2";
   packet += Util.byteToHexadecimal((TELEMETRY_BUFFER_LENGTH + 1) * 2);
   packet += Util.byteToHexadecimal(type);
@@ -201,7 +201,7 @@ void ESATEPS::sendTelemetry()
   packet += "FF"; // implement CRC
   packet =
     "{\"type\":\"onPacket\",\"id\":\""
-    + String(myId)
+    + String(identifier)
     + "\",\"data\":\""
     + packet
     +"\"}";
