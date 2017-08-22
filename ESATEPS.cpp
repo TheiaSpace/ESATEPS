@@ -30,7 +30,7 @@
 
 void ESATEPS::begin()
 {
-  Flash.read(flash, &identifier, sizeof(identifier));
+  Flash.read(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
   command.pending = false;
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
@@ -97,9 +97,9 @@ void ESATEPS::handleMaximumPowerPointTrackingModeCommand()
 
 void ESATEPS::handleSetIdentifierCommand()
 {
-  Flash.erase(flash);
+  Flash.erase(EPS_IDENTIFIER_FLASH_SEGMENT);
   identifier = command.parameter;
-  Flash.write(flash, &identifier, sizeof(identifier));
+  Flash.write(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
 }
 
 void ESATEPS::handleSweepModeCommand()
