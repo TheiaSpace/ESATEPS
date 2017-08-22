@@ -16,8 +16,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <USBSerial.h>
-#include <MspFlash.h>
 #include <ESATEPS.h>
 
 void setup()
