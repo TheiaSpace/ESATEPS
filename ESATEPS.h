@@ -28,9 +28,6 @@
 class ESATEPS
 {
   public:
-    // Instantiate a new ESATEPS object.
-    ESATEPS();
-
     void begin();
 
     // Handle the next command of the command queue.
