@@ -139,7 +139,7 @@ void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
 
 void ESATEPS::queueIncomingUSBCommands()
 {
-  while (USB.available())
+  if (USB.available())
   {
     const String packet = USB.readStringUntil('\r');
     const String identifier = packet.substring(0, 1);
