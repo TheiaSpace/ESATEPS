@@ -49,9 +49,6 @@ class ESATEPS
     // otherwise return false.
     boolean pendingCommands();
 
-    // Add a command to the command queue.
-    void queueCommand(byte commandCode, byte parameter);
-
     // Send a telemetry packet.
     void sendTelemetry();
 
@@ -159,8 +156,14 @@ class ESATEPS
 
     String build_tm_packet(int type, int apid);
 
+    // Add a command to the command queue.
+    void queueCommand(byte commandCode, byte parameter);
+
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
+
+    // Response to incoming telecommands sent by the OBC.
+    static void receiveEvent(int howMany);
 
     // Response when asked for telemetry by the OBC.
     static void requestEvent();
