@@ -20,9 +20,7 @@
 #define ESATEPS_h
 
 #include <Energia.h>
-#include <MspFlash.h>
 
-#define EPS_IDENTIFIER_FLASH_SEGMENT SEGMENT_C
 #define EPS_SOFTWARE_VERSION 1
 
 class ESATEPS

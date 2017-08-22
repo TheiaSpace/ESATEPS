@@ -19,6 +19,7 @@
 #include "ESATEPS.h"
 #include <ESATUtil.h>
 #include <USBSerial.h>
+#include <MspFlash.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
 #include "ESATDirectEnergyTransferSystem.h"
@@ -27,6 +28,8 @@
 #include "ESATOvercurrentDetector.h"
 #include "ESATPowerLineSwitch.h"
 #include "ESATSolarPanelThermometer.h"
+
+#define EPS_IDENTIFIER_FLASH_SEGMENT SEGMENT_C
 
 void ESATEPS::begin()
 {
