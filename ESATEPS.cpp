@@ -202,7 +202,7 @@ void ESATEPS::sendTelemetry()
   packet += "FF"; // implement CRC
   packet =
     "{\"type\":\"onPacket\",\"id\":\""
-    + String(identifier)
+    + String(int(identifier % 16), HEX)
     + "\",\"data\":\""
     + packet
     +"\"}";
