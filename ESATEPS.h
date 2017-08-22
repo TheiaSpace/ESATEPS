@@ -155,6 +155,9 @@ class ESATEPS
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
+
+    // Response when asked for telemetry by the OBC.
+    static void requestEvent();
 };
 
 extern ESATEPS EPS;

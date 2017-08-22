@@ -54,11 +54,6 @@ void receiveEvent(const int howMany)
   }
 }
 
-void requestEvent()
-{
-  Wire.write(EPS.bufferH, 51);
-}
-
 void ESATEPS::begin()
 {
   unsigned char Id;
@@ -294,6 +289,15 @@ void ESATEPS::queueIncomingUSBCommands()
       const byte parameter = Util.hexadecimalToByte(packet.substring(7, 7 + length));
       queueCommand(commandCode, parameter);
     }
+  }
+}
+
+void ESATEPS::requestEvent()
+{
+  for (int index = 0; index < TELEMETRY_BUFFER_LENGTH; index++)
+  {
+    Wire.write(highByte(EPS.telemetry[index]));
+    Wire.write(lowByte(EPS.telemetry[index]));
   }
 }
 
