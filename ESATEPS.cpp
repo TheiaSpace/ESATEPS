@@ -43,7 +43,6 @@ void ESATEPS::begin()
   MaximumPowerPointTrackingDriver2.begin();
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
-  EPSStatus = 0;
   PowerLine5VSwitch.begin();
   PowerLine5VSwitch.write(PowerLine5VSwitch.off);
   PowerLine3V3Switch.begin();

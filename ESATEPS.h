@@ -28,8 +28,6 @@
 class ESATEPS
 {
   public:
-    byte EPSStatus;
-
     // Instantiate a new ESATEPS object.
     ESATEPS();
 
