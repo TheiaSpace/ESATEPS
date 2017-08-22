@@ -34,9 +34,7 @@ ESATEPS::ESATEPS()
 
 void ESATEPS::begin()
 {
-  unsigned char Id;
-  Flash.read(flash, &Id, 1);
-  identifier = (int) Id;
+  Flash.read(flash, &identifier, sizeof(identifier));
   command.pending = false;
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
