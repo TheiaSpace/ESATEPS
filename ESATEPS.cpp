@@ -263,7 +263,6 @@ void ESATEPS::housekeeping()
   bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
            OVERCURRENT_5V_OFFSET,
            OvercurrentDetector.read5VLineOvercurrentState());
-  build_tm_packet(1, 2);
 }
 
 void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
