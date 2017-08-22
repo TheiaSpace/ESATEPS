@@ -28,10 +28,6 @@
 #include "ESATPowerLineSwitch.h"
 #include "ESATSolarPanelThermometer.h"
 
-ESATEPS::ESATEPS()
-{
-}
-
 void ESATEPS::begin()
 {
   Flash.read(flash, &identifier, sizeof(identifier));
