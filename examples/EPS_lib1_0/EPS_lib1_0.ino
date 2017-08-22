@@ -27,7 +27,7 @@ void setup()
 
 void loop()
 {
-  EPS.updateMPPT();
+  EPS.updateMaximumPowerPointTracking();
   while (EPS.pendingCommands())
   {
     EPS.handleCommand();

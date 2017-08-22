@@ -36,7 +36,8 @@ class ESATEPS
     // Update the telemetry buffer.
     void updateTelemetry();
 
-    void updateMPPT();
+    // Update the maximum power point tracking system.
+    void updateMaximumPowerPointTracking();
 
     // Handle the next command of the command queue.
     void handleCommand();
