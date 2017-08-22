@@ -293,7 +293,7 @@ void ESATEPS::updatePanelTelemetry()
 void ESATEPS::updateSoftwareVersionTelemetry()
 {
   telemetry[STATUS_REGISTER_1_OFFSET] =
-    soft_v << SOFTWARE_VERSION_OFFSET;
+    EPS_SOFTWARE_VERSION << SOFTWARE_VERSION_OFFSET;
 }
 
 void ESATEPS::updateStatusTelemetry()

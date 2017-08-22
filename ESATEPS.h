@@ -23,7 +23,7 @@
 #include <MspFlash.h>
 
 #define flash SEGMENT_C
-#define soft_v 1
+#define EPS_SOFTWARE_VERSION 1
 
 class ESATEPS
 {
