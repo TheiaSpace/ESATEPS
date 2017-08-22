@@ -182,102 +182,92 @@ String ESATEPS::build_tm_packet(int type, int apid=1)
 void ESATEPS::housekeeping()
 {
   // EPS (Main) TM
-  const word current5V = EPSMeasurements.read5VLineCurrent();
-  bufferH[4] = highByte(current5V);
-  bufferH[5] = lowByte(current5V);
-  const word voltage5V = EPSMeasurements.read5VLineVoltage();
-  bufferH[6] = highByte(voltage5V);
-  bufferH[7] = lowByte(voltage5V);
-  const word current3V3 = EPSMeasurements.read3V3LineCurrent();
-  bufferH[8] = highByte(current3V3);
-  bufferH[9] = lowByte(current3V3);
-  const word voltage3V3 = EPSMeasurements.read3V3LineVoltage();
-  bufferH[10] = highByte(voltage3V3);
-  bufferH[11] = lowByte(voltage3V3);
-  const word inputCurrent = EPSMeasurements.readInputLineCurrent();
-  bufferH[12] = highByte(inputCurrent);
-  bufferH[13] = lowByte(inputCurrent);
-  const word inputVoltage = EPSMeasurements.readInputLineVoltage();
-  bufferH[14] = highByte(inputVoltage);
-  bufferH[15] = lowByte(inputVoltage);
-  const word panel1OutputCurrent = EPSMeasurements.readPanel1OutputCurrent();
-  bufferH[16] = highByte(panel1OutputCurrent);
-  bufferH[17] = lowByte(panel1OutputCurrent);
-  const word panel1Voltage = EPSMeasurements.readPanel1Voltage();
-  bufferH[18] = highByte(panel1Voltage);
-  bufferH[19] = lowByte(panel1Voltage);
-  const word panel1InputCurrent = EPSMeasurements.readPanel1InputCurrent();
-  bufferH[20] = highByte(panel1InputCurrent);
-  bufferH[21] = lowByte(panel1InputCurrent);
-  const word panel2Voltage = EPSMeasurements.readPanel2Voltage();
-  bufferH[22] = highByte(panel2Voltage);
-  bufferH[23] = lowByte(panel2Voltage);
-  const word panel2InputCurrent = EPSMeasurements.readPanel2InputCurrent();
-  bufferH[24] = highByte(panel2InputCurrent);
-  bufferH[25] = lowByte(panel2InputCurrent);
-  const word panel2OutputCurrent = EPSMeasurements.readPanel2OutputCurrent();
-  bufferH[26] = highByte(panel2OutputCurrent);
-  bufferH[27] = lowByte(panel2OutputCurrent);
+  telemetry[CURRENT_5V_OFFSET] =
+    EPSMeasurements.read5VLineCurrent();
+  telemetry[VOLTAGE_5V_OFFSET] =
+    EPSMeasurements.read5VLineVoltage();
+  telemetry[CURRENT_3V3_OFFSET] =
+    EPSMeasurements.read3V3LineCurrent();
+  telemetry[VOLTAGE_3V3_OFFSET] =
+    EPSMeasurements.read3V3LineVoltage();
+  telemetry[INPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readInputLineCurrent();
+  telemetry[INPUT_VOLTAGE_OFFSET] =
+    EPSMeasurements.readInputLineVoltage();
+  telemetry[PANEL_1_OUTPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel1OutputCurrent();
+  telemetry[PANEL_1_VOLTAGE_OFFSET] =
+    EPSMeasurements.readPanel1Voltage();
+  telemetry[PANEL_1_INPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel1InputCurrent();
+  telemetry[PANEL_2_VOLTAGE_OFFSET] =
+    EPSMeasurements.readPanel2Voltage();
+  telemetry[PANEL_2_INPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel2InputCurrent();
+  telemetry[PANEL_2_OUTPUT_CURRENT_OFFSET] =
+    EPSMeasurements.readPanel2OutputCurrent();
 
   // Software version
-  bufferH[1] = (soft_v << 3);
+  telemetry[STATUS_REGISTER_1_OFFSET] =
+    soft_v << SOFTWARE_VERSION_OFFSET;
 
   // EPS (Bat) TM
   BatteryController.error = false;
-  const int totalBatteryVoltage = BatteryController.readTotalBatteryVoltage();
-  bufferH[28] = highByte(totalBatteryVoltage);
-  bufferH[29] = lowByte(totalBatteryVoltage);
-  const int battery1Voltage = BatteryController.readBattery1Voltage();
-  bufferH[30] = highByte(battery1Voltage);
-  bufferH[31] = lowByte(battery1Voltage);
-  const int battery2Voltage = BatteryController.readBattery2Voltage();
-  bufferH[32] = highByte(battery2Voltage);
-  bufferH[33] = lowByte(battery2Voltage);
-  const byte stateOfCharge = BatteryController.readStateOfCharge();
-  bufferH[48] = 0;
-  bufferH[49] = stateOfCharge;
-  const int batteryTemperature = BatteryController.readBatteryTemperature();
-  bufferH[34] = highByte(batteryTemperature);
-  bufferH[35] = lowByte(batteryTemperature);
-  const int batteryCurrent = BatteryController.readBatteryCurrent();
-  bufferH[36] = highByte(batteryCurrent);
-  bufferH[37] = lowByte(batteryCurrent);
-  bitWrite(EPSStatus, 3, !BatteryController.error); // EPSStatus.BAT
+  telemetry[TOTAL_BATTERY_VOLTAGE_OFFSET] =
+    BatteryController.readTotalBatteryVoltage();
+  telemetry[BATTERY_1_VOLTAGE_OFFSET] =
+    BatteryController.readBattery1Voltage();
+  telemetry[BATTERY_2_VOLTAGE_OFFSET] =
+    BatteryController.readBattery2Voltage();
+  telemetry[BATTERY_TEMPERATURE_OFFSET] =
+    BatteryController.readBatteryTemperature();
+  telemetry[BATTERY_CURRENT_OFFSET] =
+    BatteryController.readBatteryCurrent();
+  telemetry[STATE_OF_CHARGE_OFFSET] =
+    BatteryController.readStateOfCharge();
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           BATTERY_STATUS_OFFSET,
+           !BatteryController.error);
 
   // Solar array TM
   SolarPanel1Thermometer.error = false;
-  const int solarPanel1Temperature = SolarPanel1Thermometer.read();
-  bufferH[38] = highByte(solarPanel1Temperature);
-  bufferH[39] = lowByte(solarPanel1Temperature);
-  bitWrite(EPSStatus, 2, !SolarPanel1Thermometer.error);
-  SolarPanel1Thermometer.error = false;
-  const int solarPanel2Temperature = SolarPanel2Thermometer.read();
-  bufferH[0] = highByte(solarPanel2Temperature);
-  bufferH[1] = lowByte(solarPanel2Temperature);
-  bitWrite(EPSStatus, 1, !SolarPanel2Thermometer.error);
+  telemetry[PANEL_1_TEMPERATURE_OFFSET] =
+    SolarPanel1Thermometer.read();
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           PANEL_1_THERMOMETER_STATUS_OFFSET,
+           !SolarPanel1Thermometer.error);
+  SolarPanel2Thermometer.error = false;
+  telemetry[PANEL_2_TEMPERATURE_OFFSET] =
+    SolarPanel2Thermometer.read();
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           PANEL_2_THERMOMETER_STATUS_OFFSET,
+           !SolarPanel2Thermometer.error);
 
   // DET TM
   DirectEnergyTransferSystem.error = false;
-  const int directEnergyTransferSystemCurrent =
+  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_CURRENT_OFFSET] =
     DirectEnergyTransferSystem.readCurrent();
-  bufferH[42] = highByte(directEnergyTransferSystemCurrent);
-  bufferH[43] = lowByte(directEnergyTransferSystemCurrent);
-  const int directEnergyTransferSystemVoltage =
+  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_VOLTAGE_OFFSET] =
     DirectEnergyTransferSystem.readVoltage();
-  bufferH[44] = highByte(directEnergyTransferSystemVoltage);
-  bufferH[45] = lowByte(directEnergyTransferSystemVoltage);
-  const int directEnergyTransferSystemShuntVoltage =
+  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_SHUNT_VOLTAGE_OFFSET] =
     DirectEnergyTransferSystem.readShuntVoltage();
-  bufferH[46] = highByte(directEnergyTransferSystemShuntVoltage);
-  bufferH[47] = lowByte(directEnergyTransferSystemShuntVoltage);
-  bitWrite(EPSStatus, 0, !DirectEnergyTransferSystem.error);
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           DIRECT_ENERGY_TRANSFER_SYSTEM_STATUS_OFFSET,
+           !DirectEnergyTransferSystem.error);
 
   // EPS Status registers
-  bitWrite(EPSStatus, 7, PowerLine5VSwitch.read());
-  bitWrite(EPSStatus, 6, PowerLine3V3Switch.read());
-  bitWrite(EPSStatus, 5, OvercurrentDetector.read3V3LineOvercurrentState());
-  bitWrite(EPSStatus, 4, OvercurrentDetector.read5VLineOvercurrentState());
-  bufferH[3] = EPSStatus;
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           SWITCH_5V_ON_OFFSET,
+           PowerLine5VSwitch.read());
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           SWITCH_3V3_ON_OFFSET,
+           PowerLine3V3Switch.read());
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           OVERCURRENT_3V3_OFFSET,
+           OvercurrentDetector.read3V3LineOvercurrentState());
+  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
+           OVERCURRENT_5V_OFFSET,
+           OvercurrentDetector.read5VLineOvercurrentState());
   build_tm_packet(1, 2);
 }
 
