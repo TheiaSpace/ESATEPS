@@ -49,9 +49,6 @@ class ESATEPS
     // otherwise return false.
     boolean pendingCommands();
 
-    // Add a command to the command queue.
-    void queueCommand(byte commandCode, byte parameter);
-
     // Send a telemetry packet.
     void sendTelemetry();
 
@@ -158,6 +155,9 @@ class ESATEPS
     void handleToggle5VLineCommand();
 
     String build_tm_packet(int type, int apid);
+
+    // Add a command to the command queue.
+    void queueCommand(byte commandCode, byte parameter);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
