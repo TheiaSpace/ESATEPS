@@ -33,12 +33,6 @@ class ESATEPS
 
     void begin();
 
-    // Update the telemetry buffer.
-    void updateTelemetry();
-
-    // Update the maximum power point tracking system.
-    void updateMaximumPowerPointTracking();
-
     // Handle the next command of the command queue.
     void handleCommand();
 
@@ -48,6 +42,12 @@ class ESATEPS
 
     // Send a telemetry packet.
     void sendTelemetry();
+
+    // Update the maximum power point tracking system.
+    void updateMaximumPowerPointTracking();
+
+    // Update the telemetry buffer.
+    void updateTelemetry();
 
   private:
     // Command codes.
