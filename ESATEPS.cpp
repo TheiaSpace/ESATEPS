@@ -32,28 +32,6 @@ ESATEPS::ESATEPS()
 {
 }
 
-void ESATEPS::receiveEvent(const int howMany)
-{
-  const int commandCode = Wire.read();
-  if (commandCode < 0)
-  {
-    return;
-  }
-  if (howMany > 1)
-  {
-    const int parameter = Wire.read();
-    if (parameter < 0)
-    {
-      return;
-    }
-    EPS.queueCommand(commandCode, parameter);
-  }
-  else
-  {
-    EPS.queueCommand(commandCode, 0);
-  }
-}
-
 void ESATEPS::begin()
 {
   unsigned char Id;
@@ -172,6 +150,28 @@ void ESATEPS::queueIncomingUSBCommands()
       const byte parameter = Util.hexadecimalToByte(packet.substring(7, 7 + length));
       queueCommand(commandCode, parameter);
     }
+  }
+}
+
+void ESATEPS::receiveEvent(const int howMany)
+{
+  const int commandCode = Wire.read();
+  if (commandCode < 0)
+  {
+    return;
+  }
+  if (howMany > 1)
+  {
+    const int parameter = Wire.read();
+    if (parameter < 0)
+    {
+      return;
+    }
+    EPS.queueCommand(commandCode, parameter);
+  }
+  else
+  {
+    EPS.queueCommand(commandCode, 0);
   }
 }
 
