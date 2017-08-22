@@ -109,6 +109,9 @@ class ESATEPS
       SWITCH_5V_ON_OFFSET = 7,
     };
 
+    // Size in words of the telemetry buffer.
+    static const byte TELEMETRY_BUFFER_LENGTH = 25;
+
     // Command buffer structure.
     struct Command
     {
@@ -125,6 +128,9 @@ class ESATEPS
 
     // Last received command parameter.
     byte commandParameter;
+
+    // Telemetry buffer.
+    word telemetry[TELEMETRY_BUFFER_LENGTH];
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand();
