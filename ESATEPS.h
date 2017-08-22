@@ -28,7 +28,6 @@
 class ESATEPS
 {
   public:
-    byte bufferH[51];
     byte EPSStatus;
 
     // Instantiate a new ESATEPS object.
