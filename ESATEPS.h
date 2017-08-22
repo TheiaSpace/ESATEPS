@@ -22,7 +22,7 @@
 #include <Energia.h>
 #include <MspFlash.h>
 
-#define flash SEGMENT_C
+#define EPS_IDENTIFIER_FLASH_SEGMENT SEGMENT_C
 #define EPS_SOFTWARE_VERSION 1
 
 class ESATEPS
