@@ -154,8 +154,6 @@ class ESATEPS
     // Toggle the 5V line.
     void handleToggle5VLineCommand();
 
-    String build_tm_packet(int type, int apid);
-
     // Add a command to the command queue.
     void queueCommand(byte commandCode, byte parameter);
 
