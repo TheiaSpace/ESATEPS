@@ -23,9 +23,6 @@ ESATEPSMeasurements EPSMeasurements;
 // Number of samples for current measurements.
 static const byte currentSamples = 5;
 
-// Time between samples.
-static const unsigned long millisecondsBetweenSamples = 10;
-
 // Number of samples for voltage measurements.
 static const byte voltageSamples = 1;
 
@@ -53,7 +50,6 @@ static word read(const byte line, const byte samples)
   for (int sample = 0; sample < samples; sample++)
   {
     sum = sum + analogRead(line);
-    delay(millisecondsBetweenSamples);
   }
   return round(sum / samples);
 }
