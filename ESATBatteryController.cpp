@@ -23,26 +23,26 @@ ESATBatteryController::ESATBatteryController(): error(false)
 {
 }
 
-int ESATBatteryController::readBattery1Voltage()
+word ESATBatteryController::readBattery1Voltage()
 {
-  return readInteger(battery1VoltageRegister);
+  return readWord(battery1VoltageRegister);
 }
 
-int ESATBatteryController::readBattery2Voltage()
+word ESATBatteryController::readBattery2Voltage()
 {
-  return readInteger(battery2VoltageRegister);
-}
-
-
-int ESATBatteryController::readBatteryCurrent()
-{
-  return readInteger(batteryCurrentRegister);
+  return readWord(battery2VoltageRegister);
 }
 
 
-int ESATBatteryController::readBatteryTemperature()
+word ESATBatteryController::readBatteryCurrent()
 {
-  return readInteger(batteryTemperatureRegister);
+  return readWord(batteryCurrentRegister);
+}
+
+
+word ESATBatteryController::readBatteryTemperature()
+{
+  return readWord(batteryTemperatureRegister);
 }
 
 
@@ -52,9 +52,9 @@ byte ESATBatteryController::readStateOfCharge()
 }
 
 
-int ESATBatteryController::readTotalBatteryVoltage()
+word ESATBatteryController::readTotalBatteryVoltage()
 {
-  return readInteger(totalBatteryVoltageRegister);
+  return readWord(totalBatteryVoltageRegister);
 }
 
 byte ESATBatteryController::readByte(const byte registerName)
@@ -73,7 +73,7 @@ byte ESATBatteryController::readByte(const byte registerName)
   }
 }
 
-int ESATBatteryController::readInteger(const byte registerName)
+word ESATBatteryController::readWord(const byte registerName)
 {
   Wire1.beginTransmission(address);
   Wire1.write(registerName);
