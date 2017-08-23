@@ -16,7 +16,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <ESATI2CDevice.h>
 #include "ESATSolarPanelThermometer.h"
 
 // Address/register pairs.
@@ -38,20 +37,22 @@ ESATSolarPanelThermometer::ESATSolarPanelThermometer(const byte primaryAddress,
   primaryRegister(primaryRegister),
   secondaryAddress(secondaryAddress),
   secondaryRegister(secondaryRegister),
-  error(false)
+  error(false),
+  primaryDevice(Wire1, primaryAddress),
+  secondaryDevice(Wire1, secondaryAddress)
 {
 }
 
 word ESATSolarPanelThermometer::read()
 {
-  ESATI2CDevice primaryDevice(Wire1, primaryAddress);
-  const word primaryTemperature = primaryDevice.readBigEndianWord(primaryRegister);
+  const word primaryTemperature =
+    primaryDevice.readBigEndianWord(primaryRegister);
   if (!primaryDevice.error)
   {
     return primaryTemperature;
   }
-  ESATI2CDevice secondaryDevice(Wire1, secondaryAddress);
-  const word secondaryTemperature = secondaryDevice.readBigEndianWord(secondaryRegister);
+  const word secondaryTemperature =
+    secondaryDevice.readBigEndianWord(secondaryRegister);
   if (secondaryDevice.error)
   {
     error = true;
