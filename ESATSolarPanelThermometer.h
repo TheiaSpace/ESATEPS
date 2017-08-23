@@ -37,7 +37,7 @@ class ESATSolarPanelThermometer
 
     // Return the temperature measured by the thermometer.
     // Set the error flag on error.
-    int read();
+    word read();
 
   private:
     // True on read success, false otherwise.
@@ -53,7 +53,7 @@ class ESATSolarPanelThermometer
 
     // Try to read the temperature from the given address/register pair.
     // Set the success flag.
-    int tryToRead(byte address, byte registerNumber);
+    word tryToRead(byte address, byte registerNumber);
 };
 
 // Thermometer on solar panel 1.
