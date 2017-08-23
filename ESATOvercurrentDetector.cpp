@@ -63,5 +63,5 @@ boolean ESATOvercurrentDetector::read3V3LineOvercurrentState()
 
 boolean ESATOvercurrentDetector::read5VLineOvercurrentState()
 {
-  return digitalRead(OC5V);
+  return !digitalRead(OC5V);
 }
