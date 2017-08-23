@@ -43,14 +43,14 @@ ESATSolarPanelThermometer::ESATSolarPanelThermometer(const byte primaryAddress,
 {
 }
 
-int ESATSolarPanelThermometer::read()
+word ESATSolarPanelThermometer::read()
 {
-  const int primaryTemperature = tryToRead(primaryAddress, primaryRegister);
+  const word primaryTemperature = tryToRead(primaryAddress, primaryRegister);
   if (success)
   {
     return primaryTemperature;
   }
-  const int secondaryTemperature = tryToRead(secondaryAddress, secondaryRegister);
+  const word secondaryTemperature = tryToRead(secondaryAddress, secondaryRegister);
   if (success)
   {
     return secondaryTemperature;
@@ -59,7 +59,7 @@ int ESATSolarPanelThermometer::read()
   return 0;
 }
 
-int ESATSolarPanelThermometer::tryToRead(const byte address, const byte registerNumber)
+word ESATSolarPanelThermometer::tryToRead(const byte address, const byte registerNumber)
 {
   Wire1.beginTransmission(address);
   Wire1.write(registerNumber);
