@@ -41,6 +41,7 @@ word ESATDirectEnergyTransferSystem::readConvertedValue()
   else
   {
     error = true;
+    return 0;
   }
 }
 
