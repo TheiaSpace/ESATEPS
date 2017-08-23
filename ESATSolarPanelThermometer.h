@@ -40,9 +40,6 @@ class ESATSolarPanelThermometer
     word read();
 
   private:
-    // True on read success, false otherwise.
-    boolean success;
-
     // First try to read the temperature from this I2C address/register pair.
     const byte primaryAddress;
     const byte primaryRegister;
@@ -50,10 +47,6 @@ class ESATSolarPanelThermometer
     // Fall back to this I2C address/register pair on error.
     const byte secondaryAddress;
     const byte secondaryRegister;
-
-    // Try to read the temperature from the given address/register pair.
-    // Set the success flag.
-    word tryToRead(byte address, byte registerNumber);
 };
 
 // Thermometer on solar panel 1.
