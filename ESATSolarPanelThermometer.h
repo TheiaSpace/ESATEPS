@@ -20,6 +20,7 @@
 #define ESATSolarPanelThermometer_h
 
 #include <Energia.h>
+#include <ESATI2CDevice.h>
 
 // An interface to the thermometers found on ESAT's solar panels.
 class ESATSolarPanelThermometer
@@ -40,9 +41,6 @@ class ESATSolarPanelThermometer
     word read();
 
   private:
-    // True on read success, false otherwise.
-    boolean success;
-
     // First try to read the temperature from this I2C address/register pair.
     const byte primaryAddress;
     const byte primaryRegister;
@@ -51,9 +49,9 @@ class ESATSolarPanelThermometer
     const byte secondaryAddress;
     const byte secondaryRegister;
 
-    // Try to read the temperature from the given address/register pair.
-    // Set the success flag.
-    word tryToRead(byte address, byte registerNumber);
+    // I2C device interfaces.
+    ESATI2CDevice primaryDevice;
+    ESATI2CDevice secondaryDevice;
 };
 
 // Thermometer on solar panel 1.

@@ -20,6 +20,7 @@
 #define ESATDirectEnergyTransferSystem_h
 
 #include <Energia.h>
+#include <ESATI2CDevice.h>
 
 // Interface with the direct energy transfer system.
 class ESATDirectEnergyTransferSystem
@@ -27,6 +28,9 @@ class ESATDirectEnergyTransferSystem
   public:
     // True after a read error.  Must be reset manually.
     boolean error;
+
+    // Instantiate a new direct energy transfer system interface object.
+    ESATDirectEnergyTransferSystem();
 
     // Read the current circulating through the direct energy transfer
     // system.
@@ -60,6 +64,9 @@ class ESATDirectEnergyTransferSystem
     static const word currentChannelConfigurationBits = B100 << 12; // AINp = AIN0, AINn = GND.
     static const word voltageChannelConfigurationBits = B101 << 12; // AINp = AIN1, AINn = GND.
     static const word shuntVoltageChannelConfigurationBits = B111 << 12; // AINp = AIN3, AINn = GND.
+
+    // I2C device interface.
+    ESATI2CDevice device;
 
     // Read a sample from the sensors.
     // Set the error flag on error.
