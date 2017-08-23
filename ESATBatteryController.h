@@ -33,19 +33,19 @@ class ESATBatteryController
 
     // Read the voltage of battery number 1.
     // Set the error flag on error.
-    int readBattery1Voltage();
+    word readBattery1Voltage();
 
     // Read the voltage of battery number 2.
     // Set the error flag on error.
-    int readBattery2Voltage();
+    word readBattery2Voltage();
 
     // Read the current flowing through the batteries.
     // Set the error flag on error.
-    int readBatteryCurrent();
+    word readBatteryCurrent();
 
     // Read the temperature of the batteries.
     // Set the error flag on error.
-    int readBatteryTemperature();
+    word readBatteryTemperature();
 
     // Read the state of charge.
     // Set the error flag on error.
@@ -53,7 +53,7 @@ class ESATBatteryController
 
     // Read the total battery voltage.
     // Set the error flag on error.
-    int readTotalBatteryVoltage();
+    word readTotalBatteryVoltage();
 
 
   private:
@@ -74,7 +74,7 @@ class ESATBatteryController
 
     // Read a 16-bit integer from the given register.
     // Set the error flag on error.
-    int readInteger(byte registerName);
+    word readWord(byte registerName);
 };
 
 extern ESATBatteryController BatteryController;
