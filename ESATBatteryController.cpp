@@ -70,6 +70,7 @@ byte ESATBatteryController::readByte(const byte registerName)
   else
   {
     error = true;
+    return 0;
   }
 }
 
@@ -88,6 +89,7 @@ word ESATBatteryController::readWord(const byte registerName)
   else
   {
     error = true;
+    return 0;
   }
 }
 
