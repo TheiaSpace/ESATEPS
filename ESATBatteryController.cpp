@@ -16,10 +16,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <ESATI2CDevice.h>
 #include "ESATBatteryController.h"
 
-ESATBatteryController::ESATBatteryController(): error(false)
+ESATBatteryController::ESATBatteryController():
+  device(Wire1, address), error(false)
 {
 }
 
@@ -59,7 +59,6 @@ word ESATBatteryController::readTotalBatteryVoltage()
 
 byte ESATBatteryController::readByte(const byte registerNumber)
 {
-  ESATI2CDevice device(Wire1, address);
   const byte measurement = device.readByte(registerNumber);
   if (device.error)
   {
@@ -70,7 +69,6 @@ byte ESATBatteryController::readByte(const byte registerNumber)
 
 word ESATBatteryController::readWord(const byte registerNumber)
 {
-  ESATI2CDevice device(Wire1, address);
   const word measurement = device.readLittleEndianWord(registerNumber);
   if (device.error)
   {
