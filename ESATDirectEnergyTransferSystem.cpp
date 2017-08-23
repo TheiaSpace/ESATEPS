@@ -16,32 +16,27 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <Wire.h>
+#include <ESATI2CDevice.h>
 #include "ESATDirectEnergyTransferSystem.h"
 
 word ESATDirectEnergyTransferSystem::read(const word channelConfigurationBits)
 {
   startConversion(channelConfigurationBits);
+  if (error)
+  {
+    return 0;
+  }
   delay(1);
   return readConvertedValue();
 }
 
 word ESATDirectEnergyTransferSystem::readConvertedValue()
 {
-  Wire1.beginTransmission(address);
-  Wire1.write(conversionRegister);
-  const byte wireStatus = Wire1.endTransmission();
-  if (wireStatus == 0)
-  {
-    Wire1.requestFrom((uint8_t) address, (uint8_t) 2);
-    const byte highByte = Wire1.read();
-    const byte lowByte = Wire1.read();
-    return word(highByte, lowByte);
-  }
-  else
+  ESATI2CDevice device(Wire1, address);
+  const word convertedValue = device.readBigEndianWord(conversionRegister);
+  if (device.error)
   {
     error = true;
-    return 0;
   }
 }
 
@@ -68,11 +63,12 @@ void ESATDirectEnergyTransferSystem::startConversion(const word channelConfigura
     dataRateConfigurationBits |
     fullScaleRangeConfigurationBits |
     channelConfigurationBits;
-  Wire1.beginTransmission(address);
-  Wire1.write(configurationRegister);
-  Wire1.write(highByte(configurationBits));
-  Wire1.write(lowByte(configurationBits));
-  Wire1.endTransmission();
+  ESATI2CDevice device(Wire1, address);
+  device.writeBigEndianWord(configurationRegister, configurationBits);
+  if (device.error)
+  {
+    error = true;
+  }
 }
 
 ESATDirectEnergyTransferSystem DirectEnergyTransferSystem;
