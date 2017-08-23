@@ -33,24 +33,20 @@ word ESATBatteryController::readBattery2Voltage()
   return readWord(battery2VoltageRegister);
 }
 
-
 word ESATBatteryController::readBatteryCurrent()
 {
   return readWord(batteryCurrentRegister);
 }
-
 
 word ESATBatteryController::readBatteryTemperature()
 {
   return readWord(batteryTemperatureRegister);
 }
 
-
 word ESATBatteryController::readStateOfCharge()
 {
   return word(readByte(stateOfChargeRegister));
 }
-
 
 word ESATBatteryController::readTotalBatteryVoltage()
 {
