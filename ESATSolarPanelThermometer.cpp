@@ -75,6 +75,7 @@ int ESATSolarPanelThermometer::tryToRead(const byte address, const byte register
   else
   {
     success = false;
+    return 0;
   }
 }
 
