@@ -32,5 +32,4 @@ void loop()
   }
   EPS.updateTelemetry();
   EPS.sendTelemetry();
-  delay(10);
 }
