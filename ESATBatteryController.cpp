@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <Wire.h>
+#include <ESATI2CDevice.h>
 #include "ESATBatteryController.h"
 
 ESATBatteryController::ESATBatteryController(): error(false)
@@ -59,38 +59,24 @@ word ESATBatteryController::readTotalBatteryVoltage()
 
 byte ESATBatteryController::readByte(const byte registerNumber)
 {
-  Wire.beginTransmission(address);
-  Wire1.write(registerNumber);
-  const byte wireStatus = Wire1.endTransmission();
-  if (wireStatus == 0)
-  {
-    Wire1.requestFrom((uint8_t) address, (uint8_t) 1);
-    return Wire1.read();
-  }
-  else
+  ESATI2CDevice device(Wire1, address);
+  const byte measurement = device.readByte(registerNumber);
+  if (device.error)
   {
     error = true;
-    return 0;
   }
+  return measurement;
 }
 
 word ESATBatteryController::readWord(const byte registerNumber)
 {
-  Wire1.beginTransmission(address);
-  Wire1.write(registerNumber);
-  const byte wireStatus = Wire1.endTransmission();
-  if (wireStatus == 0)
-  {
-    Wire1.requestFrom((uint8_t) address, (uint8_t) 2);
-    const byte lowByte = Wire1.read();
-    const byte highByte = Wire1.read();
-    return word(highByte, lowByte);
-  }
-  else
+  ESATI2CDevice device(Wire1, address);
+  const word measurement = device.readLittleEndianWord(registerNumber);
+  if (device.error)
   {
     error = true;
-    return 0;
   }
+  return measurement;
 }
 
 ESATBatteryController BatteryController;
