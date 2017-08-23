@@ -70,11 +70,11 @@ class ESATBatteryController
 
     // Read a byte from the given register.
     // Set the error flag on error.
-    byte readByte(byte registerName);
+    byte readByte(byte registerNumber);
 
     // Read a 16-bit integer from the given register.
     // Set the error flag on error.
-    word readWord(byte registerName);
+    word readWord(byte registerNumber);
 };
 
 extern ESATBatteryController BatteryController;

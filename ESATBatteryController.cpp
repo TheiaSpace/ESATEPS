@@ -57,10 +57,10 @@ word ESATBatteryController::readTotalBatteryVoltage()
   return readWord(totalBatteryVoltageRegister);
 }
 
-byte ESATBatteryController::readByte(const byte registerName)
+byte ESATBatteryController::readByte(const byte registerNumber)
 {
   Wire.beginTransmission(address);
-  Wire1.write(registerName);
+  Wire1.write(registerNumber);
   const byte wireStatus = Wire1.endTransmission();
   if (wireStatus == 0)
   {
@@ -74,10 +74,10 @@ byte ESATBatteryController::readByte(const byte registerName)
   }
 }
 
-word ESATBatteryController::readWord(const byte registerName)
+word ESATBatteryController::readWord(const byte registerNumber)
 {
   Wire1.beginTransmission(address);
-  Wire1.write(registerName);
+  Wire1.write(registerNumber);
   const byte wireStatus = Wire1.endTransmission();
   if (wireStatus == 0)
   {
