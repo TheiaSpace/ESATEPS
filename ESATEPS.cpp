@@ -192,7 +192,13 @@ void ESATEPS::sendTelemetry()
   String packet = "";
   packet += Util.byteToHexadecimal(identifier).substring(1, 2);
   packet += "2";
-  packet += Util.byteToHexadecimal((TELEMETRY_BUFFER_LENGTH + 1) * 2);
+  const byte hexadecimalByteCharacters = 2;
+  const byte hexadecimalWordCharacters = 4;
+  const byte dataFieldLength =
+    hexadecimalWordCharacters * TELEMETRY_BUFFER_LENGTH;
+  const byte typeFieldLength = hexadecimalByteCharacters;
+  const byte length = typeFieldLength + dataFieldLength;
+  packet += Util.byteToHexadecimal(length);
   packet += Util.byteToHexadecimal(type);
   for (int index = 0; index < TELEMETRY_BUFFER_LENGTH; index++)
   {
@@ -202,7 +208,7 @@ void ESATEPS::sendTelemetry()
   packet += "FF"; // implement CRC
   packet =
     "{\"type\":\"onPacket\",\"id\":\""
-    + String(int(identifier % 16), HEX)
+    + String(int(identifier), DEC)
     + "\",\"data\":\""
     + packet
     +"\"}";
