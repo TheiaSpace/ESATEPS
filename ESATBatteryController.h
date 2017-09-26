@@ -20,7 +20,6 @@
 #define ESATBatteryController_h
 
 #include <Energia.h>
-#include <ESATI2CDevice.h>
 
 // An interface with the battery controller.
 class ESATBatteryController
@@ -28,9 +27,6 @@ class ESATBatteryController
   public:
     // True after a read error.  Must be reset manually.
     boolean error;
-
-    // Instantiate an interface with the battery controller.
-    ESATBatteryController();
 
     // Read the voltage of battery number 1.
     // Set the error flag on error.
@@ -68,9 +64,6 @@ class ESATBatteryController
     static const byte batteryCurrentRegister = 0x0a;
     static const byte stateOfChargeRegister = 0x0d;
     static const byte totalBatteryVoltageRegister = 0x09;
-
-    // I2C interface with the battery controller.
-    ESATI2CDevice device;
 
     // Read a byte from the given register.
     // Set the error flag on error.
