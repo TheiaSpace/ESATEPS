@@ -17,6 +17,7 @@
  */
 
 #include "ESATSolarPanelThermometer.h"
+#include <Wire.h>
 
 // Address/register pairs.
 static const byte solarPanel1PrimaryAddress = 0x4a;
@@ -37,27 +38,52 @@ ESATSolarPanelThermometer::ESATSolarPanelThermometer(const byte primaryAddress,
   primaryRegister(primaryRegister),
   secondaryAddress(secondaryAddress),
   secondaryRegister(secondaryRegister),
-  error(false),
-  primaryDevice(Wire1, primaryAddress),
-  secondaryDevice(Wire1, secondaryAddress)
+  error(false)
 {
 }
 
 word ESATSolarPanelThermometer::read()
 {
   const word primaryTemperature =
-    primaryDevice.readBigEndianWord(primaryRegister);
-  if (!primaryDevice.error)
+    tryRead(primaryAddress, primaryRegister);
+  if (successfulRead)
   {
     return primaryTemperature;
   }
   const word secondaryTemperature =
-    secondaryDevice.readBigEndianWord(secondaryRegister);
-  if (secondaryDevice.error)
+    tryRead(secondaryAddress, secondaryRegister);
+  if (successfulRead)
+  {
+    return secondaryTemperature;
+  }
+  else
   {
     error = true;
+    return 0;
   }
-  return secondaryTemperature;
+}
+
+word ESATSolarPanelThermometer::tryRead(const byte address,
+                                        const byte registerNumber)
+{
+  Wire1.beginTransmission(address);
+  Wire1.write(registerNumber);
+  const byte writeStatus = Wire1.endTransmission();
+  if (writeStatus != 0)
+  {
+    successfulRead = false;
+    return 0;
+  }
+  const byte bytesRead = Wire1.requestFrom(int(address), 2);
+  if (bytesRead != 2)
+  {
+    successfulRead = false;
+    return 0;
+  }
+  successfulRead = true;
+  const byte highByte = Wire1.read();
+  const byte lowByte = Wire1.read();
+  return word(highByte, lowByte);
 }
 
 ESATSolarPanelThermometer SolarPanel1Thermometer(solarPanel1PrimaryAddress,

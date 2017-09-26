@@ -17,31 +17,41 @@
  */
 
 #include "ESATDirectEnergyTransferSystem.h"
-
-ESATDirectEnergyTransferSystem::ESATDirectEnergyTransferSystem():
-  device(Wire1, address)
-{
-}
+#include <Wire.h>
 
 word ESATDirectEnergyTransferSystem::read(const word channelConfigurationBits)
 {
-  startConversion(channelConfigurationBits);
-  if (device.error)
+  const boolean successfulConversionStart =
+    startConversion(channelConfigurationBits);
+  if (!successfulConversionStart)
   {
+    error = true;
     return 0;
   }
   delay(1);
   const word convertedValue = readConvertedValue();
-  if (device.error)
-  {
-    error = true;
-  }
   return convertedValue;
 }
 
 word ESATDirectEnergyTransferSystem::readConvertedValue()
 {
-  return device.readBigEndianWord(conversionRegister);
+  Wire1.beginTransmission(address);
+  Wire1.write(conversionRegister);
+  const byte writeStatus = Wire1.endTransmission();
+  if (writeStatus != 0)
+  {
+    error = true;
+    return 0;
+  }
+  const byte bytesRead = Wire1.requestFrom(int(address), 2);
+  if (bytesRead != 2)
+  {
+    error = true;
+    return 0;
+  }
+  const byte highByte = Wire1.read();
+  const byte lowByte = Wire1.read();
+  return word(highByte, lowByte);
 }
 
 word ESATDirectEnergyTransferSystem::readCurrent()
@@ -59,7 +69,7 @@ word ESATDirectEnergyTransferSystem::readVoltage()
   return read(voltageChannelConfigurationBits);
 }
 
-void ESATDirectEnergyTransferSystem::startConversion(const word channelConfigurationBits)
+boolean ESATDirectEnergyTransferSystem::startConversion(const word channelConfigurationBits)
 {
   const word configurationBits =
     startSingleShotConversionConfigurationBits |
@@ -67,7 +77,19 @@ void ESATDirectEnergyTransferSystem::startConversion(const word channelConfigura
     dataRateConfigurationBits |
     fullScaleRangeConfigurationBits |
     channelConfigurationBits;
-  device.writeBigEndianWord(configurationRegister, configurationBits);
+  Wire1.beginTransmission(address);
+  Wire1.write(configurationRegister);
+  Wire1.write(highByte(configurationBits));
+  Wire1.write(lowByte(configurationBits));
+  const byte status = Wire1.endTransmission();
+  if (status == 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 ESATDirectEnergyTransferSystem DirectEnergyTransferSystem;
