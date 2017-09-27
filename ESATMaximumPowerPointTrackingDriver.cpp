@@ -28,6 +28,16 @@ void ESATMaximumPowerPointTrackingDriver::begin()
   pinMode(outputPin, OUTPUT);
 }
 
+byte ESATMaximumPowerPointTrackingDriver::getDutyCycle()
+{
+  return dutyCycle;
+}
+
+byte ESATMaximumPowerPointTrackingDriver::getMode()
+{
+  return mode;
+}
+
 int ESATMaximumPowerPointTrackingDriver::gradientDirection()
 {
   const int reading = (analogRead(sensorPin) + analogRead(sensorPin)) / 2;
