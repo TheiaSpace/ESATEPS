@@ -19,7 +19,6 @@
 #include "ESATEPS.h"
 #include <ESATUtil.h>
 #include <USBSerial.h>
-#include <MspFlash.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
 #include "ESATDirectEnergyTransferSystem.h"
