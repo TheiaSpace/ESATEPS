@@ -88,9 +88,6 @@ void ESATEPS::handleCommands()
   const byte commandParameter = telecommand.readByte();
   switch (commandCode)
   {
-  case SET_IDENTIFIER:
-    handleSetIdentifierCommand(commandParameter);
-    break;
   case TOGGLE_5V_LINE:
     handleToggle5VLineCommand(commandParameter);
     break;
@@ -124,13 +121,6 @@ void ESATEPS::handleMaximumPowerPointTrackingModeCommand(const byte commandParam
 {
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
-}
-
-void ESATEPS::handleSetIdentifierCommand(const byte commandParameter)
-{
-  Flash.erase(EPS_IDENTIFIER_FLASH_SEGMENT);
-  identifier = commandParameter;
-  Flash.write(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
 }
 
 void ESATEPS::handleSweepModeCommand(const byte commandParameter)

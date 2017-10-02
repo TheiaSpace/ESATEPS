@@ -51,7 +51,6 @@ class ESATEPS
     // Command codes.
     enum CommandCode
     {
-      SET_IDENTIFIER = 0,
       TOGGLE_5V_LINE = 1,
       TOGGLE_3V3_LINE = 2,
       MAXIMUM_POWER_POINT_TRACKING_MODE = 3,
@@ -202,9 +201,6 @@ class ESATEPS
     // Set the maximum power point tracking drivers in maximum power
     // point tracking mode.
     void handleMaximumPowerPointTrackingModeCommand(byte commandParameter);
-
-    // Set and store the identifier number.
-    void handleSetIdentifierCommand(byte commandParameter);
 
     // Set the maximum power point tracking drivers in sweep mode.
     void handleSweepModeCommand(byte commandParameter);
