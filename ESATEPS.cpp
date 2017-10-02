@@ -37,7 +37,6 @@ void ESATEPS::begin()
   telemetryBufferIndex = 0;
   telemetryPacketSequenceCount = 0;
   currentTelemetryBuffer = 0;
-  Flash.read(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
