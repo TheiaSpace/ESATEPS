@@ -29,8 +29,6 @@
 #include "ESATPowerLineSwitch.h"
 #include "ESATSolarPanelThermometer.h"
 
-#define EPS_IDENTIFIER_FLASH_SEGMENT SEGMENT_C
-
 void ESATEPS::begin()
 {
   pendingTelecommand = false;
