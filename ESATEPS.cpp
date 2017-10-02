@@ -33,8 +33,11 @@
 
 void ESATEPS::begin()
 {
+  pendingTelecommand = false;
+  telemetryBufferIndex = 0;
+  telemetryPacketSequenceCount = 0;
+  currentTelemetryBuffer = 0;
   Flash.read(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
-  command.pending = false;
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
@@ -52,229 +55,172 @@ void ESATEPS::begin()
   USB.begin();
 }
 
-void ESATEPS::handleCommand()
+void ESATEPS::handleCommands()
 {
-  if (command.pending)
+  if (!pendingTelecommand)
   {
-    switch (command.commandCode)
-    {
-    case SET_IDENTIFIER:
-      handleSetIdentifierCommand();
-      break;
-    case TOGGLE_5V_LINE:
-      handleToggle5VLineCommand();
-      break;
-    case TOGGLE_3V3_LINE:
-      handleToggle3V3LineCommand();
-      break;
-    case MAXIMUM_POWER_POINT_TRACKING_MODE:
-      handleMaximumPowerPointTrackingModeCommand();
-      break;
-    case SWEEP_MODE:
-      handleSweepModeCommand();
-      break;
-    case FIXED_MODE:
-      handleFixedModeCommand();
-      break;
-    default:
-      break;
-    }
-    command.pending = false;
+    return;
+  }
+  byte buffer[COMMAND_PACKET_LENGTH];
+  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  {
+    buffer[index] = telecommandBuffer[index];
+  }
+  pendingTelecommand = false;
+  ESATCCSDSPacket telecommand(buffer);
+  if (telecommand.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
+  {
+    return;
+  }
+  if ((telecommand.PRIMARY_HEADER_LENGTH + telecommand.readPacketDataLength())
+      != COMMAND_PACKET_LENGTH)
+  {
+    return;
+  }
+  const byte majorVersionNumber = telecommand.readByte();
+  const byte minorVersionNumber = telecommand.readByte();
+  const byte patchVersionNumber = telecommand.readByte();
+  if (majorVersionNumber < MAJOR_VERSION_NUMBER)
+  {
+    return;
+  }
+  const byte commandCode = telecommand.readByte();
+  const byte commandParameter = telecommand.readByte();
+  switch (commandCode)
+  {
+  case SET_IDENTIFIER:
+    handleSetIdentifierCommand(commandParameter);
+    break;
+  case TOGGLE_5V_LINE:
+    handleToggle5VLineCommand(commandParameter);
+    break;
+  case TOGGLE_3V3_LINE:
+    handleToggle3V3LineCommand(commandParameter);
+    break;
+  case MAXIMUM_POWER_POINT_TRACKING_MODE:
+    handleMaximumPowerPointTrackingModeCommand(commandParameter);
+    break;
+  case SWEEP_MODE:
+    handleSweepModeCommand(commandParameter);
+    break;
+  case FIXED_MODE:
+    handleFixedModeCommand(commandParameter);
+    break;
+  default:
+    break;
   }
 }
 
-void ESATEPS::handleFixedModeCommand()
+void ESATEPS::handleFixedModeCommand(const byte commandParameter)
 {
-  const byte dutyCycle = constrain(command.parameter, 0, 255);
+  const byte dutyCycle = constrain(commandParameter, 0, 255);
   MaximumPowerPointTrackingDriver1.setFixedMode();
   MaximumPowerPointTrackingDriver2.setFixedMode();
   MaximumPowerPointTrackingDriver1.dutyCycle = dutyCycle;
   MaximumPowerPointTrackingDriver2.dutyCycle = dutyCycle;
 }
 
-void ESATEPS::handleMaximumPowerPointTrackingModeCommand()
+void ESATEPS::handleMaximumPowerPointTrackingModeCommand(const byte commandParameter)
 {
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
 }
 
-void ESATEPS::handleSetIdentifierCommand()
+void ESATEPS::handleSetIdentifierCommand(const byte commandParameter)
 {
   Flash.erase(EPS_IDENTIFIER_FLASH_SEGMENT);
-  identifier = command.parameter;
+  identifier = commandParameter;
   Flash.write(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
 }
 
-void ESATEPS::handleSweepModeCommand()
+void ESATEPS::handleSweepModeCommand(const byte commandParameter)
 {
   MaximumPowerPointTrackingDriver1.setSweepMode();
   MaximumPowerPointTrackingDriver2.setSweepMode();
 }
 
-void ESATEPS::handleToggle3V3LineCommand()
+void ESATEPS::handleToggle3V3LineCommand(const byte commandParameter)
 {
   PowerLine3V3Switch.toggle();
 }
 
-void ESATEPS::handleToggle5VLineCommand()
+void ESATEPS::handleToggle5VLineCommand(const byte commandParameter)
 {
   PowerLine5VSwitch.toggle();
 }
 
 boolean ESATEPS::pendingCommands()
 {
-  queueIncomingUSBCommands();
-  return command.pending;
+  receiveTelecommandFromUSB();
+  return pendingTelecommand;
 }
 
-void ESATEPS::queueCommand(const byte commandCode, const byte parameter)
+void ESATEPS::receiveEvent(const int howManyBytes)
 {
-  if (!command.pending)
+  const byte registerNumber = Wire.read();
+  switch (registerNumber)
   {
-    command.commandCode = commandCode;
-    command.parameter = parameter;
-    command.pending = true;
-  }
-}
-
-void ESATEPS::queueIncomingUSBCommands()
-{
-  if (USB.available())
-  {
-    const String packet = USB.readStringUntil('\r');
-    const String identifier = packet.substring(0, 1);
-    if (identifier == "@")
-    {
-      const byte commandCode = Util.hexadecimalToByte(packet.substring(5, 7));
-      const byte length = Util.hexadecimalToByte(packet.substring(3, 5));
-      const byte parameter = Util.hexadecimalToByte(packet.substring(7, 7 + length));
-      queueCommand(commandCode, parameter);
-    }
-  }
-}
-
-void ESATEPS::receiveEvent(const int howMany)
-{
-  const int commandCode = Wire.read();
-  if (commandCode < 0)
-  {
-    return;
-  }
-  if (howMany > 1)
-  {
-    const int parameter = Wire.read();
-    if (parameter < 0)
-    {
-      return;
-    }
-    EPS.queueCommand(commandCode, parameter);
-  }
-  else
-  {
-    EPS.queueCommand(commandCode, 0);
+  case TELECOMMAND_CONTROL:
+    EPS.receiveTelecommandFromI2C(howManyBytes - 1);
+    break;
+  case TELEMETRY_CONTROL:
+    EPS.telemetryBufferIndex = 0;
+    break;
+  case TELEMETRY_VECTOR:
+    EPS.telemetryBufferIndex = 0;
+    break;
   }
 }
 
 void ESATEPS::requestEvent()
 {
-  for (int index = 0; index < TELEMETRY_BUFFER_LENGTH; index++)
-  {
-    Wire.write(highByte(EPS.telemetry[index]));
-    Wire.write(lowByte(EPS.telemetry[index]));
-  }
+  Wire.write(EPS.telemetryBuffer[EPS.currentTelemetryBuffer][EPS.telemetryBufferIndex]);
 }
 
 void ESATEPS::sendTelemetry()
 {
-  const byte type = 1;
-  // build packet with given data (hex), type
-  // ID(b3)|TM/TC(b1)|APID(h1)|length(h2)|type(h2)|data|CRC(h2)
-  String packet = "";
-  packet += Util.byteToHexadecimal(identifier).substring(1, 2);
-  packet += "2";
-  const byte hexadecimalByteCharacters = 2;
-  const byte hexadecimalWordCharacters = 4;
-  const byte dataFieldLength =
-    hexadecimalWordCharacters * TELEMETRY_BUFFER_LENGTH;
-  const byte typeFieldLength = hexadecimalByteCharacters;
-  const byte length = typeFieldLength + dataFieldLength;
-  packet += Util.byteToHexadecimal(length);
-  packet += Util.byteToHexadecimal(type);
-  for (int index = 0; index < TELEMETRY_BUFFER_LENGTH; index++)
+  USB.write(telemetryBuffer[currentTelemetryBuffer],
+            TELEMETRY_BUFFER_LENGTH);
+}
+
+void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
+{
+  if (pendingTelecommand)
   {
-    packet += Util.wordToHexadecimal(telemetry[index]);
+    return;
   }
-  packet += "00000000";
-  packet += "FF"; // implement CRC
-  packet =
-    "{\"type\":\"onPacket\",\"id\":\""
-    + String(int(identifier), DEC)
-    + "\",\"data\":\""
-    + packet
-    +"\"}";
-  USB.println(packet);
+  if (packetLength != COMMAND_PACKET_LENGTH)
+  {
+    return;
+  }
+  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  {
+    telecommandBuffer[index] = Wire.read();
+  }
+  pendingTelecommand = true;
 }
 
-void ESATEPS::updateBatteryTelemetry()
+void::ESATEPS::receiveTelecommandFromUSB()
 {
-  BatteryController.error = false;
-  telemetry[TOTAL_BATTERY_VOLTAGE_OFFSET] =
-    BatteryController.readTotalBatteryVoltage();
-  telemetry[BATTERY_1_VOLTAGE_OFFSET] =
-    BatteryController.readBattery1Voltage();
-  telemetry[BATTERY_2_VOLTAGE_OFFSET] =
-    BatteryController.readBattery2Voltage();
-  telemetry[BATTERY_TEMPERATURE_OFFSET] =
-    BatteryController.readBatteryTemperature();
-  telemetry[BATTERY_CURRENT_OFFSET] =
-    BatteryController.readBatteryCurrent();
-  telemetry[STATE_OF_CHARGE_OFFSET] =
-    BatteryController.readStateOfCharge();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           BATTERY_STATUS_OFFSET,
-           !BatteryController.error);
-}
-
-void ESATEPS::updateDirectEnergyTransferSystemTelemetry()
-{
-  DirectEnergyTransferSystem.error = false;
-  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_CURRENT_OFFSET] =
-    DirectEnergyTransferSystem.readCurrent();
-  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_VOLTAGE_OFFSET] =
-    DirectEnergyTransferSystem.readVoltage();
-  telemetry[DIRECT_ENERGY_TRANSFER_SYSTEM_SHUNT_VOLTAGE_OFFSET] =
-    DirectEnergyTransferSystem.readShuntVoltage();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           DIRECT_ENERGY_TRANSFER_SYSTEM_STATUS_OFFSET,
-           !DirectEnergyTransferSystem.error);
-}
-
-void ESATEPS::updateMainTelemetry()
-{
-  telemetry[CURRENT_5V_OFFSET] =
-    EPSMeasurements.read5VLineCurrent();
-  telemetry[VOLTAGE_5V_OFFSET] =
-    EPSMeasurements.read5VLineVoltage();
-  telemetry[CURRENT_3V3_OFFSET] =
-    EPSMeasurements.read3V3LineCurrent();
-  telemetry[VOLTAGE_3V3_OFFSET] =
-    EPSMeasurements.read3V3LineVoltage();
-  telemetry[INPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readInputLineCurrent();
-  telemetry[INPUT_VOLTAGE_OFFSET] =
-    EPSMeasurements.readInputLineVoltage();
-  telemetry[PANEL_1_OUTPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel1OutputCurrent();
-  telemetry[PANEL_1_VOLTAGE_OFFSET] =
-    EPSMeasurements.readPanel1Voltage();
-  telemetry[PANEL_1_INPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel1InputCurrent();
-  telemetry[PANEL_2_VOLTAGE_OFFSET] =
-    EPSMeasurements.readPanel2Voltage();
-  telemetry[PANEL_2_INPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel2InputCurrent();
-  telemetry[PANEL_2_OUTPUT_CURRENT_OFFSET] =
-    EPSMeasurements.readPanel2OutputCurrent();
+  if (pendingTelecommand)
+  {
+    return;
+  }
+  if (USB.available() == 0)
+  {
+    return;
+  }
+  char buffer[COMMAND_PACKET_LENGTH];
+  const size_t bytesRead = USB.readBytes(buffer, COMMAND_PACKET_LENGTH);
+  if (bytesRead != COMMAND_PACKET_LENGTH)
+  {
+    return;
+  }
+  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  {
+    telecommandBuffer[index] = buffer[index];
+  }
+  pendingTelecommand = true;
 }
 
 void ESATEPS::updateMaximumPowerPointTracking()
@@ -283,52 +229,62 @@ void ESATEPS::updateMaximumPowerPointTracking()
   MaximumPowerPointTrackingDriver2.update();
 }
 
-void ESATEPS::updatePanelTelemetry()
-{
-  SolarPanel1Thermometer.error = false;
-  telemetry[PANEL_1_TEMPERATURE_OFFSET] =
-    SolarPanel1Thermometer.read();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           PANEL_1_THERMOMETER_STATUS_OFFSET,
-           !SolarPanel1Thermometer.error);
-  SolarPanel2Thermometer.error = false;
-  telemetry[PANEL_2_TEMPERATURE_OFFSET] =
-    SolarPanel2Thermometer.read();
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           PANEL_2_THERMOMETER_STATUS_OFFSET,
-           !SolarPanel2Thermometer.error);
-}
-
-void ESATEPS::updateSoftwareVersionTelemetry()
-{
-  telemetry[STATUS_REGISTER_1_OFFSET] =
-    EPS_SOFTWARE_VERSION << SOFTWARE_VERSION_OFFSET;
-}
-
-void ESATEPS::updateStatusTelemetry()
-{
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           SWITCH_5V_ON_OFFSET,
-           PowerLine5VSwitch.read());
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           SWITCH_3V3_ON_OFFSET,
-           PowerLine3V3Switch.read());
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           OVERCURRENT_3V3_OFFSET,
-           OvercurrentDetector.read3V3LineOvercurrentState());
-  bitWrite(telemetry[STATUS_REGISTER_2_OFFSET],
-           OVERCURRENT_5V_OFFSET,
-           OvercurrentDetector.read5VLineOvercurrentState());
-}
-
 void ESATEPS::updateTelemetry()
 {
-  updateMainTelemetry();
-  updateSoftwareVersionTelemetry();
-  updateBatteryTelemetry();
-  updatePanelTelemetry();
-  updateDirectEnergyTransferSystemTelemetry();
-  updateStatusTelemetry();
+  const byte nextTelemetryBuffer = (currentTelemetryBuffer + 1) % 2;
+  ESATCCSDSPacket packet(telemetryBuffer[nextTelemetryBuffer]);
+  packet.clear();
+  packet.writePacketVersionNumber(0);
+  packet.writePacketType(packet.TELEMETRY);
+  packet.writeSecondaryHeaderFlag(packet.SECONDARY_HEADER_IS_PRESENT);
+  packet.writeApplicationProcessIdentifier(SUBSYSTEM_IDENTIFIER);
+  packet.writeSequenceFlags(packet.UNSEGMENTED_USER_DATA);
+  packet.writePacketSequenceCount(telemetryPacketSequenceCount);
+  packet.writeByte(MAJOR_VERSION_NUMBER);
+  packet.writeByte(MINOR_VERSION_NUMBER);
+  packet.writeByte(PATCH_VERSION_NUMBER);
+  packet.writeByte(HOUSEKEEPING);
+  packet.writeWord(EPSMeasurements.read3V3LineCurrent());
+  packet.writeWord(EPSMeasurements.read3V3LineVoltage());
+  packet.writeWord(EPSMeasurements.read5VLineCurrent());
+  packet.writeWord(EPSMeasurements.read5VLineVoltage());
+  packet.writeWord(EPSMeasurements.readInputLineCurrent());
+  packet.writeWord(EPSMeasurements.readInputLineVoltage());
+  packet.writeWord(EPSMeasurements.readPanel1InputCurrent());
+  packet.writeWord(EPSMeasurements.readPanel1OutputCurrent());
+  packet.writeWord(EPSMeasurements.readPanel1Voltage());
+  packet.writeWord(EPSMeasurements.readPanel2InputCurrent());
+  packet.writeWord(EPSMeasurements.readPanel2OutputCurrent());
+  packet.writeWord(EPSMeasurements.readPanel2Voltage());
+  packet.writeByte(PowerLine3V3Switch.read());
+  packet.writeByte(PowerLine5VSwitch.read());
+  packet.writeByte(OvercurrentDetector.read3V3LineOvercurrentState());
+  packet.writeByte(OvercurrentDetector.read5VLineOvercurrentState());
+  BatteryController.error = false;
+  packet.writeWord(BatteryController.readBatteryCurrent());
+  packet.writeWord(BatteryController.readTotalBatteryVoltage());
+  packet.writeWord(BatteryController.readBattery1Voltage());
+  packet.writeWord(BatteryController.readBattery2Voltage());
+  packet.writeWord(BatteryController.readBatteryTemperature());
+  packet.writeByte(BatteryController.readStateOfCharge());
+  packet.writeByte(BatteryController.error);
+  SolarPanel1Thermometer.error = false;
+  packet.writeWord(SolarPanel1Thermometer.read());
+  packet.writeByte(SolarPanel1Thermometer.error);
+  SolarPanel2Thermometer.error = false;
+  packet.writeWord(SolarPanel2Thermometer.read());
+  packet.writeByte(SolarPanel2Thermometer.error);
+  packet.writeByte(MaximumPowerPointTrackingDriver1.getMode());
+  packet.writeByte(MaximumPowerPointTrackingDriver1.getDutyCycle());
+  packet.writeByte(MaximumPowerPointTrackingDriver2.getMode());
+  packet.writeByte(MaximumPowerPointTrackingDriver2.getDutyCycle());
+  DirectEnergyTransferSystem.error = false;
+  packet.writeWord(DirectEnergyTransferSystem.readCurrent());
+  packet.writeWord(DirectEnergyTransferSystem.readVoltage());
+  packet.writeWord(DirectEnergyTransferSystem.readShuntVoltage());
+  packet.writeByte(DirectEnergyTransferSystem.error);
+  telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
+  currentTelemetryBuffer = nextTelemetryBuffer;
 }
 
 ESATEPS EPS;

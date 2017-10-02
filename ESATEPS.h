@@ -20,17 +20,19 @@
 #define ESATEPS_h
 
 #include <Energia.h>
-
-#define EPS_SOFTWARE_VERSION 2
+#include <ESATCCSDSPacket.h>
 
 class ESATEPS
 {
   public:
+    // EPS subsystem identifier.
+    static const byte SUBSYSTEM_IDENTIFIER = 2;
+
     // Set up the EPS board.
     void begin();
 
-    // Handle the next command of the command queue.
-    void handleCommand();
+    // Handle all pending commands.
+    void handleCommands();
 
     // Return true if there are pending commands;
     // otherwise return false.
@@ -57,98 +59,161 @@ class ESATEPS
       FIXED_MODE = 5,
     };
 
-    // Offsets of the telemetry fields.
-    enum TelemetryFieldOffsets
+    // Register numbers for I2C control.
+    enum RegisterNumbers
     {
-      STATUS_REGISTER_1_OFFSET = 0,
-      STATUS_REGISTER_2_OFFSET = 1,
-      CURRENT_5V_OFFSET = 2,
-      VOLTAGE_5V_OFFSET = 3,
-      CURRENT_3V3_OFFSET = 4,
-      VOLTAGE_3V3_OFFSET = 5,
-      INPUT_CURRENT_OFFSET = 6,
-      INPUT_VOLTAGE_OFFSET = 7,
-      PANEL_1_OUTPUT_CURRENT_OFFSET = 8,
-      PANEL_1_VOLTAGE_OFFSET = 9,
-      PANEL_1_INPUT_CURRENT_OFFSET = 10,
-      PANEL_2_VOLTAGE_OFFSET = 11,
-      PANEL_2_INPUT_CURRENT_OFFSET = 12,
-      PANEL_2_OUTPUT_CURRENT_OFFSET = 13,
-      TOTAL_BATTERY_VOLTAGE_OFFSET = 14,
-      BATTERY_1_VOLTAGE_OFFSET = 15,
-      BATTERY_2_VOLTAGE_OFFSET = 16,
-      BATTERY_TEMPERATURE_OFFSET = 17,
-      BATTERY_CURRENT_OFFSET = 18,
-      STATE_OF_CHARGE_OFFSET = 24,
-      PANEL_1_TEMPERATURE_OFFSET = 19,
-      PANEL_2_TEMPERATURE_OFFSET = 20,
-      DIRECT_ENERGY_TRANSFER_SYSTEM_CURRENT_OFFSET = 21,
-      DIRECT_ENERGY_TRANSFER_SYSTEM_VOLTAGE_OFFSET = 22,
-      DIRECT_ENERGY_TRANSFER_SYSTEM_SHUNT_VOLTAGE_OFFSET = 23,
+      TELECOMMAND_CONTROL = 0,
+      TELECOMMAND_STATUS = 1,
+      TELEMETRY_CONTROL = 2,
+      TELEMETRY_STATUS = 3,
+      TELEMETRY_VECTOR = 4,
     };
 
-    enum StatusRegister1Offsets
+    // Telemetry packet identifiers.
+    enum TelemetryPacketIdentifier
     {
-      SOFTWARE_VERSION_OFFSET = 3,
+      HOUSEKEEPING = 0,
     };
 
-    // Bit offsets of the status bits on status register 2.
-    enum StatusRegister2Offsets
-    {
-      DIRECT_ENERGY_TRANSFER_SYSTEM_STATUS_OFFSET = 0,
-      PANEL_2_THERMOMETER_STATUS_OFFSET = 1,
-      PANEL_1_THERMOMETER_STATUS_OFFSET = 2,
-      BATTERY_STATUS_OFFSET = 3,
-      OVERCURRENT_3V3_OFFSET = 4,
-      OVERCURRENT_5V_OFFSET = 5,
-      SWITCH_3V3_ON_OFFSET = 6,
-      SWITCH_5V_ON_OFFSET = 7,
-    };
+    // Software version number.
+    static const byte MAJOR_VERSION_NUMBER = 2;
+    static const byte MINOR_VERSION_NUMBER = 0;
+    static const byte PATCH_VERSION_NUMBER = 0;
 
-    // Size in words of the telemetry buffer.
-    static const byte TELEMETRY_BUFFER_LENGTH = 25;
+    // Size of the secondary header:
+    // - Major version number (1 byte).
+    // - Minor version number (1 byte).
+    // - Patch version number (1 byte).
+    // - Packet identifier (1 byte).
+    static const byte SECONDARY_HEADER_LENGTH = 4;
 
-    // Command buffer structure.
-    struct Command
-    {
-      byte commandCode;
-      byte parameter;
-      boolean pending;
-    };
+    // Telecommands have a 1-byte argument field.
+    static const byte COMMAND_PARAMETER_LENGTH = 1;
 
-    // Command queue.
-    volatile Command command;
+    // Size of the telecommand buffer:
+    // - Primary header.
+    // - Secondary header.
+    // - Command parameter.
+    static const byte COMMAND_PACKET_LENGTH =
+      ESATCCSDSPacket::PRIMARY_HEADER_LENGTH
+      + SECONDARY_HEADER_LENGTH
+      + COMMAND_PARAMETER_LENGTH;
 
-    // Last received command code.
-    byte commandCode;
+    // Size of the telemetry buffer (EPS measurements):
+    // - 3.3 V line current (2 bytes).
+    // - 3.3 V line voltage (2 bytes).
+    // - 5 V line current (2 bytes).
+    // - 5 V line voltage (2 bytes).
+    // - Input line current (2 bytes).
+    // - Input line voltage (2 bytes).
+    // - Panel 1 input current (2 bytes).
+    // - Panel 1 output current (2 bytes).
+    // - Panel 1 voltage (2 bytes).
+    // - Panel 2 input current (2 bytes).
+    // - Panel 2 output current (2 bytes).
+    // - Panel 2 voltage (2 bytes).
+    static const byte EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*12;
 
-    // Last received command parameter.
-    byte commandParameter;
+    // Size of the telemetry buffer (switches):
+    // - 3.3 V line switch state (1 byte).
+    // - 5 V line switch state (1 byte).
+    static const byte SWITCHES_TELEMETRY_BUFFER_LENGTH = 1*2;
+
+    // Size of the telemetry buffer (overcurrent):
+    // - 3.3 V line overcurrent (1 byte).
+    // - 5 V line overcurrent (1 byte);
+    static const byte OVERCURRENT_TELEMETRY_BUFFER_LENGTH = 1*2;
+
+    // Size of the telemetry buffer (battery controller):
+    // - Battery current (2 bytes).
+    // - Total battery voltage (2 bytes).
+    // - Battery 1 voltage (2 bytes).
+    // - Battery 2 voltage (2 bytes).
+    // - Battery temperature (2 bytes).
+    // - State of charge (1 byte).
+    // - Error (1 byte).
+    static const byte BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH = 2*5 + 1*2;
+
+    // Size of the telemetry buffer (panel thermometers):
+    // - Panel 1 temperature (2 bytes).
+    // - Panel 1 thermometer error (1 byte).
+    // - Panel 2 temperature (2 bytes).
+    // - Panel 2 thermometer error (1 byte).
+    static const byte PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH = 2*2 + 1*2;
+
+    // Size of the telemetry buffer (maximum power point tracking):
+    // - Driver 1 mode (1 byte).
+    // - Driver 1 duty cycle (1 byte).
+    // - Driver 2 mode (1 byte).
+    // - Driver 2 duty cycle (1 byte).
+    static const byte MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH = 1*4;
+
+    // Size of the telemetry buffer (direct energy transfer system):
+    // - Current (2 bytes).
+    // - Voltage (2 bytes).
+    // - Shunt voltage (2 bytes).
+    // - Error (1 byte).
+    static const byte DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH = 2*3 + 1*1;
+
+    // Size of the telemetry buffer (total):
+    // - Primary header.
+    // - Secondary header.
+    // - EPS measurements.
+    // - Battery controller.
+    // - Panel thermometers.
+    // - Direct energy transfer system.
+    // - Switches.
+    static const byte TELEMETRY_BUFFER_LENGTH =
+      ESATCCSDSPacket::PRIMARY_HEADER_LENGTH
+      + SECONDARY_HEADER_LENGTH
+      + EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
+      + SWITCHES_TELEMETRY_BUFFER_LENGTH
+      + OVERCURRENT_TELEMETRY_BUFFER_LENGTH
+      + BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH
+      + MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH
+      + PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH
+      + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
+
+    // Current telemetry buffer.
+    byte currentTelemetryBuffer;
 
     // Identifier number of the EPS board.
     byte identifier;
 
+    // True when there is a pending unprocessed telecommand.
+    volatile boolean pendingTelecommand;
+
+    // Telecommand buffer.
+    volatile byte telecommandBuffer[COMMAND_PACKET_LENGTH];
+
     // Telemetry buffer.
-    word telemetry[TELEMETRY_BUFFER_LENGTH];
+    byte telemetryBuffer[2][TELEMETRY_BUFFER_LENGTH];
+
+    // Telemetry buffer read pointer for I2C requests.
+    byte telemetryBufferIndex;
+
+    // Telemetry packet sequence count, which must increase every time
+    // a new telemetry packet is generated.
+    word telemetryPacketSequenceCount;
 
     // Set the maximum power point tracking drivers in fixed mode.
-    void handleFixedModeCommand();
+    void handleFixedModeCommand(byte commandParameter);
 
     // Set the maximum power point tracking drivers in maximum power
     // point tracking mode.
-    void handleMaximumPowerPointTrackingModeCommand();
+    void handleMaximumPowerPointTrackingModeCommand(byte commandParameter);
 
     // Set and store the identifier number.
-    void handleSetIdentifierCommand();
+    void handleSetIdentifierCommand(byte commandParameter);
 
     // Set the maximum power point tracking drivers in sweep mode.
-    void handleSweepModeCommand();
+    void handleSweepModeCommand(byte commandParameter);
 
     // Toggle the 3V3 line.
-    void handleToggle3V3LineCommand();
+    void handleToggle3V3LineCommand(byte commandParameter);
 
     // Toggle the 5V line.
-    void handleToggle5VLineCommand();
+    void handleToggle5VLineCommand(byte commandParameter);
 
     // Add a command to the command queue.
     void queueCommand(byte commandCode, byte parameter);
@@ -159,26 +224,14 @@ class ESATEPS
     // Response to incoming telecommands sent by the OBC.
     static void receiveEvent(int howMany);
 
+    // Receive a telecommand from the I2C bus.
+    void receiveTelecommandFromI2C(const int packetLength);
+
+    // Receive a telecommand from the USB serial interface.
+    void receiveTelecommandFromUSB();
+
     // Response when asked for telemetry by the OBC.
     static void requestEvent();
-
-    // Update the battery fields of the telemetry buffer.
-    void updateBatteryTelemetry();
-
-    // Update the direct energy transfer system fields of the telemetry buffer.
-    void updateDirectEnergyTransferSystemTelemetry();
-
-    // Update the main fields of the telemetry buffer.
-    void updateMainTelemetry();
-
-    // Update the panel fields of the telemetry buffer.
-    void updatePanelTelemetry();
-
-    // Update the software version field of the telemetry buffer.
-    void updateSoftwareVersionTelemetry();
-
-    // Update the status registers of the telemetry buffer.
-    void updateStatusTelemetry();
 };
 
 extern ESATEPS EPS;
