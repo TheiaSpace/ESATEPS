@@ -19,7 +19,6 @@
 #include "ESATEPS.h"
 #include <ESATUtil.h>
 #include <USBSerial.h>
-#include <MspFlash.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
 #include "ESATDirectEnergyTransferSystem.h"
@@ -29,15 +28,12 @@
 #include "ESATPowerLineSwitch.h"
 #include "ESATSolarPanelThermometer.h"
 
-#define EPS_IDENTIFIER_FLASH_SEGMENT SEGMENT_C
-
 void ESATEPS::begin()
 {
   pendingTelecommand = false;
   telemetryBufferIndex = 0;
   telemetryPacketSequenceCount = 0;
   currentTelemetryBuffer = 0;
-  Flash.read(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
@@ -88,9 +84,6 @@ void ESATEPS::handleCommands()
   const byte commandParameter = telecommand.readByte();
   switch (commandCode)
   {
-  case SET_IDENTIFIER:
-    handleSetIdentifierCommand(commandParameter);
-    break;
   case TOGGLE_5V_LINE:
     handleToggle5VLineCommand(commandParameter);
     break;
@@ -124,13 +117,6 @@ void ESATEPS::handleMaximumPowerPointTrackingModeCommand(const byte commandParam
 {
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
-}
-
-void ESATEPS::handleSetIdentifierCommand(const byte commandParameter)
-{
-  Flash.erase(EPS_IDENTIFIER_FLASH_SEGMENT);
-  identifier = commandParameter;
-  Flash.write(EPS_IDENTIFIER_FLASH_SEGMENT, &identifier, sizeof(identifier));
 }
 
 void ESATEPS::handleSweepModeCommand(const byte commandParameter)
