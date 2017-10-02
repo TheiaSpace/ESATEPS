@@ -35,6 +35,12 @@ class ESATMaximumPowerPointTrackingDriver
     // Configure the pins of the MPPT driver.
     void begin();
 
+    // Return the duty cycle.
+    byte getDutyCycle();
+
+    // Return the mode of operation.
+    byte getMode();
+
     // Set the mode of operation to fixed mode.
     void setFixedMode();
 
@@ -51,9 +57,9 @@ class ESATMaximumPowerPointTrackingDriver
     // Modes of operation.
     enum Mode
     {
-      FIXED_MODE,
-      MPPT_MODE,
-      SWEEP_MODE,
+      FIXED_MODE = 0,
+      MPPT_MODE = 1,
+      SWEEP_MODE = 2,
     };
 
     // Default duty cycle.
