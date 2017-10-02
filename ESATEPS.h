@@ -176,9 +176,6 @@ class ESATEPS
     // Current telemetry buffer.
     byte currentTelemetryBuffer;
 
-    // Identifier number of the EPS board.
-    byte identifier;
-
     // True when there is a pending unprocessed telecommand.
     volatile boolean pendingTelecommand;
 
