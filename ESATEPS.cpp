@@ -63,7 +63,7 @@ void ESATEPS::handleCommands()
     buffer[index] = telecommandBuffer[index];
   }
   pendingTelecommand = false;
-  ESATCCSDSPacket telecommand(buffer);
+  ESATCCSDSPacket telecommand(buffer, COMMAND_PACKET_LENGTH);
   if (telecommand.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
   {
     return;
@@ -218,7 +218,8 @@ void ESATEPS::updateMaximumPowerPointTracking()
 void ESATEPS::updateTelemetry()
 {
   const byte nextTelemetryBuffer = (currentTelemetryBuffer + 1) % 2;
-  ESATCCSDSPacket packet(telemetryBuffer[nextTelemetryBuffer]);
+  ESATCCSDSPacket packet(telemetryBuffer[nextTelemetryBuffer],
+                         TELEMETRY_BUFFER_LENGTH);
   packet.clear();
   packet.writePacketVersionNumber(0);
   packet.writePacketType(packet.TELEMETRY);
