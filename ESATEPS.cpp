@@ -155,6 +155,46 @@ void ESATEPS::receiveEvent(const int howManyBytes)
   }
 }
 
+void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
+{
+  if (pendingTelecommand)
+  {
+    return;
+  }
+  if (packetLength != COMMAND_PACKET_LENGTH)
+  {
+    return;
+  }
+  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  {
+    telecommandBuffer[index] = Wire.read();
+  }
+  pendingTelecommand = true;
+}
+
+void::ESATEPS::receiveTelecommandFromUSB()
+{
+  if (pendingTelecommand)
+  {
+    return;
+  }
+  if (USB.available() == 0)
+  {
+    return;
+  }
+  char buffer[COMMAND_PACKET_LENGTH];
+  const size_t bytesRead = USB.readBytes(buffer, COMMAND_PACKET_LENGTH);
+  if (bytesRead != COMMAND_PACKET_LENGTH)
+  {
+    return;
+  }
+  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  {
+    telecommandBuffer[index] = buffer[index];
+  }
+  pendingTelecommand = true;
+}
+
 void ESATEPS::receiveTelemetryRequestFromI2C(const int requestLength)
 {
   if (requestLength < 4)
@@ -201,46 +241,6 @@ void ESATEPS::sendTelemetry()
   {
     (void) USB.write(telemetryDoubleBuffer[currentTelemetryBuffer][i]);
   }
-}
-
-void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
-{
-  if (pendingTelecommand)
-  {
-    return;
-  }
-  if (packetLength != COMMAND_PACKET_LENGTH)
-  {
-    return;
-  }
-  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
-  {
-    telecommandBuffer[index] = Wire.read();
-  }
-  pendingTelecommand = true;
-}
-
-void::ESATEPS::receiveTelecommandFromUSB()
-{
-  if (pendingTelecommand)
-  {
-    return;
-  }
-  if (USB.available() == 0)
-  {
-    return;
-  }
-  char buffer[COMMAND_PACKET_LENGTH];
-  const size_t bytesRead = USB.readBytes(buffer, COMMAND_PACKET_LENGTH);
-  if (bytesRead != COMMAND_PACKET_LENGTH)
-  {
-    return;
-  }
-  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
-  {
-    telecommandBuffer[index] = buffer[index];
-  }
-  pendingTelecommand = true;
 }
 
 void ESATEPS::updateMaximumPowerPointTracking()
