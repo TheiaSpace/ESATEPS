@@ -41,9 +41,9 @@ void ESATEPS::begin()
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
   PowerLine5VSwitch.begin();
-  PowerLine5VSwitch.write(PowerLine5VSwitch.off);
+  PowerLine5VSwitch.write(PowerLine5VSwitch.OFF);
   PowerLine3V3Switch.begin();
-  PowerLine3V3Switch.write(PowerLine3V3Switch.on);
+  PowerLine3V3Switch.write(PowerLine3V3Switch.ON);
   OvercurrentDetector.begin();
   Wire1.begin();
   Wire.begin(2);
@@ -123,11 +123,11 @@ void ESATEPS::handleSwitch3V3LineCommand(const byte commandParameter)
 {
   if (commandParameter > 0)
   {
-    PowerLine3V3Switch.write(PowerLine3V3Switch.on);
+    PowerLine3V3Switch.write(PowerLine3V3Switch.ON);
   }
   else
   {
-    PowerLine3V3Switch.write(PowerLine3V3Switch.off);
+    PowerLine3V3Switch.write(PowerLine3V3Switch.OFF);
   }
 }
 
@@ -135,11 +135,11 @@ void ESATEPS::handleSwitch5VLineCommand(const byte commandParameter)
 {
   if (commandParameter > 0)
   {
-    PowerLine5VSwitch.write(PowerLine5VSwitch.on);
+    PowerLine5VSwitch.write(PowerLine5VSwitch.ON);
   }
   else
   {
-    PowerLine5VSwitch.write(PowerLine5VSwitch.off);
+    PowerLine5VSwitch.write(PowerLine5VSwitch.OFF);
   }
 }
 

@@ -28,8 +28,8 @@ class ESATPowerLineSwitch
     // State of the switch.
     enum SwitchState
     {
-      off = 0,
-      on = 1,
+      OFF = 0,
+      ON = 1,
     };
 
     // Instantiate a new power line switch on a given line.

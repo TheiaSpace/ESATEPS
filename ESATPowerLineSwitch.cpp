@@ -22,7 +22,7 @@ ESATPowerLineSwitch PowerLine3V3Switch(EN3V3);
 ESATPowerLineSwitch PowerLine5VSwitch(EN5V);
 
 ESATPowerLineSwitch::ESATPowerLineSwitch(const byte line):
-  line(line), state(off)
+  line(line), state(OFF)
 {
 }
 
@@ -39,20 +39,20 @@ ESATPowerLineSwitch::SwitchState ESATPowerLineSwitch::read()
 
 void ESATPowerLineSwitch::toggle()
 {
-  if (state == on)
+  if (state == ON)
   {
-    write(off);
+    write(OFF);
   }
   else
   {
-    write(on);
+    write(ON);
   }
 }
 
 void ESATPowerLineSwitch::write(const ESATPowerLineSwitch::SwitchState newState)
 {
   state = newState;
-  if (state == on)
+  if (state == ON)
   {
     digitalWrite(line, HIGH);
   }
