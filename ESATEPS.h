@@ -37,11 +37,13 @@ class ESATEPS
     // Read an incomming telecommand and write it into a packet.
     // Return true if there was a valid telecommand available;
     // otherwise return false.
+    // This sets pendingI2CTelecommand to false.
     boolean readTelecommand(ESATCCSDSPacket& packet);
 
     // Fill the telemetry packet with the next available telemetry vector.
     // Return true if there were new available telemetry;
     // otherwise return false.
+    // This sets newTelemetryPacket to false.
     boolean readTelemetry(ESATCCSDSPacket& packet);
 
     // Send a telemetry packet.
@@ -193,7 +195,9 @@ class ESATEPS
     volatile word i2cTelemetryBufferIndex;
 
     // True when there is a new telemetry packet that was not
-    // requested with readTelemetry().
+    // requested with readTelemetry():
+    // - true after updateTelemetry()
+    // - false after readTelemetry()
     boolean newTelemetryPacket;
 
     // True when there is a pending unprocessed I2C telecommand.
@@ -258,6 +262,7 @@ class ESATEPS
     void updateMaximumPowerPointTracking();
 
     // Update the telemetry buffer.
+    // This sets newTelemetryPacket to true.
     void updateTelemetry();
 };
 
