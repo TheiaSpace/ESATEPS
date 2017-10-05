@@ -30,10 +30,10 @@
 
 void ESATEPS::begin()
 {
-  pendingTelecommand = false;
-  telemetryBufferIndex = 0;
-  telemetryPacketSequenceCount = 0;
   currentTelemetryBuffer = 0;
+  i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
+  pendingTelecommand = false;
+  telemetryPacketSequenceCount = 0;
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
@@ -150,23 +150,57 @@ void ESATEPS::receiveEvent(const int howManyBytes)
     EPS.receiveTelecommandFromI2C(howManyBytes - 1);
     break;
   case TELEMETRY_CONTROL:
-    EPS.telemetryBufferIndex = 0;
-    break;
-  case TELEMETRY_VECTOR:
-    EPS.telemetryBufferIndex = 0;
+    EPS.receiveTelemetryRequestFromI2C(howManyBytes - 1);
     break;
   }
 }
 
+void ESATEPS::receiveTelemetryRequestFromI2C(const int requestLength)
+{
+  if (requestLength < 4)
+  {
+    EPS.i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
+    return;
+  }
+  const byte packetIdentifier = Wire.read();
+  if (packetIdentifier != HOUSEKEEPING)
+  {
+    EPS.i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
+    return;
+  }
+  const boolean newPacket = Wire.read();
+  if (newPacket)
+  {
+    for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
+    {
+      EPS.i2cTelemetryBuffer[i] =
+        EPS.telemetryDoubleBuffer[currentTelemetryBuffer][i];
+    }
+  }
+  const byte indexHighByte = Wire.read();
+  const byte indexLowByte = Wire.read();
+  EPS.i2cTelemetryBufferIndex = word(indexHighByte, indexLowByte);
+}
+
 void ESATEPS::requestEvent()
 {
-  Wire.write(EPS.telemetryBuffer[EPS.currentTelemetryBuffer][EPS.telemetryBufferIndex]);
+  for (int i = 0; i < BUFFER_LENGTH; i++)
+  {
+    if (EPS.i2cTelemetryBufferIndex >= TELEMETRY_BUFFER_LENGTH)
+    {
+      return;
+    }
+    (void) Wire.write(EPS.i2cTelemetryBuffer[EPS.i2cTelemetryBufferIndex]);
+    EPS.i2cTelemetryBufferIndex = EPS.i2cTelemetryBufferIndex + 1;
+  }
 }
 
 void ESATEPS::sendTelemetry()
 {
-  USB.write(telemetryBuffer[currentTelemetryBuffer],
-            TELEMETRY_BUFFER_LENGTH);
+  for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
+  {
+    (void) USB.write(telemetryDoubleBuffer[currentTelemetryBuffer][i]);
+  }
 }
 
 void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
@@ -217,8 +251,8 @@ void ESATEPS::updateMaximumPowerPointTracking()
 
 void ESATEPS::updateTelemetry()
 {
-  const byte nextTelemetryBuffer = (currentTelemetryBuffer + 1) % 2;
-  ESATCCSDSPacket packet(telemetryBuffer[nextTelemetryBuffer],
+  const byte nextTelemetryBuffer = ((currentTelemetryBuffer + 1) % 2);
+  ESATCCSDSPacket packet(telemetryDoubleBuffer[nextTelemetryBuffer],
                          TELEMETRY_BUFFER_LENGTH);
   packet.clear();
   packet.writePacketVersionNumber(0);
