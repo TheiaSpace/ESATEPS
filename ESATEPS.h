@@ -31,21 +31,26 @@ class ESATEPS
     // Set up the EPS board.
     void begin();
 
-    // Handle the next pending telecommand.
-    void handleCommand();
+    // Handle a telecommand.
+    void handleTelecommand(ESATCCSDSPacket& packet);
 
-    // Return true if there are pending commands;
+    // Read an incomming telecommand and write it into a packet.
+    // Return true if there was a valid telecommand available;
     // otherwise return false.
-    boolean pendingCommands();
+    boolean readTelecommand(ESATCCSDSPacket& packet);
+
+    // Fill the telemetry packet with the next available telemetry vector.
+    // Return true if there were new available telemetry;
+    // otherwise return false.
+    boolean readTelemetry(ESATCCSDSPacket& packet);
 
     // Send a telemetry packet.
-    void sendTelemetry();
+    void sendTelemetry(ESATCCSDSPacket& packet);
 
-    // Update the maximum power point tracking system.
-    void updateMaximumPowerPointTracking();
-
-    // Update the telemetry buffer.
-    void updateTelemetry();
+    // Update the EPS:
+    // - Update the maximum point tracking system.
+    // - Update the telemetry vector.
+    void update();
 
   private:
     // Command codes.
@@ -178,17 +183,21 @@ class ESATEPS
     // sending dirty data on I2C requests.
     byte currentTelemetryBuffer;
 
+    // Telecommand buffer for I2C telecommands.
+    volatile byte i2cTelecommandBuffer[COMMAND_PACKET_LENGTH];
+
     // Telemetry buffer for I2C telemetry requests.
     volatile byte i2cTelemetryBuffer[TELEMETRY_BUFFER_LENGTH];
 
     // Telemetry buffer read pointer for I2C requests.
     volatile word i2cTelemetryBufferIndex;
 
-    // True when there is a pending unprocessed telecommand.
-    volatile boolean pendingTelecommand;
+    // True when there is a new telemetry packet that was not
+    // requested with readTelemetry().
+    boolean newTelemetryPacket;
 
-    // Telecommand buffer.
-    volatile byte telecommandBuffer[COMMAND_PACKET_LENGTH];
+    // True when there is a pending unprocessed I2C telecommand.
+    volatile boolean pendingI2CTelecommand;
 
     // Telemetry buffer.
     // We need to perform double buffering so as to avoid
@@ -221,20 +230,30 @@ class ESATEPS
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
 
+    // Read a telecommand from the I2C telecommand queue
+    // and write it into the given packet.
+    void readTelecommandFromI2C(ESATCCSDSPacket& packet);
+
+    // Read a telecommand from USB and write it into the given packet.
+    void readTelecommandFromUSB(ESATCCSDSPacket& packet);
+
     // Response to incoming telecommands sent by the OBC.
     static void receiveEvent(int howMany);
 
     // Receive a telecommand from the I2C bus.
     void receiveTelecommandFromI2C(const int packetLength);
 
-    // Receive a telecommand from the USB serial interface.
-    void receiveTelecommandFromUSB();
-
     // Receive a telemetry request from the I2C bus.
     void receiveTelemetryRequestFromI2C(const int requestLength);
 
     // Response when asked for telemetry by the OBC.
     static void requestEvent();
+
+    // Update the maximum power point tracking system.
+    void updateMaximumPowerPointTracking();
+
+    // Update the telemetry buffer.
+    void updateTelemetry();
 };
 
 extern ESATEPS EPS;
