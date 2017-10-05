@@ -63,7 +63,7 @@ class ESATMaximumPowerPointTrackingDriver
     };
 
     // Default duty cycle.
-    static const byte defaultDutyCycle = 50;
+    static const byte DEFAULT_DUTY_CYCLE = 50;
 
     // Current mode of operation.
     Mode mode;
