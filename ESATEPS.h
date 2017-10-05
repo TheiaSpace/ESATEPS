@@ -100,7 +100,7 @@ class ESATEPS
     // - Primary header.
     // - Secondary header.
     // - Command parameter.
-    static const byte COMMAND_PACKET_LENGTH =
+    static const byte TELECOMMAND_PACKET_LENGTH =
       ESATCCSDSPacket::PRIMARY_HEADER_LENGTH
       + SECONDARY_HEADER_LENGTH
       + COMMAND_PARAMETER_LENGTH;
@@ -186,7 +186,7 @@ class ESATEPS
     byte currentTelemetryBuffer;
 
     // Telecommand buffer for I2C telecommands.
-    volatile byte i2cTelecommandBuffer[COMMAND_PACKET_LENGTH];
+    volatile byte i2cTelecommandBuffer[TELECOMMAND_PACKET_LENGTH];
 
     // Telemetry buffer for I2C telemetry requests.
     volatile byte i2cTelemetryBuffer[TELEMETRY_BUFFER_LENGTH];

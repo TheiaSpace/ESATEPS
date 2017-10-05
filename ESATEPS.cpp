@@ -65,7 +65,7 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
     return;
   }
   if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
-      != COMMAND_PACKET_LENGTH)
+      != TELECOMMAND_PACKET_LENGTH)
   {
     return;
   }
@@ -148,7 +148,7 @@ void ESATEPS::handleSwitch5VLineCommand(const byte commandParameter)
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
 {
   packet.clear();
-  if (packet.bufferLength < COMMAND_PACKET_LENGTH)
+  if (packet.bufferLength < TELECOMMAND_PACKET_LENGTH)
   {
     return false;
   }
@@ -172,7 +172,7 @@ boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
     return false;
   }
   if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
-      != COMMAND_PACKET_LENGTH)
+      != TELECOMMAND_PACKET_LENGTH)
   {
     packet.clear();
     return false;
@@ -182,7 +182,7 @@ boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
 
 void ESATEPS::readTelecommandFromI2C(ESATCCSDSPacket& packet)
 {
-  for (int i = 0; i < COMMAND_PACKET_LENGTH; i++)
+  for (int i = 0; i < TELECOMMAND_PACKET_LENGTH; i++)
   {
     packet.buffer[i] = i2cTelecommandBuffer[i];
   }
@@ -195,13 +195,13 @@ void ESATEPS::readTelecommandFromUSB(ESATCCSDSPacket& packet)
   {
     return;
   }
-  char buffer[COMMAND_PACKET_LENGTH];
-  const size_t bytesRead = USB.readBytes(buffer, COMMAND_PACKET_LENGTH);
-  if (bytesRead != COMMAND_PACKET_LENGTH)
+  char buffer[TELECOMMAND_PACKET_LENGTH];
+  const size_t bytesRead = USB.readBytes(buffer, TELECOMMAND_PACKET_LENGTH);
+  if (bytesRead != TELECOMMAND_PACKET_LENGTH)
   {
     return;
   }
-  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  for (int index = 0; index < TELECOMMAND_PACKET_LENGTH; index++)
   {
     packet.buffer[index] = buffer[index];
   }
@@ -268,11 +268,11 @@ void ESATEPS::receiveTelecommandFromI2C(const byte packet[],
   {
     return;
   }
-  if (packetLength != COMMAND_PACKET_LENGTH)
+  if (packetLength != TELECOMMAND_PACKET_LENGTH)
   {
     return;
   }
-  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  for (int index = 0; index < TELECOMMAND_PACKET_LENGTH; index++)
   {
     i2cTelecommandBuffer[index] = packet[index];
   }
