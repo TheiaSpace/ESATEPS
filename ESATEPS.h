@@ -25,9 +25,6 @@
 class ESATEPS
 {
   public:
-    // EPS subsystem identifier.
-    static const byte SUBSYSTEM_IDENTIFIER = 2;
-
     // Set up the EPS board.
     void begin();
 
@@ -80,6 +77,9 @@ class ESATEPS
     {
       HOUSEKEEPING = 0,
     };
+
+    // EPS subsystem identifier.
+    static const word APPLICATION_PROCESS_IDENTIFIER = 2;
 
     // Software version number.
     static const byte MAJOR_VERSION_NUMBER = 2;

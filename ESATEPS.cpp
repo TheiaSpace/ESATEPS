@@ -55,7 +55,8 @@ void ESATEPS::begin()
 void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
 {
   packet.rewind();
-  if (packet.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
+  if (packet.readApplicationProcessIdentifier()
+      != APPLICATION_PROCESS_IDENTIFIER)
   {
     return;
   }
@@ -164,7 +165,8 @@ boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
     packet.clear();
     return false;
   }
-  if (packet.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
+  if (packet.readApplicationProcessIdentifier()
+      != APPLICATION_PROCESS_IDENTIFIER)
   {
     packet.clear();
     return false;
@@ -226,7 +228,8 @@ boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
     packet.clear();
     return false;
   }
-  if (packet.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
+  if (packet.readApplicationProcessIdentifier() !=
+      APPLICATION_PROCESS_IDENTIFIER)
   {
     packet.clear();
     return false;
@@ -348,7 +351,7 @@ void ESATEPS::updateTelemetry()
   packet.writePacketVersionNumber(0);
   packet.writePacketType(packet.TELEMETRY);
   packet.writeSecondaryHeaderFlag(packet.SECONDARY_HEADER_IS_PRESENT);
-  packet.writeApplicationProcessIdentifier(SUBSYSTEM_IDENTIFIER);
+  packet.writeApplicationProcessIdentifier(APPLICATION_PROCESS_IDENTIFIER);
   packet.writeSequenceFlags(packet.UNSEGMENTED_USER_DATA);
   packet.writePacketSequenceCount(telemetryPacketSequenceCount);
   packet.writeByte(MAJOR_VERSION_NUMBER);
