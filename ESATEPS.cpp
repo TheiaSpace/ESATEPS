@@ -234,7 +234,8 @@ boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
     packet.clear();
     return false;
   }
-  if (packet.readPacketLength() != TELEMETRY_BUFFER_LENGTH)
+  if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
+      != TELEMETRY_BUFFER_LENGTH)
   {
     packet.clear();
     return false;
