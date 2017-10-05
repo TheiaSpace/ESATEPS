@@ -26,7 +26,7 @@ void setup()
 void loop()
 {
   EPS.updateMaximumPowerPointTracking();
-  if (EPS.pendingCommands())
+  while (EPS.pendingCommands())
   {
     EPS.handleCommand();
   }
