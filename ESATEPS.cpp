@@ -54,6 +54,7 @@ void ESATEPS::begin()
 
 void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
 {
+  packet.rewind();
   if (packet.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
   {
     return;
@@ -241,18 +242,24 @@ boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
 void ESATEPS::receiveEvent(const int howManyBytes)
 {
   const byte registerNumber = Wire.read();
+  byte buffer[howManyBytes - 1];
+  for (int i = 0; i < howManyBytes; i++)
+  {
+    buffer[i] = Wire.read();
+  }
   switch (registerNumber)
   {
   case TELECOMMAND_CONTROL:
-    EPS.receiveTelecommandFromI2C(howManyBytes - 1);
+    EPS.receiveTelecommandFromI2C(buffer, howManyBytes - 1);
     break;
   case TELEMETRY_CONTROL:
-    EPS.receiveTelemetryRequestFromI2C(howManyBytes - 1);
+    EPS.receiveTelemetryRequestFromI2C(buffer, howManyBytes - 1);
     break;
   }
 }
 
-void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
+void ESATEPS::receiveTelecommandFromI2C(const byte packet[],
+                                        const int packetLength)
 {
   if (pendingI2CTelecommand)
   {
@@ -264,25 +271,26 @@ void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
   }
   for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
   {
-    i2cTelecommandBuffer[index] = Wire.read();
+    i2cTelecommandBuffer[index] = packet[index];
   }
   pendingI2CTelecommand = true;
 }
 
-void ESATEPS::receiveTelemetryRequestFromI2C(const int requestLength)
+void ESATEPS::receiveTelemetryRequestFromI2C(const byte request[],
+                                             const int requestLength)
 {
   if (requestLength < 4)
   {
     EPS.i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
     return;
   }
-  const byte packetIdentifier = Wire.read();
+  const byte packetIdentifier = request[0];
   if (packetIdentifier != HOUSEKEEPING)
   {
     EPS.i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
     return;
   }
-  const boolean newPacket = Wire.read();
+  const boolean newPacket = request[1];
   if (newPacket)
   {
     for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
@@ -291,8 +299,8 @@ void ESATEPS::receiveTelemetryRequestFromI2C(const int requestLength)
         EPS.telemetryDoubleBuffer[currentTelemetryBuffer][i];
     }
   }
-  const byte indexHighByte = Wire.read();
-  const byte indexLowByte = Wire.read();
+  const byte indexHighByte = request[2];
+  const byte indexLowByte = request[3];
   EPS.i2cTelemetryBufferIndex = word(indexHighByte, indexLowByte);
 }
 
