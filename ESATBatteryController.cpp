@@ -21,37 +21,37 @@
 
 word ESATBatteryController::readBattery1Voltage()
 {
-  return readWord(battery1VoltageRegister);
+  return readWord(BATTERY_1_VOLTAGE_REGISTER);
 }
 
 word ESATBatteryController::readBattery2Voltage()
 {
-  return readWord(battery2VoltageRegister);
+  return readWord(BATTERY_2_VOLTAGE_REGISTER);
 }
 
 word ESATBatteryController::readBatteryCurrent()
 {
-  return readWord(batteryCurrentRegister);
+  return readWord(BATTERY_CURRENT_REGISTER);
 }
 
 word ESATBatteryController::readBatteryTemperature()
 {
-  return readWord(batteryTemperatureRegister);
+  return readWord(BATTERY_TEMPERATURE_REGISTER);
 }
 
 word ESATBatteryController::readStateOfCharge()
 {
-  return word(0, readByte(stateOfChargeRegister));
+  return word(0, readByte(STATE_OF_CHARGE_REGISTER));
 }
 
 word ESATBatteryController::readTotalBatteryVoltage()
 {
-  return readWord(totalBatteryVoltageRegister);
+  return readWord(TOTAL_BATTERY_VOLTAGE_REGISTER);
 }
 
 byte ESATBatteryController::readByte(const byte registerNumber)
 {
-  Wire1.beginTransmission(address);
+  Wire1.beginTransmission(ADDRESS);
   Wire1.write(registerNumber);
   const byte writeStatus = Wire1.endTransmission();
   if (writeStatus != 0)
@@ -59,7 +59,7 @@ byte ESATBatteryController::readByte(const byte registerNumber)
     error = true;
     return 0;
   }
-  const byte bytesRead = Wire1.requestFrom(int(address), 1);
+  const byte bytesRead = Wire1.requestFrom(int(ADDRESS), 1);
   if (bytesRead != 1)
   {
     error = true;
@@ -70,7 +70,7 @@ byte ESATBatteryController::readByte(const byte registerNumber)
 
 word ESATBatteryController::readWord(const byte registerNumber)
 {
-  Wire1.beginTransmission(address);
+  Wire1.beginTransmission(ADDRESS);
   Wire1.write(registerNumber);
   const byte writeStatus = Wire1.endTransmission();
   if (writeStatus != 0)
@@ -78,7 +78,7 @@ word ESATBatteryController::readWord(const byte registerNumber)
     error = true;
     return 0;
   }
-  const byte bytesRead = Wire1.requestFrom(int(address), 2);
+  const byte bytesRead = Wire1.requestFrom(int(ADDRESS), 2);
   if (bytesRead != 2)
   {
     error = true;
