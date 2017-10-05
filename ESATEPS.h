@@ -173,8 +173,16 @@ class ESATEPS
       + PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH
       + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
 
-    // Current telemetry buffer.
+    // Telemetry buffer that is currently complete.
+    // We need to perform double buffering so as to avoid
+    // sending dirty data on I2C requests.
     byte currentTelemetryBuffer;
+
+    // Telemetry buffer for I2C telemetry requests.
+    volatile byte i2cTelemetryBuffer[TELEMETRY_BUFFER_LENGTH];
+
+    // Telemetry buffer read pointer for I2C requests.
+    volatile word i2cTelemetryBufferIndex;
 
     // True when there is a pending unprocessed telecommand.
     volatile boolean pendingTelecommand;
@@ -183,10 +191,9 @@ class ESATEPS
     volatile byte telecommandBuffer[COMMAND_PACKET_LENGTH];
 
     // Telemetry buffer.
-    byte telemetryBuffer[2][TELEMETRY_BUFFER_LENGTH];
-
-    // Telemetry buffer read pointer for I2C requests.
-    byte telemetryBufferIndex;
+    // We need to perform double buffering so as to avoid
+    // sending dirty data on I2C requests.
+    byte telemetryDoubleBuffer[2][TELEMETRY_BUFFER_LENGTH];
 
     // Telemetry packet sequence count, which must increase every time
     // a new telemetry packet is generated.
@@ -222,6 +229,9 @@ class ESATEPS
 
     // Receive a telecommand from the USB serial interface.
     void receiveTelecommandFromUSB();
+
+    // Receive a telemetry request from the I2C bus.
+    void receiveTelemetryRequestFromI2C(const int requestLength);
 
     // Response when asked for telemetry by the OBC.
     static void requestEvent();
