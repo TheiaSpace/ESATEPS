@@ -51,7 +51,7 @@ void ESATEPS::begin()
   USB.begin();
 }
 
-void ESATEPS::handleCommands()
+void ESATEPS::handleCommand()
 {
   if (!pendingTelecommand)
   {

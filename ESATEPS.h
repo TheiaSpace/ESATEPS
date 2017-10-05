@@ -31,8 +31,8 @@ class ESATEPS
     // Set up the EPS board.
     void begin();
 
-    // Handle all pending commands.
-    void handleCommands();
+    // Handle the next pending telecommand.
+    void handleCommand();
 
     // Return true if there are pending commands;
     // otherwise return false.
