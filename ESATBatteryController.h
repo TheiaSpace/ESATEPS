@@ -46,7 +46,7 @@ class ESATBatteryController
 
     // Read the state of charge.
     // Set the error flag on error.
-    word readStateOfCharge();
+    byte readStateOfCharge();
 
     // Read the total battery voltage.
     // Set the error flag on error.
