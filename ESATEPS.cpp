@@ -32,7 +32,8 @@ void ESATEPS::begin()
 {
   currentTelemetryBuffer = 0;
   i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
-  pendingTelecommand = false;
+  newTelemetryPacket = false;
+  pendingI2CTelecommand = false;
   telemetryPacketSequenceCount = 0;
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
@@ -51,37 +52,30 @@ void ESATEPS::begin()
   USB.begin();
 }
 
-void ESATEPS::handleCommands()
+void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
 {
-  if (!pendingTelecommand)
+  if (packet.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
   {
     return;
   }
-  byte buffer[COMMAND_PACKET_LENGTH];
-  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
-  {
-    buffer[index] = telecommandBuffer[index];
-  }
-  pendingTelecommand = false;
-  ESATCCSDSPacket telecommand(buffer, COMMAND_PACKET_LENGTH);
-  if (telecommand.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
+  if (packet.readPacketType() != packet.TELECOMMAND)
   {
     return;
   }
-  if ((telecommand.PRIMARY_HEADER_LENGTH + telecommand.readPacketDataLength())
+  if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
       != COMMAND_PACKET_LENGTH)
   {
     return;
   }
-  const byte majorVersionNumber = telecommand.readByte();
-  const byte minorVersionNumber = telecommand.readByte();
-  const byte patchVersionNumber = telecommand.readByte();
+  const byte majorVersionNumber = packet.readByte();
+  const byte minorVersionNumber = packet.readByte();
+  const byte patchVersionNumber = packet.readByte();
   if (majorVersionNumber < MAJOR_VERSION_NUMBER)
   {
     return;
   }
-  const byte commandCode = telecommand.readByte();
-  const byte commandParameter = telecommand.readByte();
+  const byte commandCode = packet.readByte();
+  const byte commandParameter = packet.readByte();
   switch (commandCode)
   {
   case TOGGLE_5V_LINE:
@@ -135,10 +129,99 @@ void ESATEPS::handleToggle5VLineCommand(const byte commandParameter)
   PowerLine5VSwitch.toggle();
 }
 
-boolean ESATEPS::pendingCommands()
+boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
 {
-  receiveTelecommandFromUSB();
-  return pendingTelecommand;
+  packet.clear();
+  if (packet.bufferLength < COMMAND_PACKET_LENGTH)
+  {
+    return false;
+  }
+  if (pendingI2CTelecommand)
+  {
+    readTelecommandFromI2C(packet);
+  }
+  else
+  {
+    readTelecommandFromUSB(packet);
+  }
+  if (packet.readPacketType() != packet.TELECOMMAND)
+  {
+    packet.clear();
+    return false;
+  }
+  if (packet.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
+  {
+    packet.clear();
+    return false;
+  }
+  if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
+      != COMMAND_PACKET_LENGTH)
+  {
+    packet.clear();
+    return false;
+  }
+  return true;
+}
+
+void ESATEPS::readTelecommandFromI2C(ESATCCSDSPacket& packet)
+{
+  for (int i = 0; i < COMMAND_PACKET_LENGTH; i++)
+  {
+    packet.buffer[i] = i2cTelecommandBuffer[i];
+  }
+  pendingI2CTelecommand = false;
+}
+
+void ESATEPS::readTelecommandFromUSB(ESATCCSDSPacket& packet)
+{
+  if (USB.available() == 0)
+  {
+    return;
+  }
+  char buffer[COMMAND_PACKET_LENGTH];
+  const size_t bytesRead = USB.readBytes(buffer, COMMAND_PACKET_LENGTH);
+  if (bytesRead != COMMAND_PACKET_LENGTH)
+  {
+    return;
+  }
+  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
+  {
+    packet.buffer[index] = buffer[index];
+  }
+}
+
+boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
+{
+  packet.clear();
+  if (!newTelemetryPacket)
+  {
+    return false;
+  }
+  newTelemetryPacket = false;
+  if (packet.bufferLength < TELEMETRY_BUFFER_LENGTH)
+  {
+    return false;
+  }
+  for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
+  {
+    packet.buffer[i] = telemetryDoubleBuffer[currentTelemetryBuffer][i];
+  }
+  if (packet.readPacketType() != packet.TELEMETRY)
+  {
+    packet.clear();
+    return false;
+  }
+  if (packet.readApplicationProcessIdentifier() != SUBSYSTEM_IDENTIFIER)
+  {
+    packet.clear();
+    return false;
+  }
+  if (packet.readPacketLength() != TELEMETRY_BUFFER_LENGTH)
+  {
+    packet.clear();
+    return false;
+  }
+  return true;
 }
 
 void ESATEPS::receiveEvent(const int howManyBytes)
@@ -157,7 +240,7 @@ void ESATEPS::receiveEvent(const int howManyBytes)
 
 void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
 {
-  if (pendingTelecommand)
+  if (pendingI2CTelecommand)
   {
     return;
   }
@@ -167,32 +250,9 @@ void ESATEPS::receiveTelecommandFromI2C(const int packetLength)
   }
   for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
   {
-    telecommandBuffer[index] = Wire.read();
+    i2cTelecommandBuffer[index] = Wire.read();
   }
-  pendingTelecommand = true;
-}
-
-void::ESATEPS::receiveTelecommandFromUSB()
-{
-  if (pendingTelecommand)
-  {
-    return;
-  }
-  if (USB.available() == 0)
-  {
-    return;
-  }
-  char buffer[COMMAND_PACKET_LENGTH];
-  const size_t bytesRead = USB.readBytes(buffer, COMMAND_PACKET_LENGTH);
-  if (bytesRead != COMMAND_PACKET_LENGTH)
-  {
-    return;
-  }
-  for (int index = 0; index < COMMAND_PACKET_LENGTH; index++)
-  {
-    telecommandBuffer[index] = buffer[index];
-  }
-  pendingTelecommand = true;
+  pendingI2CTelecommand = true;
 }
 
 void ESATEPS::receiveTelemetryRequestFromI2C(const int requestLength)
@@ -235,12 +295,20 @@ void ESATEPS::requestEvent()
   }
 }
 
-void ESATEPS::sendTelemetry()
+void ESATEPS::sendTelemetry(ESATCCSDSPacket& packet)
 {
-  for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
+  const long packetLength =
+    packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength();
+  for (long i = 0; i < packetLength; i++)
   {
-    (void) USB.write(telemetryDoubleBuffer[currentTelemetryBuffer][i]);
+    (void) USB.write(packet.buffer[i]);
   }
+}
+
+void ESATEPS::update()
+{
+  updateMaximumPowerPointTracking();
+  updateTelemetry();
 }
 
 void ESATEPS::updateMaximumPowerPointTracking()
@@ -306,6 +374,7 @@ void ESATEPS::updateTelemetry()
   packet.writeByte(DirectEnergyTransferSystem.error);
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
   currentTelemetryBuffer = nextTelemetryBuffer;
+  newTelemetryPacket = true;
 }
 
 ESATEPS EPS;

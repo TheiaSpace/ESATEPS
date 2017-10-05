@@ -25,11 +25,16 @@ void setup()
 
 void loop()
 {
-  EPS.updateMaximumPowerPointTracking();
-  if (EPS.pendingCommands())
+  const word bufferLength = 256;
+  byte buffer[bufferLength];
+  ESATCCSDSPacket packet(buffer, bufferLength);
+  while (EPS.readTelecommand(packet))
   {
-    EPS.handleCommand();
+    EPS.handleTelecommand(packet);
   }
-  EPS.updateTelemetry();
-  EPS.sendTelemetry();
+  EPS.update();
+  while (EPS.readTelemetry(packet))
+  {
+    EPS.sendTelemetry(packet);
+  }
 }
