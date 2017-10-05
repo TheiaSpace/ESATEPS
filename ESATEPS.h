@@ -241,10 +241,15 @@ class ESATEPS
     static void receiveEvent(int howMany);
 
     // Receive a telecommand from the I2C bus.
-    void receiveTelecommandFromI2C(const int packetLength);
+    // Queue the telecommand only when pendingI2CTelecommand is false.
+    // This sets pendingI2CTelecommand to true.
+    void receiveTelecommandFromI2C(const byte packet[],
+                                   const int packetLength);
 
     // Receive a telemetry request from the I2C bus.
-    void receiveTelemetryRequestFromI2C(const int requestLength);
+    // This updates i2cTelemetryBuffer.
+    void receiveTelemetryRequestFromI2C(const byte request[],
+                                        const int requestLength);
 
     // Response when asked for telemetry by the OBC.
     static void requestEvent();
