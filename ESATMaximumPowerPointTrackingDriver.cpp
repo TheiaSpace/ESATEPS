@@ -18,7 +18,13 @@
 
 #include "ESATMaximumPowerPointTrackingDriver.h"
 
-ESATMaximumPowerPointTrackingDriver::ESATMaximumPowerPointTrackingDriver(int sensorPin, int outputPin): sensorPin(sensorPin), outputPin(outputPin), mode(FIXED_MODE), dutyCycle(defaultDutyCycle), dutyCycleIncrement(0), previousReading(0)
+ESATMaximumPowerPointTrackingDriver::ESATMaximumPowerPointTrackingDriver(int sensorPin, int outputPin):
+  sensorPin(sensorPin),
+  outputPin(outputPin),
+  mode(FIXED_MODE),
+  dutyCycle(DEFAULT_DUTY_CYCLE),
+  dutyCycleIncrement(0),
+  previousReading(0)
 {
 }
 
@@ -62,14 +68,14 @@ void ESATMaximumPowerPointTrackingDriver::setFixedMode()
 void ESATMaximumPowerPointTrackingDriver::setMPPTMode()
 {
   mode = MPPT_MODE;
-  dutyCycle = defaultDutyCycle;
+  dutyCycle = DEFAULT_DUTY_CYCLE;
   dutyCycleIncrement = 2;
 }
 
 void ESATMaximumPowerPointTrackingDriver::setSweepMode()
 {
   mode = SWEEP_MODE;
-  dutyCycle = defaultDutyCycle;
+  dutyCycle = DEFAULT_DUTY_CYCLE;
   dutyCycleIncrement = 1;
 }
 

@@ -43,23 +43,31 @@ class ESATDirectEnergyTransferSystem
 
   private:
     // Address of the sensor chip.
-    static const byte address = 0x48;
+    static const byte ADDRESS = 0x48;
 
     // Registers.
-    static const byte configurationRegister = 0x01;
-    static const byte conversionRegister = 0x00;
+    static const byte CONFIGURATION_REGISTER = 0x01;
+    static const byte CONVERSION_REGISTER = 0x00;
 
     // Configuration bits.  The device is a TI ADS1015.
-    static const word startSingleShotConversionConfigurationBits = B1 << 15; // Start a single shot conversion.
-    static const word comparatorConfigurationBits = B11 << 0; // Disable comparator.
-    static const word dataRateConfigurationBits = B100 << 5; // 1600 samples per second.
-    static const word operatingModeConfigurationBits = B1 << 8; // Single conversion.
-    static const word fullScaleRangeConfigurationBits = B001 << 9; // +-4.096 V.
+    static const word START_SINGLE_SHOT_CONVERSION_CONFIGURATION_BITS =
+      B1 << 15; // Start a single shot conversion.
+    static const word COMPARATOR_CONFIGURATION_BITS
+      = B11 << 0; // Disable comparator.
+    static const word DATA_RATE_CONFIGURATION_BITS
+      = B100 << 5; // 1600 samples per second.
+    static const word OPERATING_MODE_CONFIGURATION_BITS
+      = B1 << 8; // Single conversion.
+    static const word FULL_SCALE_RANGE_CONFIGURATION_BITS
+      = B001 << 9; // +-4.096 V.
 
     // Channel configuration bits.
-    static const word currentChannelConfigurationBits = B100 << 12; // AINp = AIN0, AINn = GND.
-    static const word voltageChannelConfigurationBits = B101 << 12; // AINp = AIN1, AINn = GND.
-    static const word shuntVoltageChannelConfigurationBits = B111 << 12; // AINp = AIN3, AINn = GND.
+    static const word CURRENT_CHANNEL_CONFIGURATION_BITS
+      = B100 << 12; // AINp = AIN0, AINn = GND.
+    static const word VOLTAGE_CHANNEL_CONFIGURATION_BITS
+      = B101 << 12; // AINp = AIN1, AINn = GND.
+    static const word SHUNT_VOLTAGE_CHANNEL_CONFIGURATION_BITS
+      = B111 << 12; // AINp = AIN3, AINn = GND.
 
     // Read a sample from the sensors.
     // Set the error flag on error.

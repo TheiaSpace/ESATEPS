@@ -55,15 +55,15 @@ class ESATBatteryController
 
   private:
     // I2C address of the battery controller.
-    static const byte address = 0x0b;
+    static const byte ADDRESS = 0x0B;
 
     // Registers.
-    static const byte battery1VoltageRegister = 0x3e;
-    static const byte battery2VoltageRegister = 0x3f;
-    static const byte batteryTemperatureRegister = 0x08;
-    static const byte batteryCurrentRegister = 0x0a;
-    static const byte stateOfChargeRegister = 0x0d;
-    static const byte totalBatteryVoltageRegister = 0x09;
+    static const byte BATTERY_1_VOLTAGE_REGISTER = 0x3E;
+    static const byte BATTERY_2_VOLTAGE_REGISTER = 0x3F;
+    static const byte BATTERY_TEMPERATURE_REGISTER = 0x08;
+    static const byte BATTERY_CURRENT_REGISTER = 0x0A;
+    static const byte STATE_OF_CHARGE_REGISTER = 0x0D;
+    static const byte TOTAL_BATTERY_VOLTAGE_REGISTER = 0x09;
 
     // Read a byte from the given register.
     // Set the error flag on error.
