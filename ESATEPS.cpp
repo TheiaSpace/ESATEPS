@@ -78,11 +78,11 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   const byte commandParameter = packet.readByte();
   switch (commandCode)
   {
-  case TOGGLE_5V_LINE:
-    handleToggle5VLineCommand(commandParameter);
+  case SWITCH_5V_LINE:
+    handleSwitch5VLineCommand(commandParameter);
     break;
-  case TOGGLE_3V3_LINE:
-    handleToggle3V3LineCommand(commandParameter);
+  case SWITCH_3V3_LINE:
+    handleSwitch3V3LineCommand(commandParameter);
     break;
   case MAXIMUM_POWER_POINT_TRACKING_MODE:
     handleMaximumPowerPointTrackingModeCommand(commandParameter);
@@ -119,14 +119,28 @@ void ESATEPS::handleSweepModeCommand(const byte commandParameter)
   MaximumPowerPointTrackingDriver2.setSweepMode();
 }
 
-void ESATEPS::handleToggle3V3LineCommand(const byte commandParameter)
+void ESATEPS::handleSwitch3V3LineCommand(const byte commandParameter)
 {
-  PowerLine3V3Switch.toggle();
+  if (commandParameter > 0)
+  {
+    PowerLine3V3Switch.write(PowerLine3V3Switch.on);
+  }
+  else
+  {
+    PowerLine3V3Switch.write(PowerLine3V3Switch.off);
+  }
 }
 
-void ESATEPS::handleToggle5VLineCommand(const byte commandParameter)
+void ESATEPS::handleSwitch5VLineCommand(const byte commandParameter)
 {
-  PowerLine5VSwitch.toggle();
+  if (commandParameter > 0)
+  {
+    PowerLine5VSwitch.write(PowerLine5VSwitch.on);
+  }
+  else
+  {
+    PowerLine5VSwitch.write(PowerLine5VSwitch.off);
+  }
 }
 
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
