@@ -39,9 +39,9 @@ word ESATBatteryController::readBatteryTemperature()
   return readWord(BATTERY_TEMPERATURE_REGISTER);
 }
 
-word ESATBatteryController::readStateOfCharge()
+byte ESATBatteryController::readStateOfCharge()
 {
-  return word(0, readByte(STATE_OF_CHARGE_REGISTER));
+  return readByte(STATE_OF_CHARGE_REGISTER);
 }
 
 word ESATBatteryController::readTotalBatteryVoltage()
