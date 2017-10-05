@@ -56,8 +56,8 @@ class ESATEPS
     // Command codes.
     enum CommandCode
     {
-      TOGGLE_5V_LINE = 1,
-      TOGGLE_3V3_LINE = 2,
+      SWITCH_5V_LINE = 1,
+      SWITCH_3V3_LINE = 2,
       MAXIMUM_POWER_POINT_TRACKING_MODE = 3,
       SWEEP_MODE = 4,
       FIXED_MODE = 5,
@@ -218,11 +218,11 @@ class ESATEPS
     // Set the maximum power point tracking drivers in sweep mode.
     void handleSweepModeCommand(byte commandParameter);
 
-    // Toggle the 3V3 line.
-    void handleToggle3V3LineCommand(byte commandParameter);
+    // Switch the 3V3 line.
+    void handleSwitch3V3LineCommand(byte commandParameter);
 
-    // Toggle the 5V line.
-    void handleToggle5VLineCommand(byte commandParameter);
+    // Switch the 5V line.
+    void handleSwitch5VLineCommand(byte commandParameter);
 
     // Add a command to the command queue.
     void queueCommand(byte commandCode, byte parameter);

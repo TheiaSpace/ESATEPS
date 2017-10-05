@@ -41,9 +41,9 @@ void ESATEPS::begin()
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
   PowerLine5VSwitch.begin();
-  PowerLine5VSwitch.write(PowerLine5VSwitch.off);
+  PowerLine5VSwitch.write(PowerLine5VSwitch.OFF);
   PowerLine3V3Switch.begin();
-  PowerLine3V3Switch.write(PowerLine3V3Switch.on);
+  PowerLine3V3Switch.write(PowerLine3V3Switch.ON);
   OvercurrentDetector.begin();
   Wire1.begin();
   Wire.begin(2);
@@ -78,11 +78,11 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   const byte commandParameter = packet.readByte();
   switch (commandCode)
   {
-  case TOGGLE_5V_LINE:
-    handleToggle5VLineCommand(commandParameter);
+  case SWITCH_5V_LINE:
+    handleSwitch5VLineCommand(commandParameter);
     break;
-  case TOGGLE_3V3_LINE:
-    handleToggle3V3LineCommand(commandParameter);
+  case SWITCH_3V3_LINE:
+    handleSwitch3V3LineCommand(commandParameter);
     break;
   case MAXIMUM_POWER_POINT_TRACKING_MODE:
     handleMaximumPowerPointTrackingModeCommand(commandParameter);
@@ -119,14 +119,28 @@ void ESATEPS::handleSweepModeCommand(const byte commandParameter)
   MaximumPowerPointTrackingDriver2.setSweepMode();
 }
 
-void ESATEPS::handleToggle3V3LineCommand(const byte commandParameter)
+void ESATEPS::handleSwitch3V3LineCommand(const byte commandParameter)
 {
-  PowerLine3V3Switch.toggle();
+  if (commandParameter > 0)
+  {
+    PowerLine3V3Switch.write(PowerLine3V3Switch.ON);
+  }
+  else
+  {
+    PowerLine3V3Switch.write(PowerLine3V3Switch.OFF);
+  }
 }
 
-void ESATEPS::handleToggle5VLineCommand(const byte commandParameter)
+void ESATEPS::handleSwitch5VLineCommand(const byte commandParameter)
 {
-  PowerLine5VSwitch.toggle();
+  if (commandParameter > 0)
+  {
+    PowerLine5VSwitch.write(PowerLine5VSwitch.ON);
+  }
+  else
+  {
+    PowerLine5VSwitch.write(PowerLine5VSwitch.OFF);
+  }
 }
 
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
