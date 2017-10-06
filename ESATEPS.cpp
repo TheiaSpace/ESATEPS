@@ -310,7 +310,7 @@ void ESATEPS::receiveTelemetryRequestFromI2C(const byte request[],
 
 void ESATEPS::requestEvent()
 {
-  for (int i = 0; i < BUFFER_LENGTH; i++)
+  for (int i = 0; i < I2C_CHUNK_LENGTH; i++)
   {
     if (EPS.i2cTelemetryBufferIndex >= TELEMETRY_BUFFER_LENGTH)
     {

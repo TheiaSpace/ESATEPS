@@ -180,6 +180,9 @@ class ESATEPS
       + PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH
       + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
 
+    // I2C messages are at most 16 bytes long.
+    static const byte I2C_CHUNK_LENGTH = 16;
+
     // Telemetry buffer that is currently complete.
     // We need to perform double buffering so as to avoid
     // sending dirty data on I2C requests.
