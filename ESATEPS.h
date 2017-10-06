@@ -79,7 +79,7 @@ class ESATEPS
     };
 
     // EPS subsystem identifier.
-    static const word APPLICATION_PROCESS_IDENTIFIER = 2;
+    static const word APPLICATION_PROCESS_IDENTIFIER = 1;
 
     // Software version number.
     static const byte MAJOR_VERSION_NUMBER = 2;
