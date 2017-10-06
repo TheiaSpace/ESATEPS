@@ -65,11 +65,12 @@ class ESATEPS
     // Register numbers for I2C control.
     enum RegisterNumbers
     {
-      TELECOMMAND_CONTROL = 0,
-      TELECOMMAND_STATUS = 1,
-      TELEMETRY_CONTROL = 2,
-      TELEMETRY_STATUS = 3,
-      TELEMETRY_VECTOR = 4,
+      TELECOMMAND_PRIMARY_HEADER = 0,
+      TELECOMMAND_PACKET_DATA = 1,
+      TELECOMMAND_STATUS = 2,
+      TELEMETRY_REQUEST = 3,
+      TELEMETRY_STATUS = 4,
+      TELEMETRY_VECTOR = 5,
     };
 
     // Telemetry packet identifiers.
@@ -191,6 +192,10 @@ class ESATEPS
     // Telecommand buffer for I2C telecommands.
     volatile byte i2cTelecommandBuffer[TELECOMMAND_PACKET_LENGTH];
 
+    // Current length in bytes of the telecommand packet data (after
+    // the primary header) received from the I2C bus.
+    long i2cTelecommandPacketDataLength;
+
     // Telemetry buffer for I2C telemetry requests.
     volatile byte i2cTelemetryBuffer[TELEMETRY_BUFFER_LENGTH];
 
@@ -214,6 +219,9 @@ class ESATEPS
     // Telemetry packet sequence count, which must increase every time
     // a new telemetry packet is generated.
     word telemetryPacketSequenceCount;
+
+    // Return the length in bytes of the next I2C telemetry transfer chunk.
+    byte getI2CTelemetryTransferLength();
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(byte commandParameter);
@@ -247,16 +255,21 @@ class ESATEPS
     // Response to incoming telecommands sent by the OBC.
     static void receiveEvent(int howMany);
 
-    // Receive a telecommand from the I2C bus.
+    // Receive telecommand packet data from the I2C bus.
     // Queue the telecommand only when pendingI2CTelecommand is false.
     // This sets pendingI2CTelecommand to true.
-    void receiveTelecommandFromI2C(const byte packet[],
-                                   const int packetLength);
+    void receiveTelecommandPacketDataFromI2C(const byte message[],
+                                             const int messageLength);
+
+    // Receive a telecommand primary header from the I2C bus.
+    // Queue the telecommand only when pendingI2CTelecommand is false.
+    void receiveTelecommandPrimaryHeaderFromI2C(const byte message[],
+                                                const int messageLength);
 
     // Receive a telemetry request from the I2C bus.
     // This updates i2cTelemetryBuffer.
-    void receiveTelemetryRequestFromI2C(const byte request[],
-                                        const int requestLength);
+    void receiveTelemetryRequestFromI2C(const byte message[],
+                                        const int messageLength);
 
     // Response when asked for telemetry by the OBC.
     static void requestEvent();

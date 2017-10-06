@@ -52,6 +52,19 @@ void ESATEPS::begin()
   USB.begin();
 }
 
+byte ESATEPS::getI2CTelemetryTransferLength()
+{
+  if (i2cTelemetryBufferIndex == 0)
+  {
+    return ESATCCSDSPacket::PRIMARY_HEADER_LENGTH;
+  }
+  if (i2cTelemetryBufferIndex + I2C_CHUNK_LENGTH > TELEMETRY_BUFFER_LENGTH)
+  {
+    return TELEMETRY_BUFFER_LENGTH - i2cTelemetryBufferIndex;
+  }
+  return I2C_CHUNK_LENGTH;
+}
+
 void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
 {
   packet.rewind();
@@ -253,69 +266,98 @@ void ESATEPS::receiveEvent(const int howManyBytes)
   }
   switch (registerNumber)
   {
-  case TELECOMMAND_CONTROL:
-    EPS.receiveTelecommandFromI2C(buffer, howManyBytes - 1);
+  case TELECOMMAND_PRIMARY_HEADER:
+    EPS.receiveTelecommandPrimaryHeaderFromI2C(buffer, howManyBytes - 1);
     break;
-  case TELEMETRY_CONTROL:
+  case TELECOMMAND_PACKET_DATA:
+    EPS.receiveTelecommandPacketDataFromI2C(buffer, howManyBytes - 1);
+  case TELEMETRY_REQUEST:
     EPS.receiveTelemetryRequestFromI2C(buffer, howManyBytes - 1);
     break;
   }
 }
 
-void ESATEPS::receiveTelecommandFromI2C(const byte packet[],
-                                        const int packetLength)
+void ESATEPS::receiveTelecommandPacketDataFromI2C(const byte message[],
+                                                  const int messageLength)
 {
   if (pendingI2CTelecommand)
   {
     return;
   }
-  if (packetLength != TELECOMMAND_PACKET_LENGTH)
+  ESATCCSDSPacket packet((byte*) i2cTelecommandBuffer,
+                         TELECOMMAND_PACKET_LENGTH);
+  const word packetDataLength = packet.readPacketDataLength();
+  if (i2cTelecommandPacketDataLength >= packetDataLength)
   {
+    packet.clear();
     return;
   }
-  for (int index = 0; index < TELECOMMAND_PACKET_LENGTH; index++)
+  if ((i2cTelecommandPacketDataLength + messageLength) > packetDataLength)
   {
-    i2cTelecommandBuffer[index] = packet[index];
+    packet.clear();
+    return;
   }
-  pendingI2CTelecommand = true;
+  for (int index = 0; index < messageLength; index++)
+  {
+    i2cTelecommandBuffer[i2cTelecommandPacketDataLength + index] =
+      message[index];
+  }
+  i2cTelecommandPacketDataLength =
+    i2cTelecommandPacketDataLength + messageLength;
+  if (i2cTelecommandPacketDataLength == packetDataLength)
+  {
+    pendingI2CTelecommand = true;
+  }
 }
 
-void ESATEPS::receiveTelemetryRequestFromI2C(const byte request[],
-                                             const int requestLength)
+void ESATEPS::receiveTelecommandPrimaryHeaderFromI2C(const byte message[],
+                                                     const int messageLength)
 {
-  if (requestLength < 4)
+  if (pendingI2CTelecommand)
   {
-    EPS.i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
     return;
   }
-  const byte packetIdentifier = request[0];
-  if (packetIdentifier != HOUSEKEEPING)
+  ESATCCSDSPacket packet((byte*) i2cTelecommandBuffer,
+                         TELECOMMAND_PACKET_LENGTH);
+  packet.clear();
+  if (messageLength != packet.PRIMARY_HEADER_LENGTH)
   {
-    EPS.i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
     return;
   }
-  const boolean newPacket = request[1];
-  if (newPacket)
+  for (int index = 0; index < packet.PRIMARY_HEADER_LENGTH; index++)
   {
-    for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
-    {
-      EPS.i2cTelemetryBuffer[i] =
-        EPS.telemetryDoubleBuffer[currentTelemetryBuffer][i];
-    }
+    i2cTelecommandBuffer[index] = message[index];
   }
-  const byte indexHighByte = request[2];
-  const byte indexLowByte = request[3];
-  EPS.i2cTelemetryBufferIndex = word(indexHighByte, indexLowByte);
+  i2cTelecommandPacketDataLength = 0;
+}
+
+void ESATEPS::receiveTelemetryRequestFromI2C(const byte message[],
+                                             const int messageLength)
+{
+  if (messageLength != 1)
+  {
+    i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
+    return;
+  }
+  const byte packetType = message[0];
+  if (packetType != HOUSEKEEPING)
+  {
+    i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
+    return;
+  }
+  for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
+  {
+    i2cTelemetryBuffer[i] =
+      telemetryDoubleBuffer[currentTelemetryBuffer][i];
+  }
+  i2cTelemetryBufferIndex = 0;
 }
 
 void ESATEPS::requestEvent()
 {
-  for (int i = 0; i < I2C_CHUNK_LENGTH; i++)
+  const byte transferLength = EPS.getI2CTelemetryTransferLength();
+  for (int i = 0; i < transferLength; i++)
   {
-    if (EPS.i2cTelemetryBufferIndex >= TELEMETRY_BUFFER_LENGTH)
-    {
-      return;
-    }
     (void) Wire.write(EPS.i2cTelemetryBuffer[EPS.i2cTelemetryBufferIndex]);
     EPS.i2cTelemetryBufferIndex = EPS.i2cTelemetryBufferIndex + 1;
   }
