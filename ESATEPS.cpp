@@ -18,6 +18,7 @@
 
 #include "ESATEPS.h"
 #include <ESATUtil.h>
+#include <ESATI2CSlave.h>
 #include <USBSerial.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
@@ -30,11 +31,10 @@
 
 void ESATEPS::begin()
 {
-  currentTelemetryBuffer = 0;
-  i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
   newTelemetryPacket = false;
-  pendingI2CTelecommand = false;
   telemetryPacketSequenceCount = 0;
+  telemetry = ESATCCSDSPacket(telemetryPacketData,
+                              TELEMETRY_PACKET_DATA_LENGTH);
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
@@ -47,22 +47,12 @@ void ESATEPS::begin()
   OvercurrentDetector.begin();
   Wire1.begin();
   Wire.begin(2);
-  Wire.onReceive(receiveEvent);
-  Wire.onRequest(requestEvent);
   USB.begin();
-}
-
-byte ESATEPS::getI2CTelemetryTransferLength()
-{
-  if (i2cTelemetryBufferIndex == 0)
-  {
-    return ESATCCSDSPacket::PRIMARY_HEADER_LENGTH;
-  }
-  if (i2cTelemetryBufferIndex + I2C_CHUNK_LENGTH > TELEMETRY_BUFFER_LENGTH)
-  {
-    return TELEMETRY_BUFFER_LENGTH - i2cTelemetryBufferIndex;
-  }
-  return I2C_CHUNK_LENGTH;
+  I2CSlave.begin(Wire,
+                 i2cTelecommandPacketData,
+                 TELECOMMAND_PACKET_DATA_LENGTH,
+                 i2cTelemetryPacketData,
+                 TELEMETRY_PACKET_DATA_LENGTH);
 }
 
 void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
@@ -77,8 +67,7 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   {
     return;
   }
-  if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
-      != TELECOMMAND_PACKET_LENGTH)
+  if (packet.readPacketDataLength() != TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return;
   }
@@ -161,222 +150,64 @@ void ESATEPS::handleSwitch5VLineCommand(const byte commandParameter)
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
 {
   packet.clear();
-  if (packet.bufferLength < TELECOMMAND_PACKET_LENGTH)
+  if (packet.packetDataBufferLength < TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return false;
   }
-  if (pendingI2CTelecommand)
+  boolean pendingTelecommand = I2CSlave.readTelecommand(packet);
+  if (!pendingTelecommand)
   {
-    readTelecommandFromI2C(packet);
+    pendingTelecommand = readTelecommandFromUSB(packet);
   }
-  else
+  if (!pendingTelecommand)
   {
-    readTelecommandFromUSB(packet);
+    return false;
   }
   if (packet.readPacketType() != packet.TELECOMMAND)
   {
-    packet.clear();
     return false;
   }
   if (packet.readApplicationProcessIdentifier()
       != APPLICATION_PROCESS_IDENTIFIER)
   {
-    packet.clear();
     return false;
   }
-  if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
-      != TELECOMMAND_PACKET_LENGTH)
+  if (packet.readPacketDataLength() != TELECOMMAND_PACKET_DATA_LENGTH)
   {
-    packet.clear();
     return false;
   }
   return true;
 }
 
-void ESATEPS::readTelecommandFromI2C(ESATCCSDSPacket& packet)
-{
-  for (int i = 0; i < TELECOMMAND_PACKET_LENGTH; i++)
-  {
-    packet.buffer[i] = i2cTelecommandBuffer[i];
-  }
-  pendingI2CTelecommand = false;
-}
-
-void ESATEPS::readTelecommandFromUSB(ESATCCSDSPacket& packet)
+boolean ESATEPS::readTelecommandFromUSB(ESATCCSDSPacket& packet)
 {
   if (USB.available() == 0)
   {
-    return;
+    return false;
   }
-  char buffer[TELECOMMAND_PACKET_LENGTH];
-  const size_t bytesRead = USB.readBytes(buffer, TELECOMMAND_PACKET_LENGTH);
-  if (bytesRead != TELECOMMAND_PACKET_LENGTH)
-  {
-    return;
-  }
-  for (int index = 0; index < TELECOMMAND_PACKET_LENGTH; index++)
-  {
-    packet.buffer[index] = buffer[index];
-  }
+  return packet.readFrom(USB);
 }
 
 boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
 {
-  packet.clear();
   if (!newTelemetryPacket)
   {
     return false;
   }
   newTelemetryPacket = false;
-  if (packet.bufferLength < TELEMETRY_BUFFER_LENGTH)
-  {
-    return false;
-  }
-  for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
-  {
-    packet.buffer[i] = telemetryDoubleBuffer[currentTelemetryBuffer][i];
-  }
-  if (packet.readPacketType() != packet.TELEMETRY)
-  {
-    packet.clear();
-    return false;
-  }
-  if (packet.readApplicationProcessIdentifier() !=
-      APPLICATION_PROCESS_IDENTIFIER)
-  {
-    packet.clear();
-    return false;
-  }
-  if ((packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength())
-      != TELEMETRY_BUFFER_LENGTH)
-  {
-    packet.clear();
-    return false;
-  }
-  return true;
-}
-
-void ESATEPS::receiveEvent(const int howManyBytes)
-{
-  const byte registerNumber = Wire.read();
-  byte buffer[howManyBytes - 1];
-  for (int i = 0; i < howManyBytes; i++)
-  {
-    buffer[i] = Wire.read();
-  }
-  switch (registerNumber)
-  {
-  case TELECOMMAND_PRIMARY_HEADER:
-    EPS.receiveTelecommandPrimaryHeaderFromI2C(buffer, howManyBytes - 1);
-    break;
-  case TELECOMMAND_PACKET_DATA:
-    EPS.receiveTelecommandPacketDataFromI2C(buffer, howManyBytes - 1);
-  case TELEMETRY_REQUEST:
-    EPS.receiveTelemetryRequestFromI2C(buffer, howManyBytes - 1);
-    break;
-  }
-}
-
-void ESATEPS::receiveTelecommandPacketDataFromI2C(const byte message[],
-                                                  const int messageLength)
-{
-  if (pendingI2CTelecommand)
-  {
-    return;
-  }
-  ESATCCSDSPacket packet((byte*) i2cTelecommandBuffer,
-                         TELECOMMAND_PACKET_LENGTH);
-  const word packetDataLength = packet.readPacketDataLength();
-  if (i2cTelecommandPacketDataLength >= packetDataLength)
-  {
-    packet.clear();
-    return;
-  }
-  if ((i2cTelecommandPacketDataLength + messageLength) > packetDataLength)
-  {
-    packet.clear();
-    return;
-  }
-  for (int index = 0; index < messageLength; index++)
-  {
-    i2cTelecommandBuffer[i2cTelecommandPacketDataLength + index] =
-      message[index];
-  }
-  i2cTelecommandPacketDataLength =
-    i2cTelecommandPacketDataLength + messageLength;
-  if (i2cTelecommandPacketDataLength == packetDataLength)
-  {
-    pendingI2CTelecommand = true;
-  }
-}
-
-void ESATEPS::receiveTelecommandPrimaryHeaderFromI2C(const byte message[],
-                                                     const int messageLength)
-{
-  if (pendingI2CTelecommand)
-  {
-    return;
-  }
-  ESATCCSDSPacket packet((byte*) i2cTelecommandBuffer,
-                         TELECOMMAND_PACKET_LENGTH);
-  packet.clear();
-  if (messageLength != packet.PRIMARY_HEADER_LENGTH)
-  {
-    return;
-  }
-  for (int index = 0; index < packet.PRIMARY_HEADER_LENGTH; index++)
-  {
-    i2cTelecommandBuffer[index] = message[index];
-  }
-  i2cTelecommandPacketDataLength = 0;
-}
-
-void ESATEPS::receiveTelemetryRequestFromI2C(const byte message[],
-                                             const int messageLength)
-{
-  if (messageLength != 1)
-  {
-    i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
-    return;
-  }
-  const byte packetType = message[0];
-  if (packetType != HOUSEKEEPING)
-  {
-    i2cTelemetryBufferIndex = TELEMETRY_BUFFER_LENGTH;
-    return;
-  }
-  for (int i = 0; i < TELEMETRY_BUFFER_LENGTH; i++)
-  {
-    i2cTelemetryBuffer[i] =
-      telemetryDoubleBuffer[currentTelemetryBuffer][i];
-  }
-  i2cTelemetryBufferIndex = 0;
-}
-
-void ESATEPS::requestEvent()
-{
-  const byte transferLength = EPS.getI2CTelemetryTransferLength();
-  for (int i = 0; i < transferLength; i++)
-  {
-    (void) Wire.write(EPS.i2cTelemetryBuffer[EPS.i2cTelemetryBufferIndex]);
-    EPS.i2cTelemetryBufferIndex = EPS.i2cTelemetryBufferIndex + 1;
-  }
+  return telemetry.copyTo(packet);
 }
 
 void ESATEPS::sendTelemetry(ESATCCSDSPacket& packet)
 {
-  const long packetLength =
-    packet.PRIMARY_HEADER_LENGTH + packet.readPacketDataLength();
-  for (long i = 0; i < packetLength; i++)
-  {
-    (void) USB.write(packet.buffer[i]);
-  }
+//  (void) packet.writeTo(USB);
 }
 
 void ESATEPS::update()
 {
   updateMaximumPowerPointTracking();
   updateTelemetry();
+  updateI2CTelemetry();
 }
 
 void ESATEPS::updateMaximumPowerPointTracking()
@@ -385,63 +216,68 @@ void ESATEPS::updateMaximumPowerPointTracking()
   MaximumPowerPointTrackingDriver2.update();
 }
 
+void ESATEPS::updateI2CTelemetry()
+{
+  const int packetIdentifier = I2CSlave.requestedTelemetryPacket();
+  if (packetIdentifier == HOUSEKEEPING)
+  {
+    (void) I2CSlave.writeTelemetry(telemetry);
+  }
+}
+
 void ESATEPS::updateTelemetry()
 {
-  const byte nextTelemetryBuffer = ((currentTelemetryBuffer + 1) % 2);
-  ESATCCSDSPacket packet(telemetryDoubleBuffer[nextTelemetryBuffer],
-                         TELEMETRY_BUFFER_LENGTH);
-  packet.clear();
-  packet.writePacketVersionNumber(0);
-  packet.writePacketType(packet.TELEMETRY);
-  packet.writeSecondaryHeaderFlag(packet.SECONDARY_HEADER_IS_PRESENT);
-  packet.writeApplicationProcessIdentifier(APPLICATION_PROCESS_IDENTIFIER);
-  packet.writeSequenceFlags(packet.UNSEGMENTED_USER_DATA);
-  packet.writePacketSequenceCount(telemetryPacketSequenceCount);
-  packet.writeByte(MAJOR_VERSION_NUMBER);
-  packet.writeByte(MINOR_VERSION_NUMBER);
-  packet.writeByte(PATCH_VERSION_NUMBER);
-  packet.writeByte(HOUSEKEEPING);
-  packet.writeWord(EPSMeasurements.read3V3LineCurrent());
-  packet.writeWord(EPSMeasurements.read3V3LineVoltage());
-  packet.writeWord(EPSMeasurements.read5VLineCurrent());
-  packet.writeWord(EPSMeasurements.read5VLineVoltage());
-  packet.writeWord(EPSMeasurements.readInputLineCurrent());
-  packet.writeWord(EPSMeasurements.readInputLineVoltage());
-  packet.writeWord(EPSMeasurements.readPanel1InputCurrent());
-  packet.writeWord(EPSMeasurements.readPanel1OutputCurrent());
-  packet.writeWord(EPSMeasurements.readPanel1Voltage());
-  packet.writeWord(EPSMeasurements.readPanel2InputCurrent());
-  packet.writeWord(EPSMeasurements.readPanel2OutputCurrent());
-  packet.writeWord(EPSMeasurements.readPanel2Voltage());
-  packet.writeByte(PowerLine3V3Switch.read());
-  packet.writeByte(PowerLine5VSwitch.read());
-  packet.writeByte(OvercurrentDetector.read3V3LineOvercurrentState());
-  packet.writeByte(OvercurrentDetector.read5VLineOvercurrentState());
+  telemetry.clear();
+  telemetry.writePacketVersionNumber(0);
+  telemetry.writePacketType(telemetry.TELEMETRY);
+  telemetry.writeSecondaryHeaderFlag(telemetry.SECONDARY_HEADER_IS_PRESENT);
+  telemetry.writeApplicationProcessIdentifier(APPLICATION_PROCESS_IDENTIFIER);
+  telemetry.writeSequenceFlags(telemetry.UNSEGMENTED_USER_DATA);
+  telemetry.writePacketSequenceCount(telemetryPacketSequenceCount);
+  telemetry.writeByte(MAJOR_VERSION_NUMBER);
+  telemetry.writeByte(MINOR_VERSION_NUMBER);
+  telemetry.writeByte(PATCH_VERSION_NUMBER);
+  telemetry.writeByte(HOUSEKEEPING);
+  telemetry.writeWord(EPSMeasurements.read3V3LineCurrent());
+  telemetry.writeWord(EPSMeasurements.read3V3LineVoltage());
+  telemetry.writeWord(EPSMeasurements.read5VLineCurrent());
+  telemetry.writeWord(EPSMeasurements.read5VLineVoltage());
+  telemetry.writeWord(EPSMeasurements.readInputLineCurrent());
+  telemetry.writeWord(EPSMeasurements.readInputLineVoltage());
+  telemetry.writeWord(EPSMeasurements.readPanel1InputCurrent());
+  telemetry.writeWord(EPSMeasurements.readPanel1OutputCurrent());
+  telemetry.writeWord(EPSMeasurements.readPanel1Voltage());
+  telemetry.writeWord(EPSMeasurements.readPanel2InputCurrent());
+  telemetry.writeWord(EPSMeasurements.readPanel2OutputCurrent());
+  telemetry.writeWord(EPSMeasurements.readPanel2Voltage());
+  telemetry.writeByte(PowerLine3V3Switch.read());
+  telemetry.writeByte(PowerLine5VSwitch.read());
+  telemetry.writeByte(OvercurrentDetector.read3V3LineOvercurrentState());
+  telemetry.writeByte(OvercurrentDetector.read5VLineOvercurrentState());
   BatteryController.error = false;
-  packet.writeWord(BatteryController.readBatteryCurrent());
-  packet.writeWord(BatteryController.readTotalBatteryVoltage());
-  packet.writeWord(BatteryController.readBattery1Voltage());
-  packet.writeWord(BatteryController.readBattery2Voltage());
-  packet.writeWord(BatteryController.readBatteryTemperature());
-  packet.writeByte(BatteryController.readStateOfCharge());
-  packet.writeByte(BatteryController.error);
+  telemetry.writeWord(BatteryController.readBatteryCurrent());
+  telemetry.writeWord(BatteryController.readTotalBatteryVoltage());
+  telemetry.writeWord(BatteryController.readBattery1Voltage());
+  telemetry.writeWord(BatteryController.readBattery2Voltage());
+  telemetry.writeWord(BatteryController.readBatteryTemperature());
+  telemetry.writeByte(BatteryController.readStateOfCharge());
+  telemetry.writeByte(BatteryController.error);
   SolarPanel1Thermometer.error = false;
-  packet.writeWord(SolarPanel1Thermometer.read());
-  packet.writeByte(SolarPanel1Thermometer.error);
+  telemetry.writeWord(SolarPanel1Thermometer.read());
+  telemetry.writeByte(SolarPanel1Thermometer.error);
   SolarPanel2Thermometer.error = false;
-  packet.writeWord(SolarPanel2Thermometer.read());
-  packet.writeByte(SolarPanel2Thermometer.error);
-  packet.writeByte(MaximumPowerPointTrackingDriver1.getMode());
-  packet.writeByte(MaximumPowerPointTrackingDriver1.getDutyCycle());
-  packet.writeByte(MaximumPowerPointTrackingDriver2.getMode());
-  packet.writeByte(MaximumPowerPointTrackingDriver2.getDutyCycle());
+  telemetry.writeWord(SolarPanel2Thermometer.read());
+  telemetry.writeByte(SolarPanel2Thermometer.error);
+  telemetry.writeByte(MaximumPowerPointTrackingDriver1.getMode());
+  telemetry.writeByte(MaximumPowerPointTrackingDriver1.getDutyCycle());
+  telemetry.writeByte(MaximumPowerPointTrackingDriver2.getMode());
+  telemetry.writeByte(MaximumPowerPointTrackingDriver2.getDutyCycle());
   DirectEnergyTransferSystem.error = false;
-  packet.writeWord(DirectEnergyTransferSystem.readCurrent());
-  packet.writeWord(DirectEnergyTransferSystem.readVoltage());
-  packet.writeWord(DirectEnergyTransferSystem.readShuntVoltage());
-  packet.writeByte(DirectEnergyTransferSystem.error);
+  telemetry.writeWord(DirectEnergyTransferSystem.readCurrent());
+  telemetry.writeWord(DirectEnergyTransferSystem.readVoltage());
+  telemetry.writeWord(DirectEnergyTransferSystem.readShuntVoltage());
+  telemetry.writeByte(DirectEnergyTransferSystem.error);
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
-  currentTelemetryBuffer = nextTelemetryBuffer;
   newTelemetryPacket = true;
 }
 
