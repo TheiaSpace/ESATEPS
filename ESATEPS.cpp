@@ -200,7 +200,7 @@ boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
 
 void ESATEPS::sendTelemetry(ESATCCSDSPacket& packet)
 {
-//  (void) packet.writeTo(USB);
+  (void) packet.writeTo(USB);
 }
 
 void ESATEPS::update()
