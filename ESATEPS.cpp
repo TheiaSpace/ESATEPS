@@ -277,6 +277,11 @@ void ESATEPS::updateTelemetry()
   telemetry.writeWord(DirectEnergyTransferSystem.readVoltage());
   telemetry.writeWord(DirectEnergyTransferSystem.readShuntVoltage());
   telemetry.writeByte(DirectEnergyTransferSystem.error);
+  telemetry.updatePacketDataLength();
+  if (telemetry.readPacketDataLength() > telemetry.packetDataBufferLength)
+  {
+    return;
+  }
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
   newTelemetryPacket = true;
 }
