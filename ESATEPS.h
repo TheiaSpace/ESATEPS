@@ -62,16 +62,6 @@ class ESATEPS
       FIXED_MODE = 5,
     };
 
-    // Register numbers for I2C control.
-    enum RegisterNumbers
-    {
-      TELECOMMAND_CONTROL = 0,
-      TELECOMMAND_STATUS = 1,
-      TELEMETRY_CONTROL = 2,
-      TELEMETRY_STATUS = 3,
-      TELEMETRY_VECTOR = 4,
-    };
-
     // Telemetry packet identifiers.
     enum TelemetryPacketIdentifier
     {
@@ -96,13 +86,11 @@ class ESATEPS
     // Telecommands have a 1-byte argument field.
     static const byte COMMAND_PARAMETER_LENGTH = 1;
 
-    // Size of the telecommand buffer:
-    // - Primary header.
+    // Packet data length of telecommand packets.
     // - Secondary header.
     // - Command parameter.
-    static const byte TELECOMMAND_PACKET_LENGTH =
-      ESATCCSDSPacket::PRIMARY_HEADER_LENGTH
-      + SECONDARY_HEADER_LENGTH
+    static const byte TELECOMMAND_PACKET_DATA_LENGTH =
+      SECONDARY_HEADER_LENGTH
       + COMMAND_PARAMETER_LENGTH;
 
     // Size of the telemetry buffer (EPS measurements):
@@ -161,17 +149,15 @@ class ESATEPS
     // - Error (1 byte).
     static const byte DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH = 2*3 + 1*1;
 
-    // Size of the telemetry buffer (total):
-    // - Primary header.
+    // Size of the telemetry packet data buffer (total):
     // - Secondary header.
     // - EPS measurements.
     // - Battery controller.
     // - Panel thermometers.
     // - Direct energy transfer system.
     // - Switches.
-    static const byte TELEMETRY_BUFFER_LENGTH =
-      ESATCCSDSPacket::PRIMARY_HEADER_LENGTH
-      + SECONDARY_HEADER_LENGTH
+    static const byte TELEMETRY_PACKET_DATA_LENGTH =
+      SECONDARY_HEADER_LENGTH
       + EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
       + SWITCHES_TELEMETRY_BUFFER_LENGTH
       + OVERCURRENT_TELEMETRY_BUFFER_LENGTH
@@ -180,19 +166,9 @@ class ESATEPS
       + PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH
       + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
 
-    // Telemetry buffer that is currently complete.
-    // We need to perform double buffering so as to avoid
-    // sending dirty data on I2C requests.
-    byte currentTelemetryBuffer;
-
-    // Telecommand buffer for I2C telecommands.
-    volatile byte i2cTelecommandBuffer[TELECOMMAND_PACKET_LENGTH];
-
-    // Telemetry buffer for I2C telemetry requests.
-    volatile byte i2cTelemetryBuffer[TELEMETRY_BUFFER_LENGTH];
-
-    // Telemetry buffer read pointer for I2C requests.
-    volatile word i2cTelemetryBufferIndex;
+    // I2C packet buffers.
+    byte i2cTelecommandPacketData[TELECOMMAND_PACKET_DATA_LENGTH];
+    byte i2cTelemetryPacketData[TELEMETRY_PACKET_DATA_LENGTH];
 
     // True when there is a new telemetry packet that was not
     // requested with readTelemetry():
@@ -200,16 +176,14 @@ class ESATEPS
     // - false after readTelemetry()
     boolean newTelemetryPacket;
 
-    // True when there is a pending unprocessed I2C telecommand.
-    volatile boolean pendingI2CTelecommand;
-
     // Telemetry buffer.
-    // We need to perform double buffering so as to avoid
-    // sending dirty data on I2C requests.
-    byte telemetryDoubleBuffer[2][TELEMETRY_BUFFER_LENGTH];
+    ESATCCSDSPacket telemetry;
 
-    // Telemetry packet sequence count, which must increase every time
-    // a new telemetry packet is generated.
+    // Telemetry packet data buffer.
+    byte telemetryPacketData[TELEMETRY_PACKET_DATA_LENGTH];
+
+    // Packet sequence count of the telemetry packets.
+    // It grows by 1 every time we generate a new telemetry packet.
     word telemetryPacketSequenceCount;
 
     // Set the maximum power point tracking drivers in fixed mode.
@@ -228,38 +202,18 @@ class ESATEPS
     // Switch the 5V line.
     void handleSwitch5VLineCommand(byte commandParameter);
 
-    // Add a command to the command queue.
-    void queueCommand(byte commandCode, byte parameter);
-
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
 
-    // Read a telecommand from the I2C telecommand queue
-    // and write it into the given packet.
-    void readTelecommandFromI2C(ESATCCSDSPacket& packet);
-
     // Read a telecommand from USB and write it into the given packet.
-    void readTelecommandFromUSB(ESATCCSDSPacket& packet);
-
-    // Response to incoming telecommands sent by the OBC.
-    static void receiveEvent(int howMany);
-
-    // Receive a telecommand from the I2C bus.
-    // Queue the telecommand only when pendingI2CTelecommand is false.
-    // This sets pendingI2CTelecommand to true.
-    void receiveTelecommandFromI2C(const byte packet[],
-                                   const int packetLength);
-
-    // Receive a telemetry request from the I2C bus.
-    // This updates i2cTelemetryBuffer.
-    void receiveTelemetryRequestFromI2C(const byte request[],
-                                        const int requestLength);
-
-    // Response when asked for telemetry by the OBC.
-    static void requestEvent();
+    // Return true on success; otherwise return false.
+    boolean readTelecommandFromUSB(ESATCCSDSPacket& packet);
 
     // Update the maximum power point tracking system.
     void updateMaximumPowerPointTracking();
+
+    // Update the I2C slave telemetry buffer.
+    void updateI2CTelemetry();
 
     // Update the telemetry buffer.
     // This sets newTelemetryPacket to true.
