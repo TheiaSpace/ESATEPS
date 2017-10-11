@@ -28,6 +28,7 @@
 #include "ESATOvercurrentDetector.h"
 #include "ESATPowerLineSwitch.h"
 #include "ESATSolarPanelThermometer.h"
+#include "ESATTimestamp.h"
 
 void ESATEPS::begin()
 {
@@ -71,6 +72,15 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   {
     return;
   }
+  ESATTimestamp Timestamp;
+  Timestamp.year = packet.readWord() - 2000;
+  Timestamp.month = packet.readByte();
+  Timestamp.day = packet.readByte();
+  Timestamp.hours = packet.readByte();
+  Timestamp.minutes = packet.readByte();
+  Timestamp.seconds = packet.readByte();
+  // Nothing to do with this timestamp until the scheduled
+  // commands are implemented
   const byte majorVersionNumber = packet.readByte();
   const byte minorVersionNumber = packet.readByte();
   const byte patchVersionNumber = packet.readByte();
@@ -227,17 +237,29 @@ void ESATEPS::updateI2CTelemetry()
 
 void ESATEPS::updateTelemetry()
 {
+  ESATTimestamp Timestamp;
+  // ESAT RTC under development, at the moment it sends
+  // 2000-00-00T00:00:00 as timestamp
   telemetry.clear();
+  // Primary header
   telemetry.writePacketVersionNumber(0);
   telemetry.writePacketType(telemetry.TELEMETRY);
   telemetry.writeSecondaryHeaderFlag(telemetry.SECONDARY_HEADER_IS_PRESENT);
   telemetry.writeApplicationProcessIdentifier(APPLICATION_PROCESS_IDENTIFIER);
   telemetry.writeSequenceFlags(telemetry.UNSEGMENTED_USER_DATA);
   telemetry.writePacketSequenceCount(telemetryPacketSequenceCount);
+  // Secondary header
+  telemetry.writeWord((word)Timestamp.year + 2000);
+  telemetry.writeByte(Timestamp.month);
+  telemetry.writeByte(Timestamp.day);
+  telemetry.writeByte(Timestamp.hours);
+  telemetry.writeByte(Timestamp.minutes);
+  telemetry.writeByte(Timestamp.seconds);
   telemetry.writeByte(MAJOR_VERSION_NUMBER);
   telemetry.writeByte(MINOR_VERSION_NUMBER);
   telemetry.writeByte(PATCH_VERSION_NUMBER);
   telemetry.writeByte(HOUSEKEEPING);
+  // Packet data
   telemetry.writeWord(EPSMeasurements.read3V3LineCurrent());
   telemetry.writeWord(EPSMeasurements.read3V3LineVoltage());
   telemetry.writeWord(EPSMeasurements.read5VLineCurrent());
