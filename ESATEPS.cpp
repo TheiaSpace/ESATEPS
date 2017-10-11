@@ -259,7 +259,7 @@ void ESATEPS::updateTelemetry()
   telemetry.writeByte(MINOR_VERSION_NUMBER);
   telemetry.writeByte(PATCH_VERSION_NUMBER);
   telemetry.writeByte(HOUSEKEEPING);
-  // Packet data
+  // User data
   telemetry.writeWord(EPSMeasurements.read3V3LineCurrent());
   telemetry.writeWord(EPSMeasurements.read3V3LineVoltage());
   telemetry.writeWord(EPSMeasurements.read5VLineCurrent());
@@ -299,6 +299,7 @@ void ESATEPS::updateTelemetry()
   telemetry.writeWord(DirectEnergyTransferSystem.readVoltage());
   telemetry.writeWord(DirectEnergyTransferSystem.readShuntVoltage());
   telemetry.writeByte(DirectEnergyTransferSystem.error);
+  // End of user data
   telemetry.updatePacketDataLength();
   if (telemetry.readPacketDataLength() > telemetry.packetDataBufferLength)
   {
