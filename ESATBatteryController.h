@@ -19,7 +19,7 @@
 #ifndef ESATBatteryController_h
 #define ESATBatteryController_h
 
-#include <Energia.h>
+#include <Arduino.h>
 
 // An interface with the battery controller.
 class ESATBatteryController

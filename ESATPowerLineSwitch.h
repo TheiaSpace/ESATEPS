@@ -19,7 +19,7 @@
 #ifndef ESATPowerLineSwitch_h
 #define ESATPowerLineSwitch_h
 
-#include <Energia.h>
+#include <Arduino.h>
 
 // Power line switch controller.
 class ESATPowerLineSwitch

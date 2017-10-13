@@ -19,7 +19,7 @@
 #ifndef ESATEPSMeasurements_h
 #define ESATEPSMeasurements_h
 
-#include <Energia.h>
+#include <Arduino.h>
 
 // EPS current and voltage measurements.
 class ESATEPSMeasurements

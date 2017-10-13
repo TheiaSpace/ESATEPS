@@ -19,7 +19,7 @@
 #ifndef ESATDirectEnergyTransferSystem_h
 #define ESATDirectEnergyTransferSystem_h
 
-#include <Energia.h>
+#include <Arduino.h>
 
 // Interface with the direct energy transfer system.
 class ESATDirectEnergyTransferSystem

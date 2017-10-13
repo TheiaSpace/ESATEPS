@@ -19,7 +19,7 @@
 #ifndef ESATEPS_h
 #define ESATEPS_h
 
-#include <Energia.h>
+#include <Arduino.h>
 #include <ESATCCSDSPacket.h>
 #include "ESATRealTimeClock.h"
 
