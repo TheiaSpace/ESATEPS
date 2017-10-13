@@ -53,7 +53,8 @@ class ESATEPS
     void update();
 
   private:
-    // ESP Real Time Clock
+    // Real time clock.
+    // Useful for generating timestamps for telemetry packets.
     ESATRealTimeClock clock;
     
     // Command codes.
