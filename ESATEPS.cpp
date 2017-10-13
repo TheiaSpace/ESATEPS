@@ -159,14 +159,14 @@ void ESATEPS::handleSwitch5VLineCommand(ESATCCSDSPacket& packet)
 
 void ESATEPS::handleSetCurrentTimeCommand(ESATCCSDSPacket& packet)
 {
-  ESATTimestamp Timestamp;
-  Timestamp.year = packet.readWord() - 2000;
-  Timestamp.month = packet.readByte();
-  Timestamp.day = packet.readByte();
-  Timestamp.hours = packet.readByte();
-  Timestamp.minutes = packet.readByte();
-  Timestamp.seconds = packet.readByte();
-  clock.write(Timestamp);
+  ESATTimestamp timestamp;
+  timestamp.year = packet.readWord() - 2000;
+  timestamp.month = packet.readByte();
+  timestamp.day = packet.readByte();
+  timestamp.hours = packet.readByte();
+  timestamp.minutes = packet.readByte();
+  timestamp.seconds = packet.readByte();
+  clock.write(timestamp);
 }
 
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
@@ -254,12 +254,12 @@ void ESATEPS::updateI2CTelemetry()
 void ESATEPS::updateTelemetry()
 {
   telemetry.clear();
-  ESATTimestamp Timestamp;
+  ESATTimestamp timestamp;
   if(!clock.isRunning())
   {
     return;
   }
-  Timestamp = clock.read();
+  timestamp = clock.read();
   // Primary header.
   telemetry.writePacketVersionNumber(0);
   telemetry.writePacketType(telemetry.TELEMETRY);
@@ -271,7 +271,7 @@ void ESATEPS::updateTelemetry()
   ESATCCSDSSecondaryHeader secondaryHeader;
   secondaryHeader.preamble =
     secondaryHeader.CALENDAR_SEGMENTED_TIME_CODE_MONTH_DAY_VARIANT_1_SECOND_RESOLUTION;
-  secondaryHeader.timestamp = Timestamp;
+  secondaryHeader.timestamp = timestamp;
   secondaryHeader.majorVersionNumber = MAJOR_VERSION_NUMBER;
   secondaryHeader.minorVersionNumber = MINOR_VERSION_NUMBER;
   secondaryHeader.patchVersionNumber = PATCH_VERSION_NUMBER;
