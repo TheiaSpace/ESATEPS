@@ -255,7 +255,7 @@ void ESATEPS::updateTelemetry()
 {
   telemetry.clear();
   ESATTimestamp timestamp;
-  if(!clock.isRunning())
+  if (!clock.isRunning())
   {
     return;
   }
