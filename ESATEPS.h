@@ -21,7 +21,7 @@
 
 #include <Energia.h>
 #include <ESATCCSDSPacket.h>
-#include "ESATRTC.h"
+#include "ESATRealTimeClock.h"
 
 class ESATEPS
 {
@@ -53,9 +53,6 @@ class ESATEPS
     void update();
 
   private:
-    // ESP Real Time Clock
-    ESATRTC EPSRTC;
-    
     // Command codes.
     enum CommandCode
     {
@@ -179,6 +176,10 @@ class ESATEPS
       + MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH
       + PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH
       + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
+
+    // Real time clock.
+    // Useful for generating timestamps for telemetry packets.
+    ESATRealTimeClock clock;
 
     // I2C packet buffers.
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
