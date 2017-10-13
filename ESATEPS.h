@@ -21,6 +21,7 @@
 
 #include <Energia.h>
 #include <ESATCCSDSPacket.h>
+#include "ESATRTC.h"
 
 class ESATEPS
 {
@@ -52,6 +53,9 @@ class ESATEPS
     void update();
 
   private:
+    // ESP Real Time Clock
+    ESATRTC EPSRTC;
+    
     // Command codes.
     enum CommandCode
     {
@@ -60,6 +64,7 @@ class ESATEPS
       MAXIMUM_POWER_POINT_TRACKING_MODE = 3,
       SWEEP_MODE = 4,
       FIXED_MODE = 5,
+      SET_CURRENT_TIME = 6,
     };
 
     // Telemetry packet identifiers.
@@ -76,15 +81,31 @@ class ESATEPS
     static const byte MINOR_VERSION_NUMBER = 0;
     static const byte PATCH_VERSION_NUMBER = 0;
 
-    // Telecommands have a 1-byte argument field.
-    static const byte COMMAND_PARAMETER_LENGTH = 1;
+    // The commands that have a 1-byte argument field.
+    static const byte MINIMUM_COMMAND_PARAMETER_LENGTH = 1;
+    
+    // Set current time command size:
+    // - Year (2 byte).
+    // - Month (1 byte).
+    // - Day (1 byte).
+    // - Hours (1 byte).
+    // - Minutes (1 byte).
+    // - Seconds (1 byte).
+    static const byte MAXIMUM_COMMAND_PARAMETER_LENGTH = 7;
 
     // Packet data length of telecommand packets.
     // - Secondary header.
-    // - Command parameter.
-    static const byte TELECOMMAND_PACKET_DATA_LENGTH =
+    // - Shortest command parameter.
+    static const byte MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH = 
       ESATCCSDSSecondaryHeader::LENGTH
-      + COMMAND_PARAMETER_LENGTH;
+      + MINIMUM_COMMAND_PARAMETER_LENGTH;
+
+    // Packet data length of telecommand packets.
+    // - Secondary header.
+    // - Longest command parameter.
+    static const byte MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH = 
+      ESATCCSDSSecondaryHeader::LENGTH
+      + MAXIMUM_COMMAND_PARAMETER_LENGTH;
 
     // Size of the telemetry buffer (EPS measurements):
     // - 3.3 V line current (2 bytes).
@@ -160,7 +181,7 @@ class ESATEPS
       + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
 
     // I2C packet buffers.
-    byte i2cTelecommandPacketData[TELECOMMAND_PACKET_DATA_LENGTH];
+    byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     byte i2cTelemetryPacketData[TELEMETRY_PACKET_DATA_LENGTH];
 
     // True when there is a new telemetry packet that was not
@@ -180,20 +201,23 @@ class ESATEPS
     word telemetryPacketSequenceCount;
 
     // Set the maximum power point tracking drivers in fixed mode.
-    void handleFixedModeCommand(byte commandParameter);
+    void handleFixedModeCommand(ESATCCSDSPacket& packet);
 
     // Set the maximum power point tracking drivers in maximum power
     // point tracking mode.
-    void handleMaximumPowerPointTrackingModeCommand(byte commandParameter);
+    void handleMaximumPowerPointTrackingModeCommand(ESATCCSDSPacket& packet);
 
     // Set the maximum power point tracking drivers in sweep mode.
-    void handleSweepModeCommand(byte commandParameter);
+    void handleSweepModeCommand(ESATCCSDSPacket& packet);
 
     // Switch the 3V3 line.
-    void handleSwitch3V3LineCommand(byte commandParameter);
+    void handleSwitch3V3LineCommand(ESATCCSDSPacket& packet);
 
     // Switch the 5V line.
-    void handleSwitch5VLineCommand(byte commandParameter);
+    void handleSwitch5VLineCommand(ESATCCSDSPacket& packet);
+    
+    // Set the current time in the ESAT real time clock
+    void handleSetCurrentTimeCommand(ESATCCSDSPacket& packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();

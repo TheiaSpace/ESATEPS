@@ -51,7 +51,7 @@ void ESATEPS::begin()
   USB.begin();
   I2CSlave.begin(Wire,
                  i2cTelecommandPacketData,
-                 TELECOMMAND_PACKET_DATA_LENGTH,
+                 MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                  i2cTelemetryPacketData,
                  TELEMETRY_PACKET_DATA_LENGTH);
 }
@@ -68,7 +68,11 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   {
     return;
   }
-  if (packet.readPacketDataLength() != TELECOMMAND_PACKET_DATA_LENGTH)
+  if (packet.readPacketDataLength() < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  {
+    return;
+  }
+  if (packet.readPacketDataLength() > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return;
   }
@@ -81,27 +85,31 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   switch (secondaryHeader.packetIdentifier)
   {
   case SWITCH_5V_LINE:
-    handleSwitch5VLineCommand(commandParameter);
+    handleSwitch5VLineCommand(packet);
     break;
   case SWITCH_3V3_LINE:
-    handleSwitch3V3LineCommand(commandParameter);
+    handleSwitch3V3LineCommand(packet);
     break;
   case MAXIMUM_POWER_POINT_TRACKING_MODE:
-    handleMaximumPowerPointTrackingModeCommand(commandParameter);
+    handleMaximumPowerPointTrackingModeCommand(packet);
     break;
   case SWEEP_MODE:
-    handleSweepModeCommand(commandParameter);
+    handleSweepModeCommand(packet);
     break;
   case FIXED_MODE:
-    handleFixedModeCommand(commandParameter);
+    handleFixedModeCommand(packet);
+    break;
+  case SET_CURRENT_TIME:
+    handleSetCurrentTimeCommand(packet);
     break;
   default:
     break;
   }
 }
 
-void ESATEPS::handleFixedModeCommand(const byte commandParameter)
+void ESATEPS::handleFixedModeCommand(ESATCCSDSPacket& packet)
 {
+  const byte commandParameter = packet.readByte();
   const byte dutyCycle = constrain(commandParameter, 0, 255);
   MaximumPowerPointTrackingDriver1.setFixedMode();
   MaximumPowerPointTrackingDriver2.setFixedMode();
@@ -109,20 +117,23 @@ void ESATEPS::handleFixedModeCommand(const byte commandParameter)
   MaximumPowerPointTrackingDriver2.dutyCycle = dutyCycle;
 }
 
-void ESATEPS::handleMaximumPowerPointTrackingModeCommand(const byte commandParameter)
+void ESATEPS::handleMaximumPowerPointTrackingModeCommand(ESATCCSDSPacket& packet)
 {
+  const byte commandParameter = packet.readByte();
   MaximumPowerPointTrackingDriver1.setMPPTMode();
   MaximumPowerPointTrackingDriver2.setMPPTMode();
 }
 
-void ESATEPS::handleSweepModeCommand(const byte commandParameter)
+void ESATEPS::handleSweepModeCommand(ESATCCSDSPacket& packet)
 {
+  const byte commandParameter = packet.readByte();
   MaximumPowerPointTrackingDriver1.setSweepMode();
   MaximumPowerPointTrackingDriver2.setSweepMode();
 }
 
-void ESATEPS::handleSwitch3V3LineCommand(const byte commandParameter)
+void ESATEPS::handleSwitch3V3LineCommand(ESATCCSDSPacket& packet)
 {
+  const byte commandParameter = packet.readByte();
   if (commandParameter > 0)
   {
     PowerLine3V3Switch.write(PowerLine3V3Switch.ON);
@@ -133,8 +144,9 @@ void ESATEPS::handleSwitch3V3LineCommand(const byte commandParameter)
   }
 }
 
-void ESATEPS::handleSwitch5VLineCommand(const byte commandParameter)
+void ESATEPS::handleSwitch5VLineCommand(ESATCCSDSPacket& packet)
 {
+  const byte commandParameter = packet.readByte();
   if (commandParameter > 0)
   {
     PowerLine5VSwitch.write(PowerLine5VSwitch.ON);
@@ -145,10 +157,22 @@ void ESATEPS::handleSwitch5VLineCommand(const byte commandParameter)
   }
 }
 
+void ESATEPS::handleSetCurrentTimeCommand(ESATCCSDSPacket& packet)
+{
+  ESATTimestamp Timestamp;
+  Timestamp.year = packet.readWord() - 2000;
+  Timestamp.month = packet.readByte();
+  Timestamp.day = packet.readByte();
+  Timestamp.hours = packet.readByte();
+  Timestamp.minutes = packet.readByte();
+  Timestamp.seconds = packet.readByte();
+  EPSRTC.write(Timestamp);
+}
+
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
 {
   packet.clear();
-  if (packet.packetDataBufferLength < TELECOMMAND_PACKET_DATA_LENGTH)
+  if (packet.packetDataBufferLength < MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return false;
   }
@@ -170,7 +194,11 @@ boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
   {
     return false;
   }
-  if (packet.readPacketDataLength() != TELECOMMAND_PACKET_DATA_LENGTH)
+  if (packet.readPacketDataLength() > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  {
+    return false;
+  }
+  if (packet.readPacketDataLength() < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return false;
   }
@@ -225,10 +253,13 @@ void ESATEPS::updateI2CTelemetry()
 
 void ESATEPS::updateTelemetry()
 {
-  ESATTimestamp Timestamp;
-  // ESAT RTC under development, at the moment it sends
-  // 2000-00-00T00:00:00 as timestamp
   telemetry.clear();
+  ESATTimestamp Timestamp;
+  if(!EPSRTC.isRunning())
+  {
+    return;
+  }
+  Timestamp = EPSRTC.read();
   // Primary header
   telemetry.writePacketVersionNumber(0);
   telemetry.writePacketType(telemetry.TELEMETRY);
