@@ -254,12 +254,6 @@ void ESATEPS::updateI2CTelemetry()
 void ESATEPS::updateTelemetry()
 {
   telemetry.clear();
-  ESATTimestamp timestamp;
-  if (!clock.isRunning())
-  {
-    return;
-  }
-  timestamp = clock.read();
   // Primary header.
   telemetry.writePacketVersionNumber(0);
   telemetry.writePacketType(telemetry.TELEMETRY);
@@ -271,7 +265,7 @@ void ESATEPS::updateTelemetry()
   ESATCCSDSSecondaryHeader secondaryHeader;
   secondaryHeader.preamble =
     secondaryHeader.CALENDAR_SEGMENTED_TIME_CODE_MONTH_DAY_VARIANT_1_SECOND_RESOLUTION;
-  secondaryHeader.timestamp = timestamp;
+  secondaryHeader.timestamp = clock.read();
   secondaryHeader.majorVersionNumber = MAJOR_VERSION_NUMBER;
   secondaryHeader.minorVersionNumber = MINOR_VERSION_NUMBER;
   secondaryHeader.patchVersionNumber = PATCH_VERSION_NUMBER;
