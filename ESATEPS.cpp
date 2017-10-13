@@ -159,14 +159,14 @@ void ESATEPS::handleSwitch5VLineCommand(ESATCCSDSPacket& packet)
 
 void ESATEPS::handleSetCurrentTimeCommand(ESATCCSDSPacket& packet)
 {
-  ESATTimestamp Timestamp;
-  Timestamp.year = packet.readWord() - 2000;
-  Timestamp.month = packet.readByte();
-  Timestamp.day = packet.readByte();
-  Timestamp.hours = packet.readByte();
-  Timestamp.minutes = packet.readByte();
-  Timestamp.seconds = packet.readByte();
-  clock.write(Timestamp);
+  ESATTimestamp timestamp;
+  timestamp.year = packet.readWord() - 2000;
+  timestamp.month = packet.readByte();
+  timestamp.day = packet.readByte();
+  timestamp.hours = packet.readByte();
+  timestamp.minutes = packet.readByte();
+  timestamp.seconds = packet.readByte();
+  clock.write(timestamp);
 }
 
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
@@ -254,30 +254,30 @@ void ESATEPS::updateI2CTelemetry()
 void ESATEPS::updateTelemetry()
 {
   telemetry.clear();
-  ESATTimestamp Timestamp;
-  if(!clock.isRunning())
+  ESATTimestamp timestamp;
+  if (!clock.isRunning())
   {
     return;
   }
-  Timestamp = clock.read();
-  // Primary header
+  timestamp = clock.read();
+  // Primary header.
   telemetry.writePacketVersionNumber(0);
   telemetry.writePacketType(telemetry.TELEMETRY);
   telemetry.writeSecondaryHeaderFlag(telemetry.SECONDARY_HEADER_IS_PRESENT);
   telemetry.writeApplicationProcessIdentifier(APPLICATION_PROCESS_IDENTIFIER);
   telemetry.writeSequenceFlags(telemetry.UNSEGMENTED_USER_DATA);
   telemetry.writePacketSequenceCount(telemetryPacketSequenceCount);
-  // Secondary header
+  // Secondary header.
   ESATCCSDSSecondaryHeader secondaryHeader;
   secondaryHeader.preamble =
     secondaryHeader.CALENDAR_SEGMENTED_TIME_CODE_MONTH_DAY_VARIANT_1_SECOND_RESOLUTION;
-  secondaryHeader.timestamp = Timestamp;
+  secondaryHeader.timestamp = timestamp;
   secondaryHeader.majorVersionNumber = MAJOR_VERSION_NUMBER;
   secondaryHeader.minorVersionNumber = MINOR_VERSION_NUMBER;
   secondaryHeader.patchVersionNumber = PATCH_VERSION_NUMBER;
   secondaryHeader.packetIdentifier = HOUSEKEEPING;
   telemetry.writeSecondaryHeader(secondaryHeader);
-  // User data
+  // User data.
   telemetry.writeWord(EPSMeasurements.read3V3LineCurrent());
   telemetry.writeWord(EPSMeasurements.read3V3LineVoltage());
   telemetry.writeWord(EPSMeasurements.read5VLineCurrent());

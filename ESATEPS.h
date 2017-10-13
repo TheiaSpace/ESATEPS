@@ -80,7 +80,7 @@ class ESATEPS
 
     // The commands that have a 1-byte argument field.
     static const byte MINIMUM_COMMAND_PARAMETER_LENGTH = 1;
-    
+
     // Set current time command size:
     // - Year (2 byte).
     // - Month (1 byte).
@@ -93,14 +93,14 @@ class ESATEPS
     // Packet data length of telecommand packets.
     // - Secondary header.
     // - Shortest command parameter.
-    static const byte MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH = 
+    static const byte MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
       ESATCCSDSSecondaryHeader::LENGTH
       + MINIMUM_COMMAND_PARAMETER_LENGTH;
 
     // Packet data length of telecommand packets.
     // - Secondary header.
     // - Longest command parameter.
-    static const byte MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH = 
+    static const byte MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
       ESATCCSDSSecondaryHeader::LENGTH
       + MAXIMUM_COMMAND_PARAMETER_LENGTH;
 
@@ -216,8 +216,8 @@ class ESATEPS
 
     // Switch the 5V line.
     void handleSwitch5VLineCommand(ESATCCSDSPacket& packet);
-    
-    // Set the current time in the ESAT real time clock
+
+    // Set the time of the real time clock.
     void handleSetCurrentTimeCommand(ESATCCSDSPacket& packet);
 
     // Queue incoming USB commands.
