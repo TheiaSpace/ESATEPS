@@ -72,25 +72,13 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   {
     return;
   }
-  ESATTimestamp Timestamp;
-  Timestamp.year = packet.readWord() - 2000;
-  Timestamp.month = packet.readByte();
-  Timestamp.day = packet.readByte();
-  Timestamp.hours = packet.readByte();
-  Timestamp.minutes = packet.readByte();
-  Timestamp.seconds = packet.readByte();
-  // Nothing to do with this timestamp until the scheduled
-  // commands are implemented
-  const byte majorVersionNumber = packet.readByte();
-  const byte minorVersionNumber = packet.readByte();
-  const byte patchVersionNumber = packet.readByte();
-  if (majorVersionNumber < MAJOR_VERSION_NUMBER)
+  const ESATCCSDSSecondaryHeader secondaryHeader = packet.readSecondaryHeader();
+  if (secondaryHeader.majorVersionNumber < MAJOR_VERSION_NUMBER)
   {
     return;
   }
-  const byte commandCode = packet.readByte();
   const byte commandParameter = packet.readByte();
-  switch (commandCode)
+  switch (secondaryHeader.packetIdentifier)
   {
   case SWITCH_5V_LINE:
     handleSwitch5VLineCommand(commandParameter);
@@ -249,16 +237,15 @@ void ESATEPS::updateTelemetry()
   telemetry.writeSequenceFlags(telemetry.UNSEGMENTED_USER_DATA);
   telemetry.writePacketSequenceCount(telemetryPacketSequenceCount);
   // Secondary header
-  telemetry.writeWord((word)Timestamp.year + 2000);
-  telemetry.writeByte(Timestamp.month);
-  telemetry.writeByte(Timestamp.day);
-  telemetry.writeByte(Timestamp.hours);
-  telemetry.writeByte(Timestamp.minutes);
-  telemetry.writeByte(Timestamp.seconds);
-  telemetry.writeByte(MAJOR_VERSION_NUMBER);
-  telemetry.writeByte(MINOR_VERSION_NUMBER);
-  telemetry.writeByte(PATCH_VERSION_NUMBER);
-  telemetry.writeByte(HOUSEKEEPING);
+  ESATCCSDSSecondaryHeader secondaryHeader;
+  secondaryHeader.preamble =
+    secondaryHeader.CALENDAR_SEGMENTED_TIME_CODE_MONTH_DAY_VARIANT_1_SECOND_RESOLUTION;
+  secondaryHeader.timestamp = Timestamp;
+  secondaryHeader.majorVersionNumber = MAJOR_VERSION_NUMBER;
+  secondaryHeader.minorVersionNumber = MINOR_VERSION_NUMBER;
+  secondaryHeader.patchVersionNumber = PATCH_VERSION_NUMBER;
+  secondaryHeader.packetIdentifier = HOUSEKEEPING;
+  telemetry.writeSecondaryHeader(secondaryHeader);
   // User data
   telemetry.writeWord(EPSMeasurements.read3V3LineCurrent());
   telemetry.writeWord(EPSMeasurements.read3V3LineVoltage());
