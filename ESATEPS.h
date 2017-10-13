@@ -21,7 +21,7 @@
 
 #include <Energia.h>
 #include <ESATCCSDSPacket.h>
-#include "ESATRTC.h"
+#include "ESATRealTimeClock.h"
 
 class ESATEPS
 {
@@ -54,7 +54,7 @@ class ESATEPS
 
   private:
     // ESP Real Time Clock
-    ESATRTC EPSRTC;
+    ESATRealTimeClock clock;
     
     // Command codes.
     enum CommandCode

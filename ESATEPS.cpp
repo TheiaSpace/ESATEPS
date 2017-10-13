@@ -166,7 +166,7 @@ void ESATEPS::handleSetCurrentTimeCommand(ESATCCSDSPacket& packet)
   Timestamp.hours = packet.readByte();
   Timestamp.minutes = packet.readByte();
   Timestamp.seconds = packet.readByte();
-  EPSRTC.write(Timestamp);
+  clock.write(Timestamp);
 }
 
 boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
@@ -255,11 +255,11 @@ void ESATEPS::updateTelemetry()
 {
   telemetry.clear();
   ESATTimestamp Timestamp;
-  if(!EPSRTC.isRunning())
+  if(!clock.isRunning())
   {
     return;
   }
-  Timestamp = EPSRTC.read();
+  Timestamp = clock.read();
   // Primary header
   telemetry.writePacketVersionNumber(0);
   telemetry.writePacketType(telemetry.TELEMETRY);
