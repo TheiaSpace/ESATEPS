@@ -216,8 +216,8 @@ class ESATEPS
 
     // Switch the 5V line.
     void handleSwitch5VLineCommand(ESATCCSDSPacket& packet);
-    
-    // Set the current time in the ESAT real time clock
+
+    // Set the time of the real time clock.
     void handleSetCurrentTimeCommand(ESATCCSDSPacket& packet);
 
     // Queue incoming USB commands.

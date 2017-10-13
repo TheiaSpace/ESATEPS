@@ -260,14 +260,14 @@ void ESATEPS::updateTelemetry()
     return;
   }
   Timestamp = clock.read();
-  // Primary header
+  // Primary header.
   telemetry.writePacketVersionNumber(0);
   telemetry.writePacketType(telemetry.TELEMETRY);
   telemetry.writeSecondaryHeaderFlag(telemetry.SECONDARY_HEADER_IS_PRESENT);
   telemetry.writeApplicationProcessIdentifier(APPLICATION_PROCESS_IDENTIFIER);
   telemetry.writeSequenceFlags(telemetry.UNSEGMENTED_USER_DATA);
   telemetry.writePacketSequenceCount(telemetryPacketSequenceCount);
-  // Secondary header
+  // Secondary header.
   ESATCCSDSSecondaryHeader secondaryHeader;
   secondaryHeader.preamble =
     secondaryHeader.CALENDAR_SEGMENTED_TIME_CODE_MONTH_DAY_VARIANT_1_SECOND_RESOLUTION;
@@ -277,7 +277,7 @@ void ESATEPS::updateTelemetry()
   secondaryHeader.patchVersionNumber = PATCH_VERSION_NUMBER;
   secondaryHeader.packetIdentifier = HOUSEKEEPING;
   telemetry.writeSecondaryHeader(secondaryHeader);
-  // User data
+  // User data.
   telemetry.writeWord(EPSMeasurements.read3V3LineCurrent());
   telemetry.writeWord(EPSMeasurements.read3V3LineVoltage());
   telemetry.writeWord(EPSMeasurements.read5VLineCurrent());
