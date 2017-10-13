@@ -19,7 +19,7 @@
 #ifndef ESATMaximumPowerPointTrackingDriver_h
 #define ESATMaximumPowerPointTrackingDriver_h
 
-#include <Energia.h>
+#include <Arduino.h>
 
 // Maximum power point tracking (MPPT) driver.
 class ESATMaximumPowerPointTrackingDriver

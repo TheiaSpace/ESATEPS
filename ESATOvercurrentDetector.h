@@ -19,7 +19,7 @@
 #ifndef ESATOvercurrentDetector_h
 #define ESATOvercurrentDetector_h
 
-#include <Energia.h>
+#include <Arduino.h>
 
 // Overcurrent detection.
 class ESATOvercurrentDetector

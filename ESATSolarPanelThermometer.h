@@ -19,7 +19,7 @@
 #ifndef ESATSolarPanelThermometer_h
 #define ESATSolarPanelThermometer_h
 
-#include <Energia.h>
+#include <Arduino.h>
 
 // An interface to the thermometers found on ESAT's solar panels.
 class ESATSolarPanelThermometer
