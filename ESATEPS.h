@@ -21,7 +21,7 @@
 
 #include <Arduino.h>
 #include <ESATCCSDSPacket.h>
-#include "ESATRealTimeClock.h"
+#include <ESATSoftwareClock.h>
 
 class ESATEPS
 {
@@ -179,7 +179,7 @@ class ESATEPS
 
     // Real time clock.
     // Useful for generating timestamps for telemetry packets.
-    ESATRealTimeClock clock;
+    ESATSoftwareClock clock;
 
     // I2C packet buffers.
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
