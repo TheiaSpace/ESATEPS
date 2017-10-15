@@ -159,13 +159,7 @@ void ESATEPS::handleSwitch5VLineCommand(ESATCCSDSPacket& packet)
 
 void ESATEPS::handleSetCurrentTimeCommand(ESATCCSDSPacket& packet)
 {
-  ESATTimestamp timestamp;
-  timestamp.year = packet.readWord() - 2000;
-  timestamp.month = packet.readByte();
-  timestamp.day = packet.readByte();
-  timestamp.hours = packet.readByte();
-  timestamp.minutes = packet.readByte();
-  timestamp.seconds = packet.readByte();
+  const ESATTimestamp timestamp = packet.readTimestamp();
   clock.write(timestamp);
 }
 
