@@ -19,6 +19,7 @@
 #include "ESATEPS.h"
 #include <ESATUtil.h>
 #include <ESATI2CSlave.h>
+#include <ESATKISSStream.h>
 #include <USBSerial.h>
 #include <Wire.h>
 #include "ESATBatteryController.h"
@@ -205,7 +206,11 @@ boolean ESATEPS::readTelecommandFromUSB(ESATCCSDSPacket& packet)
   {
     return false;
   }
-  return packet.readFrom(USB);
+  const unsigned long bufferLength =
+    packet.PRIMARY_HEADER_LENGTH + packet.packetDataBufferLength;
+  byte buffer[bufferLength];
+  ESATKISSStream decoder(USB, buffer, bufferLength);
+  return packet.readFrom(decoder);
 }
 
 boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
@@ -220,7 +225,10 @@ boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
 
 void ESATEPS::sendTelemetry(ESATCCSDSPacket& packet)
 {
-  (void) packet.writeTo(USB);
+  ESATKISSStream encoder(USB, nullptr, 0);
+  (void) encoder.beginFrame();
+  (void) packet.writeTo(encoder);
+  (void) encoder.endFrame();
 }
 
 void ESATEPS::update()
