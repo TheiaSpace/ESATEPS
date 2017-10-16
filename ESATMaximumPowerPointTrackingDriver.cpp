@@ -83,17 +83,17 @@ void ESATMaximumPowerPointTrackingDriver::update()
 {
   switch (mode)
   {
-  case FIXED_MODE:
-    updateFixedMode();
-    break;
-  case MPPT_MODE:
-    updateMPPTMode();
-    break;
-  case SWEEP_MODE:
-    updateSweepMode();
-    break;
-  default:
-    break;
+    case FIXED_MODE:
+      updateFixedMode();
+      break;
+    case MPPT_MODE:
+      updateMPPTMode();
+      break;
+    case SWEEP_MODE:
+      updateSweepMode();
+      break;
+    default:
+      break;
   }
 }
 
