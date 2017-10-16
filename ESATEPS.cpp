@@ -223,14 +223,6 @@ boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
   return telemetry.copyTo(packet);
 }
 
-void ESATEPS::sendTelemetry(ESATCCSDSPacket& packet)
-{
-  ESATKISSStream encoder(USB, nullptr, 0);
-  (void) encoder.beginFrame();
-  (void) packet.writeTo(encoder);
-  (void) encoder.endFrame();
-}
-
 void ESATEPS::update()
 {
   updateMaximumPowerPointTracking();
@@ -321,6 +313,14 @@ void ESATEPS::updateTelemetry()
   }
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
   newTelemetryPacket = true;
+}
+
+void ESATEPS::writeTelemetry(ESATCCSDSPacket& packet)
+{
+  ESATKISSStream encoder(USB, nullptr, 0);
+  (void) encoder.beginFrame();
+  (void) packet.writeTo(encoder);
+  (void) encoder.endFrame();
 }
 
 ESATEPS EPS;
