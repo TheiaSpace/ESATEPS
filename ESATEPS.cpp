@@ -85,26 +85,26 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   const byte commandParameter = packet.readByte();
   switch (secondaryHeader.packetIdentifier)
   {
-  case SWITCH_5V_LINE:
-    handleSwitch5VLineCommand(packet);
-    break;
-  case SWITCH_3V3_LINE:
-    handleSwitch3V3LineCommand(packet);
-    break;
-  case MAXIMUM_POWER_POINT_TRACKING_MODE:
-    handleMaximumPowerPointTrackingModeCommand(packet);
-    break;
-  case SWEEP_MODE:
-    handleSweepModeCommand(packet);
-    break;
-  case FIXED_MODE:
-    handleFixedModeCommand(packet);
-    break;
-  case SET_CURRENT_TIME:
-    handleSetCurrentTimeCommand(packet);
-    break;
-  default:
-    break;
+    case SWITCH_5V_LINE:
+      handleSwitch5VLineCommand(packet);
+      break;
+    case SWITCH_3V3_LINE:
+      handleSwitch3V3LineCommand(packet);
+      break;
+    case MAXIMUM_POWER_POINT_TRACKING_MODE:
+      handleMaximumPowerPointTrackingModeCommand(packet);
+      break;
+    case SWEEP_MODE:
+      handleSweepModeCommand(packet);
+      break;
+    case FIXED_MODE:
+      handleFixedModeCommand(packet);
+      break;
+    case SET_CURRENT_TIME:
+      handleSetCurrentTimeCommand(packet);
+      break;
+    default:
+      break;
   }
 }
 
@@ -223,14 +223,6 @@ boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
   return telemetry.copyTo(packet);
 }
 
-void ESATEPS::sendTelemetry(ESATCCSDSPacket& packet)
-{
-  ESATKISSStream encoder(USB, nullptr, 0);
-  (void) encoder.beginFrame();
-  (void) packet.writeTo(encoder);
-  (void) encoder.endFrame();
-}
-
 void ESATEPS::update()
 {
   updateMaximumPowerPointTracking();
@@ -321,6 +313,14 @@ void ESATEPS::updateTelemetry()
   }
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
   newTelemetryPacket = true;
+}
+
+void ESATEPS::writeTelemetry(ESATCCSDSPacket& packet)
+{
+  ESATKISSStream encoder(USB, nullptr, 0);
+  (void) encoder.beginFrame();
+  (void) packet.writeTo(encoder);
+  (void) encoder.endFrame();
 }
 
 ESATEPS EPS;

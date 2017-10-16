@@ -35,6 +35,6 @@ void loop()
   EPS.update();
   while (EPS.readTelemetry(packet))
   {
-    EPS.sendTelemetry(packet);
+    EPS.writeTelemetry(packet);
   }
 }

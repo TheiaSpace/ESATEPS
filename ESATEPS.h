@@ -44,13 +44,13 @@ class ESATEPS
     // This sets newTelemetryPacket to false.
     boolean readTelemetry(ESATCCSDSPacket& packet);
 
-    // Send a telemetry packet.
-    void sendTelemetry(ESATCCSDSPacket& packet);
-
     // Update the EPS:
     // - Update the maximum point tracking system.
     // - Update the telemetry vector.
     void update();
+
+    // Send a telemetry packet.
+    void writeTelemetry(ESATCCSDSPacket& packet);
 
   private:
     // Command codes.
