@@ -22,6 +22,7 @@
 #include <Arduino.h>
 
 // EPS current and voltage measurements.
+// Use the global instance EPSMeasurements.
 class ESATEPSMeasurements
 {
   public:
@@ -65,6 +66,7 @@ class ESATEPSMeasurements
     word readPanel2Voltage();
 };
 
+// Global instance of the EPS measurements library.
 extern ESATEPSMeasurements EPSMeasurements;
 
 #endif /* ESATEPSMeasurements_h */
