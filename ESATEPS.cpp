@@ -48,7 +48,7 @@ void ESATEPS::begin()
   PowerLine3V3Switch.write(PowerLine3V3Switch.ON);
   OvercurrentDetector.begin();
   Wire1.begin();
-  Wire.begin(2);
+  Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   USB.begin();
   I2CSlave.begin(Wire,
                  i2cTelecommandPacketData,
