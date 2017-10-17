@@ -82,7 +82,6 @@ void ESATEPS::handleTelecommand(ESATCCSDSPacket& packet)
   {
     return;
   }
-  const byte commandParameter = packet.readByte();
   switch (secondaryHeader.packetIdentifier)
   {
     case SWITCH_5V_LINE:
