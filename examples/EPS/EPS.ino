@@ -18,11 +18,33 @@
 
 #include <ESATEPS.h>
 
+// Main program of the EPS board: respond to telecommands,
+// do housekeeping work and send telemetry.
+
+// After a call to EPS.begin(), the board will respond to I2C messages
+// on the Wire (SCL_O, SDA_O) interface through the interrupt handling
+// code of the ESATI2CSlave module (part of the ESATUtil library): it
+// will send telemetry when requested and it will queue telecommands
+// for later retrieval on the main loop with readTelecommand().
+
+// Start the peripherals and do some initial bookkeeping work.
 void setup()
 {
   EPS.begin();
 }
 
+// Body of the main loop of the program:
+// - Retrieve the incomming telecommands (from the I2C interface
+//   and from the USB interface).
+// - Handle the incoming telecommands.
+// - Update the telemetry measurements and do housekeeping work
+//   (update the maximum power point tracking drivers and prepare
+//   the responses to I2C telemetry requests).
+// - Retrieve the telemetry packets.
+// - Write the telemetry packets through the USB interface.
+// The packet data buffer used for telecommand and telemetry
+// operations must be big enough for holding all the packet
+// data; if the buffer is too small, the packets will be dropped.
 void loop()
 {
   const word bufferLength = 256;
