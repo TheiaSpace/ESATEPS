@@ -22,6 +22,9 @@
 #include <Arduino.h>
 
 // Maximum power point tracking (MPPT) driver.
+// Use the global instances MaximumPowerPointTrackingDriver1 (for
+// solar panel 1) and MaximumPowerPointTrackingDriver2 (for solar
+// panel 2).
 class ESATMaximumPowerPointTrackingDriver
 {
   public:
