@@ -22,6 +22,8 @@
 #include <Arduino.h>
 
 // Power line switch controller.
+// Use the global instances PowerLine3V3Switch (for the 3.3 V line)
+// and PowerLine5VSwitch (for the 5 V line).
 class ESATPowerLineSwitch
 {
   public:
