@@ -238,9 +238,16 @@ void ESATEPS::updateMaximumPowerPointTracking()
 void ESATEPS::updateI2CTelemetry()
 {
   const int packetIdentifier = I2CSlave.requestedTelemetryPacket();
-  if (packetIdentifier == HOUSEKEEPING)
+  switch (packetIdentifier)
   {
-    (void) I2CSlave.writeTelemetry(telemetry);
+    case I2CSlave.NO_TELEMETRY_PACKET_REQUESTED:
+      break;
+    case HOUSEKEEPING:
+      (void) I2CSlave.writeTelemetry(telemetry);
+      break;
+    default:
+      I2CSlave.rejectTelemetryRequest();
+      break;
   }
 }
 
