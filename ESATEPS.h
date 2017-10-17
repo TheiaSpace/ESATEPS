@@ -23,6 +23,17 @@
 #include <ESATCCSDSPacket.h>
 #include <ESATSoftwareClock.h>
 
+// Library with the functionality of the Electrical Power Subsystem
+// (EPS) board.  Use the global instance EPS.
+// Set up the peripherals with EPS.begin().
+// Retrieve a telecommand with readTelecommand().
+// Handle a telecommand with handleTelecommand().
+// Retrieve a telemetry packet with readTelemetry().
+// Write the telemetry packet through the USB interface with writeTelemetry().
+// Update the telemetry measurements and do housekeeping work with update().
+// After begin(), the board will respond to I2C messages on the Wire
+// (SCL_O, SDA_O) interface.
+// See the example EPS program for a functional EPS loop.
 class ESATEPS
 {
   public:
@@ -238,6 +249,7 @@ class ESATEPS
     void updateTelemetry();
 };
 
+// Global instance of the EPS library.
 extern ESATEPS EPS;
 
 #endif
