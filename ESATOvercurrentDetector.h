@@ -22,6 +22,7 @@
 #include <Arduino.h>
 
 // Overcurrent detection.
+// Use the global instance OvercurrentDetector.
 class ESATOvercurrentDetector
 {
   public:
@@ -37,6 +38,7 @@ class ESATOvercurrentDetector
     boolean read5VLineOvercurrentState();
 };
 
+// Global instance of the overcurrent detector library.
 extern ESATOvercurrentDetector OvercurrentDetector;
 
 #endif /* ESATOvercurrentDetector_h */

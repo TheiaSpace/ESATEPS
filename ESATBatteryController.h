@@ -22,6 +22,7 @@
 #include <Arduino.h>
 
 // An interface with the battery controller.
+// Use the global instance BatteryController.
 class ESATBatteryController
 {
   public:
@@ -74,6 +75,7 @@ class ESATBatteryController
     word readWord(byte registerNumber);
 };
 
+// Global instance of the battery controller library.
 extern ESATBatteryController BatteryController;
 
 #endif /* ESATBatteryController_h */

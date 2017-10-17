@@ -22,6 +22,7 @@
 #include <Arduino.h>
 
 // Interface with the direct energy transfer system.
+// Use the global instance DirectEnergyTransferSystem.
 class ESATDirectEnergyTransferSystem
 {
   public:
