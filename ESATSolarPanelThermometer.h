@@ -22,6 +22,9 @@
 #include <Arduino.h>
 
 // An interface to the thermometers found on ESAT's solar panels.
+// Use the global instances SolarPanel1Thermometer (for the
+// thermometer on solar panel 1) and SolarPanel2Thermometer (for the
+// thermometer on solar panel 2).
 class ESATSolarPanelThermometer
 {
   public:
