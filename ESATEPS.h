@@ -67,12 +67,12 @@ class ESATEPS
     // Command codes.
     enum CommandCode
     {
-      SWITCH_5V_LINE = 1,
-      SWITCH_3V3_LINE = 2,
-      MAXIMUM_POWER_POINT_TRACKING_MODE = 3,
-      SWEEP_MODE = 4,
-      FIXED_MODE = 5,
-      SET_CURRENT_TIME = 6,
+      SET_CURRENT_TIME = 0x00,
+      SWITCH_3V3_LINE = 0x10,
+      SWITCH_5V_LINE = 0x11,
+      MAXIMUM_POWER_POINT_TRACKING_MODE = 0x20,
+      SWEEP_MODE = 0x21,
+      FIXED_MODE = 0x22,
     };
 
     // Telemetry packet identifiers.
