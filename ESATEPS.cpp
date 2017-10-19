@@ -31,12 +31,13 @@
 #include "ESATSolarPanelThermometer.h"
 #include "ESATTimestamp.h"
 
-void ESATEPS::begin()
+void ESATEPS::begin(byte buffer[], const unsigned long bufferLength)
 {
   newTelemetryPacket = false;
   telemetryPacketSequenceCount = 0;
   telemetry = ESATCCSDSPacket(telemetryPacketData,
                               TELEMETRY_PACKET_DATA_LENGTH);
+  usbTelecommandDecoder = ESATKISSStream(USB, buffer, bufferLength);
   EPSMeasurements.begin();
   MaximumPowerPointTrackingDriver1.begin();
   MaximumPowerPointTrackingDriver2.begin();
@@ -201,15 +202,12 @@ boolean ESATEPS::readTelecommand(ESATCCSDSPacket& packet)
 
 boolean ESATEPS::readTelecommandFromUSB(ESATCCSDSPacket& packet)
 {
-  if (USB.available() == 0)
+  const boolean gotFrame = usbTelecommandDecoder.receiveFrame();
+  if (!gotFrame)
   {
     return false;
   }
-  const unsigned long bufferLength =
-    packet.PRIMARY_HEADER_LENGTH + packet.packetDataBufferLength;
-  byte buffer[bufferLength];
-  ESATKISSStream decoder(USB, buffer, bufferLength);
-  return packet.readFrom(decoder);
+  return packet.readFrom(usbTelecommandDecoder);
 }
 
 boolean ESATEPS::readTelemetry(ESATCCSDSPacket& packet)
@@ -323,7 +321,11 @@ void ESATEPS::updateTelemetry()
 
 void ESATEPS::writeTelemetry(ESATCCSDSPacket& packet)
 {
-  ESATKISSStream encoder(USB, nullptr, 0);
+  const unsigned long encoderBufferLength =
+    ESATKISSStream::frameLength(packet.PRIMARY_HEADER_LENGTH
+                                + packet.readPacketDataLength());
+  byte encoderBuffer[encoderBufferLength];
+  ESATKISSStream encoder(USB, encoderBuffer, encoderBufferLength);
   (void) encoder.beginFrame();
   (void) packet.writeTo(encoder);
   (void) encoder.endFrame();

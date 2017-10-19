@@ -27,10 +27,20 @@
 // will send telemetry when requested and it will queue telecommands
 // for later retrieval on the main loop with readTelecommand().
 
+// Maximum packet data length we will handle.
+const word PACKET_DATA_BUFFER_LENGTH = 256;
+
+// Maximum whole packet length we will handle.
+const word WHOLE_PACKET_BUFFER_LENGTH =
+  ESATCCSDSPacket::PRIMARY_HEADER_LENGTH + PACKET_DATA_BUFFER_LENGTH;
+
+// Accumulate incoming USB telecommands in this buffer.
+byte usbTelecommandBuffer[WHOLE_PACKET_BUFFER_LENGTH];
+
 // Start the peripherals and do some initial bookkeeping work.
 void setup()
 {
-  EPS.begin();
+  EPS.begin(usbTelecommandBuffer, WHOLE_PACKET_BUFFER_LENGTH);
 }
 
 // Body of the main loop of the program:
@@ -47,9 +57,8 @@ void setup()
 // data; if the buffer is too small, the packets will be dropped.
 void loop()
 {
-  const word bufferLength = 256;
-  byte buffer[bufferLength];
-  ESATCCSDSPacket packet(buffer, bufferLength);
+  byte buffer[PACKET_DATA_BUFFER_LENGTH];
+  ESATCCSDSPacket packet(buffer, PACKET_DATA_BUFFER_LENGTH);
   while (EPS.readTelecommand(packet))
   {
     EPS.handleTelecommand(packet);
