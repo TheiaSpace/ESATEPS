@@ -21,6 +21,7 @@
 
 #include <Arduino.h>
 #include <ESATCCSDSPacket.h>
+#include <ESATKISSStream.h>
 #include <ESATSoftwareClock.h>
 
 // Library with the functionality of the Electrical Power Subsystem
@@ -38,7 +39,8 @@ class ESATEPS
 {
   public:
     // Set up the EPS board.
-    void begin();
+    // Accumulate incoming USB telecommands in the given buffer.
+    void begin(byte buffer[], unsigned long bufferLength);
 
     // Handle a telecommand.
     void handleTelecommand(ESATCCSDSPacket& packet);
@@ -201,6 +203,9 @@ class ESATEPS
     // - true after updateTelemetry()
     // - false after readTelemetry()
     boolean newTelemetryPacket;
+
+    // Decode USB KISS frames with this stream.
+    ESATKISSStream usbTelecommandDecoder;
 
     // Telemetry buffer.
     ESATCCSDSPacket telemetry;
