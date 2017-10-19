@@ -321,7 +321,11 @@ void ESATEPS::updateTelemetry()
 
 void ESATEPS::writeTelemetry(ESATCCSDSPacket& packet)
 {
-  ESATKISSStream encoder(USB, nullptr, 0);
+  const unsigned long encoderBufferLength =
+    ESATKISSStream::frameLength(packet.PRIMARY_HEADER_LENGTH
+                                + packet.readPacketDataLength());
+  byte encoderBuffer[encoderBufferLength];
+  ESATKISSStream encoder(USB, encoderBuffer, encoderBufferLength);
   (void) encoder.beginFrame();
   (void) packet.writeTo(encoder);
   (void) encoder.endFrame();
