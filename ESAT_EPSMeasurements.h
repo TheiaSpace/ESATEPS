@@ -16,14 +16,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATEPSMeasurements_h
-#define ESATEPSMeasurements_h
+#ifndef ESAT_EPSMeasurements_h
+#define ESAT_EPSMeasurements_h
 
 #include <Arduino.h>
 
 // EPS current and voltage measurements.
-// Use the global instance EPSMeasurements.
-class ESATEPSMeasurements
+// Use the global instance ESAT_EPSMeasurements.
+class ESAT_EPSMeasurementsClass
 {
   public:
     // Return the current of the 3.3 V line.
@@ -67,6 +67,6 @@ class ESATEPSMeasurements
 };
 
 // Global instance of the EPS measurements library.
-extern ESATEPSMeasurements EPSMeasurements;
+extern ESAT_EPSMeasurementsClass ESAT_EPSMeasurements;
 
-#endif /* ESATEPSMeasurements_h */
+#endif /* ESAT_EPSMeasurements_h */

@@ -16,15 +16,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATPowerLineSwitch_h
-#define ESATPowerLineSwitch_h
+#ifndef ESAT_PowerLineSwitch_h
+#define ESAT_PowerLineSwitch_h
 
 #include <Arduino.h>
 
 // Power line switch controller.
-// Use the global instances PowerLine3V3Switch (for the 3.3 V line)
-// and PowerLine5VSwitch (for the 5 V line).
-class ESATPowerLineSwitch
+// Use the global instances ESAT_PowerLine3V3Switch (for the 3.3 V line)
+// and ESAT_PowerLine5VSwitch (for the 5 V line).
+class ESAT_PowerLineSwitchClass
 {
   public:
     // State of the switch.
@@ -35,7 +35,7 @@ class ESATPowerLineSwitch
     };
 
     // Instantiate a new power line switch on a given line.
-    ESATPowerLineSwitch(byte line);
+    ESAT_PowerLineSwitchClass(byte line);
 
     // Set up the power line controller.
     void begin();
@@ -57,7 +57,7 @@ class ESATPowerLineSwitch
     SwitchState state;
 };
 
-extern ESATPowerLineSwitch PowerLine3V3Switch;
-extern ESATPowerLineSwitch PowerLine5VSwitch;
+extern ESAT_PowerLineSwitchClass ESAT_PowerLine3V3Switch;
+extern ESAT_PowerLineSwitchClass ESAT_PowerLine5VSwitch;
 
-#endif /* ESATPowerLineSwitch_h */
+#endif /* ESAT_PowerLineSwitch_h */

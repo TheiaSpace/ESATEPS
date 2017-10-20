@@ -16,9 +16,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESATMaximumPowerPointTrackingDriver.h"
+#include "ESAT_MaximumPowerPointTrackingDriver.h"
 
-ESATMaximumPowerPointTrackingDriver::ESATMaximumPowerPointTrackingDriver(int sensorPin, int outputPin):
+ESAT_MaximumPowerPointTrackingDriverClass::ESAT_MaximumPowerPointTrackingDriverClass(int sensorPin,
+                                                                                     int outputPin):
   sensorPin(sensorPin),
   outputPin(outputPin),
   mode(FIXED_MODE),
@@ -28,23 +29,23 @@ ESATMaximumPowerPointTrackingDriver::ESATMaximumPowerPointTrackingDriver(int sen
 {
 }
 
-void ESATMaximumPowerPointTrackingDriver::begin()
+void ESAT_MaximumPowerPointTrackingDriverClass::begin()
 {
   pinMode(sensorPin, INPUT);
   pinMode(outputPin, OUTPUT);
 }
 
-byte ESATMaximumPowerPointTrackingDriver::getDutyCycle()
+byte ESAT_MaximumPowerPointTrackingDriverClass::getDutyCycle()
 {
   return dutyCycle;
 }
 
-byte ESATMaximumPowerPointTrackingDriver::getMode()
+byte ESAT_MaximumPowerPointTrackingDriverClass::getMode()
 {
   return mode;
 }
 
-int ESATMaximumPowerPointTrackingDriver::gradientDirection()
+int ESAT_MaximumPowerPointTrackingDriverClass::gradientDirection()
 {
   const int reading = (analogRead(sensorPin) + analogRead(sensorPin)) / 2;
   const int readingIncrement = reading - previousReading;
@@ -60,26 +61,26 @@ int ESATMaximumPowerPointTrackingDriver::gradientDirection()
   return -1;
 }
 
-void ESATMaximumPowerPointTrackingDriver::setFixedMode()
+void ESAT_MaximumPowerPointTrackingDriverClass::setFixedMode()
 {
   mode = FIXED_MODE;
 }
 
-void ESATMaximumPowerPointTrackingDriver::setMPPTMode()
+void ESAT_MaximumPowerPointTrackingDriverClass::setMPPTMode()
 {
   mode = MPPT_MODE;
   dutyCycle = DEFAULT_DUTY_CYCLE;
   dutyCycleIncrement = 2;
 }
 
-void ESATMaximumPowerPointTrackingDriver::setSweepMode()
+void ESAT_MaximumPowerPointTrackingDriverClass::setSweepMode()
 {
   mode = SWEEP_MODE;
   dutyCycle = DEFAULT_DUTY_CYCLE;
   dutyCycleIncrement = 1;
 }
 
-void ESATMaximumPowerPointTrackingDriver::update()
+void ESAT_MaximumPowerPointTrackingDriverClass::update()
 {
   switch (mode)
   {
@@ -97,12 +98,12 @@ void ESATMaximumPowerPointTrackingDriver::update()
   }
 }
 
-void ESATMaximumPowerPointTrackingDriver::updateFixedMode()
+void ESAT_MaximumPowerPointTrackingDriverClass::updateFixedMode()
 {
   analogWrite(outputPin, dutyCycle);
 }
 
-void ESATMaximumPowerPointTrackingDriver::updateMPPTMode()
+void ESAT_MaximumPowerPointTrackingDriverClass::updateMPPTMode()
 {
   const int direction = gradientDirection();
   if (direction > 0)
@@ -117,7 +118,7 @@ void ESATMaximumPowerPointTrackingDriver::updateMPPTMode()
   analogWrite(outputPin, dutyCycle);
 }
 
-void ESATMaximumPowerPointTrackingDriver::updateSweepMode()
+void ESAT_MaximumPowerPointTrackingDriverClass::updateSweepMode()
 {
   if (dutyCycle == 0)
   {
@@ -131,5 +132,7 @@ void ESATMaximumPowerPointTrackingDriver::updateSweepMode()
   analogWrite(outputPin, dutyCycle);
 }
 
-ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver1(I_P1_IN, PWM1);
-ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver2(I_P2_IN, PWM2);
+ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver1(I_P1_IN,
+                                                                                PWM1);
+ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver2(I_P2_IN,
+                                                                                PWM2);

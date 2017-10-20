@@ -16,40 +16,40 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESATBatteryController.h"
+#include "ESAT_BatteryController.h"
 #include <Wire.h>
 
-word ESATBatteryController::readBattery1Voltage()
+word ESAT_BatteryControllerClass::readBattery1Voltage()
 {
   return readWord(BATTERY_1_VOLTAGE_REGISTER);
 }
 
-word ESATBatteryController::readBattery2Voltage()
+word ESAT_BatteryControllerClass::readBattery2Voltage()
 {
   return readWord(BATTERY_2_VOLTAGE_REGISTER);
 }
 
-word ESATBatteryController::readBatteryCurrent()
+word ESAT_BatteryControllerClass::readBatteryCurrent()
 {
   return readWord(BATTERY_CURRENT_REGISTER);
 }
 
-word ESATBatteryController::readBatteryTemperature()
+word ESAT_BatteryControllerClass::readBatteryTemperature()
 {
   return readWord(BATTERY_TEMPERATURE_REGISTER);
 }
 
-byte ESATBatteryController::readStateOfCharge()
+byte ESAT_BatteryControllerClass::readStateOfCharge()
 {
   return readByte(STATE_OF_CHARGE_REGISTER);
 }
 
-word ESATBatteryController::readTotalBatteryVoltage()
+word ESAT_BatteryControllerClass::readTotalBatteryVoltage()
 {
   return readWord(TOTAL_BATTERY_VOLTAGE_REGISTER);
 }
 
-byte ESATBatteryController::readByte(const byte registerNumber)
+byte ESAT_BatteryControllerClass::readByte(const byte registerNumber)
 {
   Wire1.beginTransmission(ADDRESS);
   Wire1.write(registerNumber);
@@ -68,7 +68,7 @@ byte ESATBatteryController::readByte(const byte registerNumber)
   return Wire1.read();
 }
 
-word ESATBatteryController::readWord(const byte registerNumber)
+word ESAT_BatteryControllerClass::readWord(const byte registerNumber)
 {
   Wire1.beginTransmission(ADDRESS);
   Wire1.write(registerNumber);
@@ -89,4 +89,4 @@ word ESATBatteryController::readWord(const byte registerNumber)
   return word(highByte, lowByte);
 }
 
-ESATBatteryController BatteryController;
+ESAT_BatteryControllerClass ESAT_BatteryController;

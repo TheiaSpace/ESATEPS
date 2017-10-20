@@ -16,10 +16,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESATDirectEnergyTransferSystem.h"
+#include "ESAT_DirectEnergyTransferSystem.h"
 #include <Wire.h>
 
-word ESATDirectEnergyTransferSystem::read(const word channelConfigurationBits)
+word ESAT_DirectEnergyTransferSystemClass::read(const word channelConfigurationBits)
 {
   const boolean successfulConversionStart =
     startConversion(channelConfigurationBits);
@@ -33,7 +33,7 @@ word ESATDirectEnergyTransferSystem::read(const word channelConfigurationBits)
   return convertedValue;
 }
 
-word ESATDirectEnergyTransferSystem::readConvertedValue()
+word ESAT_DirectEnergyTransferSystemClass::readConvertedValue()
 {
   Wire1.beginTransmission(ADDRESS);
   Wire1.write(CONVERSION_REGISTER);
@@ -54,22 +54,22 @@ word ESATDirectEnergyTransferSystem::readConvertedValue()
   return word(highByte, lowByte);
 }
 
-word ESATDirectEnergyTransferSystem::readCurrent()
+word ESAT_DirectEnergyTransferSystemClass::readCurrent()
 {
   return read(CURRENT_CHANNEL_CONFIGURATION_BITS);
 }
 
-word ESATDirectEnergyTransferSystem::readShuntVoltage()
+word ESAT_DirectEnergyTransferSystemClass::readShuntVoltage()
 {
   return read(SHUNT_VOLTAGE_CHANNEL_CONFIGURATION_BITS);
 }
 
-word ESATDirectEnergyTransferSystem::readVoltage()
+word ESAT_DirectEnergyTransferSystemClass::readVoltage()
 {
   return read(VOLTAGE_CHANNEL_CONFIGURATION_BITS);
 }
 
-boolean ESATDirectEnergyTransferSystem::startConversion(const word channelConfigurationBits)
+boolean ESAT_DirectEnergyTransferSystemClass::startConversion(const word channelConfigurationBits)
 {
   const word configurationBits =
     START_SINGLE_SHOT_CONVERSION_CONFIGURATION_BITS |
@@ -92,4 +92,4 @@ boolean ESATDirectEnergyTransferSystem::startConversion(const word channelConfig
   }
 }
 
-ESATDirectEnergyTransferSystem DirectEnergyTransferSystem;
+ESAT_DirectEnergyTransferSystemClass ESAT_DirectEnergyTransferSystem;

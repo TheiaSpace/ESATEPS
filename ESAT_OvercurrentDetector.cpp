@@ -16,9 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESATOvercurrentDetector.h"
-
-ESATOvercurrentDetector OvercurrentDetector;
+#include "ESAT_OvercurrentDetector.h"
 
 static volatile boolean overcurrentOn3V3Line = false;
 
@@ -47,7 +45,7 @@ static void overcurrentOn3V3LineStops()
                   FALLING);
 }
 
-void ESATOvercurrentDetector::begin()
+void ESAT_OvercurrentDetectorClass::begin()
 {
   pinMode(OC3V3, INPUT_PULLUP);
   pinMode(OC5V, INPUT_PULLUP);
@@ -56,12 +54,14 @@ void ESATOvercurrentDetector::begin()
                   FALLING);
 }
 
-boolean ESATOvercurrentDetector::read3V3LineOvercurrentState()
+boolean ESAT_OvercurrentDetectorClass::read3V3LineOvercurrentState()
 {
   return overcurrentOn3V3Line;
 }
 
-boolean ESATOvercurrentDetector::read5VLineOvercurrentState()
+boolean ESAT_OvercurrentDetectorClass::read5VLineOvercurrentState()
 {
   return !digitalRead(OC5V);
 }
+
+ESAT_OvercurrentDetectorClass ESAT_OvercurrentDetector;

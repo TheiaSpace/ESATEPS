@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESATSolarPanelThermometer.h"
+#include "ESAT_SolarPanelThermometer.h"
 #include <Wire.h>
 
 // Address/register pairs.
@@ -30,10 +30,10 @@ static const byte solarPanel2SecondaryAddress = 0x1c;
 static const byte solarPanel2SecondaryRegister = 0x05;
 
 
-ESATSolarPanelThermometer::ESATSolarPanelThermometer(const byte primaryAddress,
-                                                     const byte primaryRegister,
-                                                     const byte secondaryAddress,
-                                                     const byte secondaryRegister):
+ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte primaryAddress,
+                                                                 const byte primaryRegister,
+                                                                 const byte secondaryAddress,
+                                                                 const byte secondaryRegister):
   primaryAddress(primaryAddress),
   primaryRegister(primaryRegister),
   secondaryAddress(secondaryAddress),
@@ -42,7 +42,7 @@ ESATSolarPanelThermometer::ESATSolarPanelThermometer(const byte primaryAddress,
 {
 }
 
-word ESATSolarPanelThermometer::read()
+word ESAT_SolarPanelThermometerClass::read()
 {
   const word primaryTemperature =
     tryRead(primaryAddress, primaryRegister);
@@ -63,8 +63,8 @@ word ESATSolarPanelThermometer::read()
   }
 }
 
-word ESATSolarPanelThermometer::tryRead(const byte address,
-                                        const byte registerNumber)
+word ESAT_SolarPanelThermometerClass::tryRead(const byte address,
+                                              const byte registerNumber)
 {
   Wire1.beginTransmission(address);
   Wire1.write(registerNumber);
@@ -86,12 +86,12 @@ word ESATSolarPanelThermometer::tryRead(const byte address,
   return word(highByte, lowByte);
 }
 
-ESATSolarPanelThermometer SolarPanel1Thermometer(solarPanel1PrimaryAddress,
-                                                 solarPanel1PrimaryRegister,
-                                                 solarPanel1SecondaryAddress,
-                                                 solarPanel1SecondaryRegister);
+ESAT_SolarPanelThermometerClass ESAT_SolarPanel1Thermometer(solarPanel1PrimaryAddress,
+                                                            solarPanel1PrimaryRegister,
+                                                            solarPanel1SecondaryAddress,
+                                                            solarPanel1SecondaryRegister);
 
-ESATSolarPanelThermometer SolarPanel2Thermometer(solarPanel2PrimaryAddress,
-                                                 solarPanel2PrimaryRegister,
-                                                 solarPanel2SecondaryAddress,
-                                                 solarPanel2SecondaryRegister);
+ESAT_SolarPanelThermometerClass ESAT_SolarPanel2Thermometer(solarPanel2PrimaryAddress,
+                                                            solarPanel2PrimaryRegister,
+                                                            solarPanel2SecondaryAddress,
+                                                            solarPanel2SecondaryRegister);

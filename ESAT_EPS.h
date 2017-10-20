@@ -16,26 +16,28 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATEPS_h
-#define ESATEPS_h
+#ifndef ESAT_EPS_h
+#define ESAT_EPS_h
 
 #include <Arduino.h>
-#include <ESATCCSDSPacket.h>
-#include <ESATKISSStream.h>
-#include <ESATSoftwareClock.h>
+#include <ESAT_CCSDSPacket.h>
+#include <ESAT_KISSStream.h>
+#include <ESAT_SoftwareClock.h>
 
 // Library with the functionality of the Electrical Power Subsystem
 // (EPS) board.  Use the global instance EPS.
-// Set up the peripherals with EPS.begin().
-// Retrieve a telecommand with readTelecommand().
-// Handle a telecommand with handleTelecommand().
-// Retrieve a telemetry packet with readTelemetry().
-// Write the telemetry packet through the USB interface with writeTelemetry().
-// Update the telemetry measurements and do housekeeping work with update().
-// After begin(), the board will respond to I2C messages on the Wire
-// (SCL_O, SDA_O) interface.
+// Set up the peripherals with ESAT_EPS.begin().
+// Retrieve a telecommand with ESAT_EPS.readTelecommand().
+// Handle a telecommand with ESAT_EPS.handleTelecommand().
+// Retrieve a telemetry packet with ESAT_EPS.readTelemetry().
+// Write the telemetry packet through the USB interface with
+// ESAT_EPS.writeTelemetry().
+// Update the telemetry measurements and do housekeeping work with
+// ESAT_EPS.update().
+// After ESAT_EPS.begin(), the board will respond to I2C messages
+// on the Wire (SCL_O, SDA_O) interface.
 // See the example EPS program for a functional EPS loop.
-class ESATEPS
+class ESAT_EPSClass
 {
   public:
     // Set up the EPS board.
@@ -43,19 +45,19 @@ class ESATEPS
     void begin(byte buffer[], unsigned long bufferLength);
 
     // Handle a telecommand.
-    void handleTelecommand(ESATCCSDSPacket& packet);
+    void handleTelecommand(ESAT_CCSDSPacket& packet);
 
     // Read an incomming telecommand and write it into a packet.
     // Return true if there was a valid telecommand available;
     // otherwise return false.
     // This sets pendingI2CTelecommand to false.
-    boolean readTelecommand(ESATCCSDSPacket& packet);
+    boolean readTelecommand(ESAT_CCSDSPacket& packet);
 
     // Fill the telemetry packet with the next available telemetry vector.
     // Return true if there were new available telemetry;
     // otherwise return false.
     // This sets newTelemetryPacket to false.
-    boolean readTelemetry(ESATCCSDSPacket& packet);
+    boolean readTelemetry(ESAT_CCSDSPacket& packet);
 
     // Update the EPS:
     // - Update the maximum point tracking system.
@@ -63,7 +65,7 @@ class ESATEPS
     void update();
 
     // Send a telemetry packet.
-    void writeTelemetry(ESATCCSDSPacket& packet);
+    void writeTelemetry(ESAT_CCSDSPacket& packet);
 
   private:
     // Command codes.
@@ -107,14 +109,14 @@ class ESATEPS
     // - Secondary header.
     // - Shortest command parameter.
     static const byte MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
-      ESATCCSDSSecondaryHeader::LENGTH
+      ESAT_CCSDSSecondaryHeader::LENGTH
       + MINIMUM_COMMAND_PARAMETER_LENGTH;
 
     // Packet data length of telecommand packets.
     // - Secondary header.
     // - Longest command parameter.
     static const byte MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
-      ESATCCSDSSecondaryHeader::LENGTH
+      ESAT_CCSDSSecondaryHeader::LENGTH
       + MAXIMUM_COMMAND_PARAMETER_LENGTH;
 
     // Size of the telemetry buffer (EPS measurements):
@@ -181,7 +183,7 @@ class ESATEPS
     // - Direct energy transfer system.
     // - Switches.
     static const byte TELEMETRY_PACKET_DATA_LENGTH =
-      ESATCCSDSSecondaryHeader::LENGTH
+      ESAT_CCSDSSecondaryHeader::LENGTH
       + EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
       + SWITCHES_TELEMETRY_BUFFER_LENGTH
       + OVERCURRENT_TELEMETRY_BUFFER_LENGTH
@@ -192,7 +194,7 @@ class ESATEPS
 
     // Real time clock.
     // Useful for generating timestamps for telemetry packets.
-    ESATSoftwareClock clock;
+    ESAT_SoftwareClock clock;
 
     // I2C packet buffers.
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
@@ -205,10 +207,10 @@ class ESATEPS
     boolean newTelemetryPacket;
 
     // Decode USB KISS frames with this stream.
-    ESATKISSStream usbTelecommandDecoder;
+    ESAT_KISSStream usbTelecommandDecoder;
 
     // Telemetry buffer.
-    ESATCCSDSPacket telemetry;
+    ESAT_CCSDSPacket telemetry;
 
     // Telemetry packet data buffer.
     byte telemetryPacketData[TELEMETRY_PACKET_DATA_LENGTH];
@@ -218,30 +220,30 @@ class ESATEPS
     word telemetryPacketSequenceCount;
 
     // Set the maximum power point tracking drivers in fixed mode.
-    void handleFixedModeCommand(ESATCCSDSPacket& packet);
+    void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
 
     // Set the maximum power point tracking drivers in maximum power
     // point tracking mode.
-    void handleMaximumPowerPointTrackingModeCommand(ESATCCSDSPacket& packet);
+    void handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet);
 
     // Set the maximum power point tracking drivers in sweep mode.
-    void handleSweepModeCommand(ESATCCSDSPacket& packet);
+    void handleSweepModeCommand(ESAT_CCSDSPacket& packet);
 
     // Switch the 3V3 line.
-    void handleSwitch3V3LineCommand(ESATCCSDSPacket& packet);
+    void handleSwitch3V3LineCommand(ESAT_CCSDSPacket& packet);
 
     // Switch the 5V line.
-    void handleSwitch5VLineCommand(ESATCCSDSPacket& packet);
+    void handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet);
 
     // Set the time of the real time clock.
-    void handleSetCurrentTimeCommand(ESATCCSDSPacket& packet);
+    void handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
 
     // Read a telecommand from USB and write it into the given packet.
     // Return true on success; otherwise return false.
-    boolean readTelecommandFromUSB(ESATCCSDSPacket& packet);
+    boolean readTelecommandFromUSB(ESAT_CCSDSPacket& packet);
 
     // Update the maximum power point tracking system.
     void updateMaximumPowerPointTracking();
@@ -255,6 +257,6 @@ class ESATEPS
 };
 
 // Global instance of the EPS library.
-extern ESATEPS EPS;
+extern ESAT_EPSClass ESAT_EPS;
 
 #endif

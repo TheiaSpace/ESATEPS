@@ -16,16 +16,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATMaximumPowerPointTrackingDriver_h
-#define ESATMaximumPowerPointTrackingDriver_h
+#ifndef ESAT_MaximumPowerPointTrackingDriver_h
+#define ESAT_MaximumPowerPointTrackingDriver_h
 
 #include <Arduino.h>
 
 // Maximum power point tracking (MPPT) driver.
-// Use the global instances MaximumPowerPointTrackingDriver1 (for
-// solar panel 1) and MaximumPowerPointTrackingDriver2 (for solar
+// Use the global instances ESAT_MaximumPowerPointTrackingDriver1 (for
+// solar panel 1) and ESAT_MaximumPowerPointTrackingDriver2 (for solar
 // panel 2).
-class ESATMaximumPowerPointTrackingDriver
+class ESAT_MaximumPowerPointTrackingDriverClass
 {
   public:
     // Duty cycle relative to 255.
@@ -33,7 +33,7 @@ class ESATMaximumPowerPointTrackingDriver
 
     // Instantiate an MPPT driver that takes input from a sensor pin
     // and drives an output pin with a PWM signal.
-    ESATMaximumPowerPointTrackingDriver(int sensorPin, int outputPin);
+    ESAT_MaximumPowerPointTrackingDriverClass(int sensorPin, int outputPin);
 
     // Configure the pins of the MPPT driver.
     void begin();
@@ -98,9 +98,9 @@ class ESATMaximumPowerPointTrackingDriver
 };
 
 // Maximum power point tracking driver for solar panel 1.
-extern ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver1;
+extern ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver1;
 
 // Maximum power point tracking driver for solar panel 2.
-extern ESATMaximumPowerPointTrackingDriver MaximumPowerPointTrackingDriver2;
+extern ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver2;
 
-#endif /* ESATMaximumPowerPointTrackingDriver_h */
+#endif /* ESAT_MaximumPowerPointTrackingDriver_h */

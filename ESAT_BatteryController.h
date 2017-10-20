@@ -16,14 +16,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATBatteryController_h
-#define ESATBatteryController_h
+#ifndef ESAT_BatteryController_h
+#define ESAT_BatteryController_h
 
 #include <Arduino.h>
 
 // An interface with the battery controller.
-// Use the global instance BatteryController.
-class ESATBatteryController
+// Use the global instance ESAT_BatteryController.
+class ESAT_BatteryControllerClass
 {
   public:
     // True after a read error.  Must be reset manually.
@@ -76,6 +76,6 @@ class ESATBatteryController
 };
 
 // Global instance of the battery controller library.
-extern ESATBatteryController BatteryController;
+extern ESAT_BatteryControllerClass ESAT_BatteryController;
 
-#endif /* ESATBatteryController_h */
+#endif /* ESAT_BatteryController_h */

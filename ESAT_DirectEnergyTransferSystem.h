@@ -16,14 +16,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATDirectEnergyTransferSystem_h
-#define ESATDirectEnergyTransferSystem_h
+#ifndef ESAT_DirectEnergyTransferSystem_h
+#define ESAT_DirectEnergyTransferSystem_h
 
 #include <Arduino.h>
 
 // Interface with the direct energy transfer system.
-// Use the global instance DirectEnergyTransferSystem.
-class ESATDirectEnergyTransferSystem
+// Use the global instance ESAT_DirectEnergyTransferSystem.
+class ESAT_DirectEnergyTransferSystemClass
 {
   public:
     // True after a read error.  Must be reset manually.
@@ -85,6 +85,6 @@ class ESATDirectEnergyTransferSystem
 };
 
 // The direct energy transfer system found at the battery module.
-extern ESATDirectEnergyTransferSystem DirectEnergyTransferSystem;
+extern ESAT_DirectEnergyTransferSystemClass ESAT_DirectEnergyTransferSystem;
 
-#endif /* ESATDirectEnergyTransferSystem_h */
+#endif /* ESAT_DirectEnergyTransferSystem_h */

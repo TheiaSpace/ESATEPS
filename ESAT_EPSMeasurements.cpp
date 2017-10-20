@@ -16,9 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESATEPSMeasurements.h"
-
-ESATEPSMeasurements EPSMeasurements;
+#include "ESAT_EPSMeasurements.h"
 
 // Number of samples for current measurements.
 static const byte currentSamples = 5;
@@ -26,7 +24,7 @@ static const byte currentSamples = 5;
 // Number of samples for voltage measurements.
 static const byte voltageSamples = 1;
 
-void ESATEPSMeasurements::begin()
+void ESAT_EPSMeasurementsClass::begin()
 {
   analogReference(INTERNAL2V5);
   pinMode(I_3V3, INPUT);
@@ -54,62 +52,64 @@ static word read(const byte line, const byte samples)
   return round(sum / samples);
 }
 
-word ESATEPSMeasurements::read3V3LineCurrent()
+word ESAT_EPSMeasurementsClass::read3V3LineCurrent()
 {
   return read(I_3V3, currentSamples);
 }
 
-word ESATEPSMeasurements::read3V3LineVoltage()
+word ESAT_EPSMeasurementsClass::read3V3LineVoltage()
 {
   return read(V_3V3, voltageSamples);
 }
 
-word ESATEPSMeasurements::read5VLineCurrent()
+word ESAT_EPSMeasurementsClass::read5VLineCurrent()
 {
   return read(I_5V, currentSamples);
 }
 
-word ESATEPSMeasurements::read5VLineVoltage()
+word ESAT_EPSMeasurementsClass::read5VLineVoltage()
 {
   return read(V_5V, voltageSamples);
 }
 
-word ESATEPSMeasurements::readInputLineCurrent()
+word ESAT_EPSMeasurementsClass::readInputLineCurrent()
 {
   return read(I_IN, currentSamples);
 }
 
-word ESATEPSMeasurements::readInputLineVoltage()
+word ESAT_EPSMeasurementsClass::readInputLineVoltage()
 {
   return read(V_IN, voltageSamples);
 }
 
-word ESATEPSMeasurements::readPanel1InputCurrent()
+word ESAT_EPSMeasurementsClass::readPanel1InputCurrent()
 {
   return read(I_P1_IN, currentSamples);
 }
 
-word ESATEPSMeasurements::readPanel1OutputCurrent()
+word ESAT_EPSMeasurementsClass::readPanel1OutputCurrent()
 {
   return read(I_P1_OUT, currentSamples);
 }
 
-word ESATEPSMeasurements::readPanel1Voltage()
+word ESAT_EPSMeasurementsClass::readPanel1Voltage()
 {
   return read(V_P1, voltageSamples);
 }
 
-word ESATEPSMeasurements::readPanel2InputCurrent()
+word ESAT_EPSMeasurementsClass::readPanel2InputCurrent()
 {
   return read(I_P2_IN, currentSamples);
 }
 
-word ESATEPSMeasurements::readPanel2OutputCurrent()
+word ESAT_EPSMeasurementsClass::readPanel2OutputCurrent()
 {
   return read(I_P2_OUT, currentSamples);
 }
 
-word ESATEPSMeasurements::readPanel2Voltage()
+word ESAT_EPSMeasurementsClass::readPanel2Voltage()
 {
   return read(V_P2, voltageSamples);
 }
+
+ESAT_EPSMeasurementsClass ESAT_EPSMeasurements;

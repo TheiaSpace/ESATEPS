@@ -16,16 +16,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATSolarPanelThermometer_h
-#define ESATSolarPanelThermometer_h
+#ifndef ESAT_SolarPanelThermometer_h
+#define ESAT_SolarPanelThermometer_h
 
 #include <Arduino.h>
 
 // An interface to the thermometers found on ESAT's solar panels.
-// Use the global instances SolarPanel1Thermometer (for the
-// thermometer on solar panel 1) and SolarPanel2Thermometer (for the
+// Use the global instances ESAT_SolarPanel1Thermometer (for the
+// thermometer on solar panel 1) and ESAT_SolarPanel2Thermometer (for the
 // thermometer on solar panel 2).
-class ESATSolarPanelThermometer
+class ESAT_SolarPanelThermometerClass
 {
   public:
     // True after a read error.  Must be reset manually.
@@ -33,10 +33,10 @@ class ESATSolarPanelThermometer
 
     // Instantiate a solar panel thermometer interface.
     // Support two devices for current and old thermometers.
-    ESATSolarPanelThermometer(byte primaryAddress,
-                              byte primaryRegister,
-                              byte secondaryAddress,
-                              byte SecondaryRegister);
+    ESAT_SolarPanelThermometerClass(byte primaryAddress,
+                                    byte primaryRegister,
+                                    byte secondaryAddress,
+                                    byte SecondaryRegister);
 
     // Return the temperature measured by the thermometer.
     // Set the error flag on error.
@@ -60,9 +60,9 @@ class ESATSolarPanelThermometer
 };
 
 // Thermometer on solar panel 1.
-extern ESATSolarPanelThermometer SolarPanel1Thermometer;
+extern ESAT_SolarPanelThermometerClass ESAT_SolarPanel1Thermometer;
 
 // Thermometer on solar panel 2.
-extern ESATSolarPanelThermometer SolarPanel2Thermometer;
+extern ESAT_SolarPanelThermometerClass ESAT_SolarPanel2Thermometer;
 
-#endif /* ESATSolarPanelThermometer_h */
+#endif /* ESAT_SolarPanelThermometer_h */

@@ -16,29 +16,48 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESATOvercurrentDetector_h
-#define ESATOvercurrentDetector_h
+#include "ESAT_PowerLineSwitch.h"
 
-#include <Arduino.h>
-
-// Overcurrent detection.
-// Use the global instance OvercurrentDetector.
-class ESATOvercurrentDetector
+ESAT_PowerLineSwitchClass::ESAT_PowerLineSwitchClass(const byte line):
+  line(line), state(OFF)
 {
-  public:
-    // Set up the overcurrent detector.
-    void begin();
+}
 
-    // Return true if the 3.3 V line is in overcurrent state;
-    // otherwise return false.
-    boolean read3V3LineOvercurrentState();
+void ESAT_PowerLineSwitchClass::begin()
+{
+  pinMode(line, OUTPUT);
+  write(state);
+}
 
-    // Return true if the 5 V line is in overcurrent state; otherwise
-    // return false.
-    boolean read5VLineOvercurrentState();
-};
+ESAT_PowerLineSwitchClass::SwitchState ESAT_PowerLineSwitchClass::read()
+{
+  return state;
+}
 
-// Global instance of the overcurrent detector library.
-extern ESATOvercurrentDetector OvercurrentDetector;
+void ESAT_PowerLineSwitchClass::toggle()
+{
+  if (state == ON)
+  {
+    write(OFF);
+  }
+  else
+  {
+    write(ON);
+  }
+}
 
-#endif /* ESATOvercurrentDetector_h */
+void ESAT_PowerLineSwitchClass::write(const ESAT_PowerLineSwitchClass::SwitchState newState)
+{
+  state = newState;
+  if (state == ON)
+  {
+    digitalWrite(line, HIGH);
+  }
+  else
+  {
+    digitalWrite(line, LOW);
+  }
+}
+
+ESAT_PowerLineSwitchClass ESAT_PowerLine3V3Switch(EN3V3);
+ESAT_PowerLineSwitchClass ESAT_PowerLine5VSwitch(EN5V);

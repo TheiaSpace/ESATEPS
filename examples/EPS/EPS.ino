@@ -16,7 +16,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <ESATEPS.h>
+#include <ESAT_EPS.h>
 
 // Main program of the EPS board: respond to telecommands,
 // do housekeeping work and send telemetry.
@@ -32,7 +32,7 @@ const word PACKET_DATA_BUFFER_LENGTH = 256;
 
 // Maximum whole packet length we will handle.
 const word WHOLE_PACKET_BUFFER_LENGTH =
-  ESATCCSDSPacket::PRIMARY_HEADER_LENGTH + PACKET_DATA_BUFFER_LENGTH;
+  ESAT_CCSDSPacket::PRIMARY_HEADER_LENGTH + PACKET_DATA_BUFFER_LENGTH;
 
 // Accumulate incoming USB telecommands in this buffer.
 byte usbTelecommandBuffer[WHOLE_PACKET_BUFFER_LENGTH];
@@ -40,7 +40,7 @@ byte usbTelecommandBuffer[WHOLE_PACKET_BUFFER_LENGTH];
 // Start the peripherals and do some initial bookkeeping work.
 void setup()
 {
-  EPS.begin(usbTelecommandBuffer, WHOLE_PACKET_BUFFER_LENGTH);
+  ESAT_EPS.begin(usbTelecommandBuffer, WHOLE_PACKET_BUFFER_LENGTH);
 }
 
 // Body of the main loop of the program:
@@ -58,14 +58,14 @@ void setup()
 void loop()
 {
   byte buffer[PACKET_DATA_BUFFER_LENGTH];
-  ESATCCSDSPacket packet(buffer, PACKET_DATA_BUFFER_LENGTH);
-  while (EPS.readTelecommand(packet))
+  ESAT_CCSDSPacket packet(buffer, PACKET_DATA_BUFFER_LENGTH);
+  while (ESAT_EPS.readTelecommand(packet))
   {
-    EPS.handleTelecommand(packet);
+    ESAT_EPS.handleTelecommand(packet);
   }
-  EPS.update();
-  while (EPS.readTelemetry(packet))
+  ESAT_EPS.update();
+  while (ESAT_EPS.readTelemetry(packet))
   {
-    EPS.writeTelemetry(packet);
+    ESAT_EPS.writeTelemetry(packet);
   }
 }
