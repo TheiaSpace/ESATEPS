@@ -17,7 +17,7 @@
  */
 
 #include "ESAT_EPS.h"
-#include <ESAT_Util.h>
+#include <ESAT_CCSDSPrimaryHeader.h>
 #include <ESAT_I2CSlave.h>
 #include <ESAT_KISSStream.h>
 #include <ESAT_Timestamp.h>
@@ -61,20 +61,21 @@ void ESAT_EPSClass::begin(byte buffer[], const unsigned long bufferLength)
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.rewind();
-  if (packet.readApplicationProcessIdentifier()
+  const ESAT_CCSDSPrimaryHeader primaryHeader = packet.readPrimaryHeader();
+  if (primaryHeader.applicationProcessIdentifier
       != APPLICATION_PROCESS_IDENTIFIER)
   {
     return;
   }
-  if (packet.readPacketType() != packet.TELECOMMAND)
+  if (primaryHeader.packetType != primaryHeader.TELECOMMAND)
   {
     return;
   }
-  if (packet.readPacketDataLength() < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return;
   }
-  if (packet.readPacketDataLength() > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return;
   }
@@ -168,7 +169,7 @@ void ESAT_EPSClass::handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet)
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.clear();
-  if (packet.packetDataBufferLength < MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (packet.capacity() < MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return false;
   }
@@ -181,20 +182,21 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
   {
     return false;
   }
-  if (packet.readPacketType() != packet.TELECOMMAND)
+  const ESAT_CCSDSPrimaryHeader primaryHeader = packet.readPrimaryHeader();
+  if (primaryHeader.packetType != primaryHeader.TELECOMMAND)
   {
     return false;
   }
-  if (packet.readApplicationProcessIdentifier()
+  if (primaryHeader.applicationProcessIdentifier
       != APPLICATION_PROCESS_IDENTIFIER)
   {
     return false;
   }
-  if (packet.readPacketDataLength() > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return false;
   }
-  if (packet.readPacketDataLength() < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return false;
   }
@@ -254,12 +256,19 @@ void ESAT_EPSClass::updateTelemetry()
 {
   telemetry.clear();
   // Primary header.
-  telemetry.writePacketVersionNumber(0);
-  telemetry.writePacketType(telemetry.TELEMETRY);
-  telemetry.writeSecondaryHeaderFlag(telemetry.SECONDARY_HEADER_IS_PRESENT);
-  telemetry.writeApplicationProcessIdentifier(APPLICATION_PROCESS_IDENTIFIER);
-  telemetry.writeSequenceFlags(telemetry.UNSEGMENTED_USER_DATA);
-  telemetry.writePacketSequenceCount(telemetryPacketSequenceCount);
+  ESAT_CCSDSPrimaryHeader primaryHeader;
+  primaryHeader.packetVersionNumber = 0;
+  primaryHeader.packetType =
+    primaryHeader.TELEMETRY;
+  primaryHeader.secondaryHeaderFlag =
+    primaryHeader.SECONDARY_HEADER_IS_PRESENT;
+  primaryHeader.applicationProcessIdentifier =
+    APPLICATION_PROCESS_IDENTIFIER;
+  primaryHeader.sequenceFlags =
+    primaryHeader.UNSEGMENTED_USER_DATA;
+  primaryHeader.packetSequenceCount =
+    telemetryPacketSequenceCount;
+  telemetry.writePrimaryHeader(primaryHeader);
   // Secondary header.
   ESAT_CCSDSSecondaryHeader secondaryHeader;
   secondaryHeader.preamble =
@@ -311,20 +320,18 @@ void ESAT_EPSClass::updateTelemetry()
   telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readShuntVoltage());
   telemetry.writeByte(ESAT_DirectEnergyTransferSystem.error);
   // End of user data
-  telemetry.updatePacketDataLength();
-  if (telemetry.readPacketDataLength() > telemetry.packetDataBufferLength)
-  {
-    return;
-  }
+  telemetry.flush();
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
   newTelemetryPacket = true;
 }
 
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
 {
+  packet.rewind();
+  const ESAT_CCSDSPrimaryHeader primaryHeader = packet.readPrimaryHeader();
   const unsigned long encoderBufferLength =
-    ESAT_KISSStream::frameLength(packet.PRIMARY_HEADER_LENGTH
-                                 + packet.readPacketDataLength());
+    ESAT_KISSStream::frameLength(primaryHeader.LENGTH
+                                 + primaryHeader.packetDataLength);
   byte encoderBuffer[encoderBufferLength];
   ESAT_KISSStream encoder(USB, encoderBuffer, encoderBufferLength);
   (void) encoder.beginFrame();
