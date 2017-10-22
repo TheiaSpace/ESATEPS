@@ -259,4 +259,4 @@ class ESAT_EPSClass
 // Global instance of the EPS library.
 extern ESAT_EPSClass ESAT_EPS;
 
-#endif
+#endif /* ESAT_EPS_h */
