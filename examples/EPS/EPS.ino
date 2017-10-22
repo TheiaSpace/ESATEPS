@@ -40,7 +40,7 @@ byte usbTelecommandBuffer[WHOLE_PACKET_BUFFER_LENGTH];
 // Start the peripherals and do some initial bookkeeping work.
 void setup()
 {
-  ESAT_EPS.begin(usbTelecommandBuffer, WHOLE_PACKET_BUFFER_LENGTH);
+  ESAT_EPS.begin(usbTelecommandBuffer, sizeof(usbTelecommandBuffer));
 }
 
 // Body of the main loop of the program:
@@ -58,7 +58,7 @@ void setup()
 void loop()
 {
   byte buffer[PACKET_DATA_BUFFER_LENGTH];
-  ESAT_CCSDSPacket packet(buffer, PACKET_DATA_BUFFER_LENGTH);
+  ESAT_CCSDSPacket packet(buffer, sizeof(buffer));
   while (ESAT_EPS.readTelecommand(packet))
   {
     ESAT_EPS.handleTelecommand(packet);
