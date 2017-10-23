@@ -31,13 +31,15 @@
 #include "ESAT_PowerLineSwitch.h"
 #include "ESAT_SolarPanelThermometer.h"
 
-void ESAT_EPSClass::begin(byte buffer[], const unsigned long bufferLength)
+void ESAT_EPSClass::begin()
 {
   newTelemetryPacket = false;
   telemetryPacketSequenceCount = 0;
   telemetry = ESAT_CCSDSPacket(telemetryPacketData,
                                TELEMETRY_PACKET_DATA_LENGTH);
-  usbTelecommandDecoder = ESAT_KISSStream(USB, buffer, bufferLength);
+  usbTelecommandDecoder = ESAT_KISSStream(USB,
+                                          usbTelecommandBuffer,
+                                          sizeof(usbTelecommandBuffer));
   ESAT_EPSMeasurements.begin();
   ESAT_MaximumPowerPointTrackingDriver1.begin();
   ESAT_MaximumPowerPointTrackingDriver2.begin();
