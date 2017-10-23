@@ -75,10 +75,6 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
   {
     return;
   }
-  if (primaryHeader.packetDataLength > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
-  {
-    return;
-  }
   const ESAT_CCSDSSecondaryHeader secondaryHeader =
     packet.readSecondaryHeader();
   if (secondaryHeader.majorVersionNumber < MAJOR_VERSION_NUMBER)
@@ -189,10 +185,6 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
   }
   if (primaryHeader.applicationProcessIdentifier
       != APPLICATION_PROCESS_IDENTIFIER)
-  {
-    return false;
-  }
-  if (primaryHeader.packetDataLength > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
   {
     return false;
   }
