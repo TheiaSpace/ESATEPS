@@ -41,8 +41,7 @@ class ESAT_EPSClass
 {
   public:
     // Set up the EPS board.
-    // Accumulate incoming USB telecommands in the given buffer.
-    void begin(byte buffer[], unsigned long bufferLength);
+    void begin();
 
     // Handle a telecommand.
     void handleTelecommand(ESAT_CCSDSPacket& packet);
@@ -93,9 +92,6 @@ class ESAT_EPSClass
     static const byte MINOR_VERSION_NUMBER = 0;
     static const byte PATCH_VERSION_NUMBER = 0;
 
-    // The commands that have a 1-byte argument field.
-    static const byte MINIMUM_COMMAND_PARAMETER_LENGTH = 1;
-
     // Set current time command size:
     // - Year (2 byte).
     // - Month (1 byte).
@@ -104,13 +100,6 @@ class ESAT_EPSClass
     // - Minutes (1 byte).
     // - Seconds (1 byte).
     static const byte MAXIMUM_COMMAND_PARAMETER_LENGTH = 7;
-
-    // Packet data length of telecommand packets.
-    // - Secondary header.
-    // - Shortest command parameter.
-    static const byte MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
-      ESAT_CCSDSSecondaryHeader::LENGTH
-      + MINIMUM_COMMAND_PARAMETER_LENGTH;
 
     // Packet data length of telecommand packets.
     // - Secondary header.
@@ -207,6 +196,8 @@ class ESAT_EPSClass
     boolean newTelemetryPacket;
 
     // Decode USB KISS frames with this stream.
+    byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
+                              + MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     ESAT_KISSStream usbTelecommandDecoder;
 
     // Telemetry buffer.

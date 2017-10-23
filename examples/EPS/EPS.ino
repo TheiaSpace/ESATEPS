@@ -30,17 +30,10 @@
 // Maximum packet data length we will handle.
 const word PACKET_DATA_BUFFER_LENGTH = 256;
 
-// Maximum whole packet length we will handle.
-const word WHOLE_PACKET_BUFFER_LENGTH =
-  ESAT_CCSDSPrimaryHeader::LENGTH + PACKET_DATA_BUFFER_LENGTH;
-
-// Accumulate incoming USB telecommands in this buffer.
-byte usbTelecommandBuffer[WHOLE_PACKET_BUFFER_LENGTH];
-
 // Start the peripherals and do some initial bookkeeping work.
 void setup()
 {
-  ESAT_EPS.begin(usbTelecommandBuffer, sizeof(usbTelecommandBuffer));
+  ESAT_EPS.begin();
 }
 
 // Body of the main loop of the program:

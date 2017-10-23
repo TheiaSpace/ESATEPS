@@ -31,13 +31,15 @@
 #include "ESAT_PowerLineSwitch.h"
 #include "ESAT_SolarPanelThermometer.h"
 
-void ESAT_EPSClass::begin(byte buffer[], const unsigned long bufferLength)
+void ESAT_EPSClass::begin()
 {
   newTelemetryPacket = false;
   telemetryPacketSequenceCount = 0;
   telemetry = ESAT_CCSDSPacket(telemetryPacketData,
                                TELEMETRY_PACKET_DATA_LENGTH);
-  usbTelecommandDecoder = ESAT_KISSStream(USB, buffer, bufferLength);
+  usbTelecommandDecoder = ESAT_KISSStream(USB,
+                                          usbTelecommandBuffer,
+                                          sizeof(usbTelecommandBuffer));
   ESAT_EPSMeasurements.begin();
   ESAT_MaximumPowerPointTrackingDriver1.begin();
   ESAT_MaximumPowerPointTrackingDriver2.begin();
@@ -71,11 +73,7 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
   {
     return;
   }
-  if (primaryHeader.packetDataLength < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
-  {
-    return;
-  }
-  if (primaryHeader.packetDataLength > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
   {
     return;
   }
@@ -122,14 +120,12 @@ void ESAT_EPSClass::handleFixedModeCommand(ESAT_CCSDSPacket& packet)
 
 void ESAT_EPSClass::handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet)
 {
-  const byte commandParameter = packet.readByte();
   ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
   ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
 }
 
 void ESAT_EPSClass::handleSweepModeCommand(ESAT_CCSDSPacket& packet)
 {
-  const byte commandParameter = packet.readByte();
   ESAT_MaximumPowerPointTrackingDriver1.setSweepMode();
   ESAT_MaximumPowerPointTrackingDriver2.setSweepMode();
 }
@@ -169,7 +165,7 @@ void ESAT_EPSClass::handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet)
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.clear();
-  if (packet.capacity() < MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (packet.capacity() < ESAT_CCSDSSecondaryHeader::LENGTH)
   {
     return false;
   }
@@ -192,11 +188,7 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
   {
     return false;
   }
-  if (primaryHeader.packetDataLength > MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
-  {
-    return false;
-  }
-  if (primaryHeader.packetDataLength < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
   {
     return false;
   }
