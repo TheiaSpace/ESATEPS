@@ -71,7 +71,7 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
   {
     return;
   }
-  if (primaryHeader.packetDataLength < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
   {
     return;
   }
@@ -169,7 +169,7 @@ void ESAT_EPSClass::handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet)
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.clear();
-  if (packet.capacity() < MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (packet.capacity() < ESAT_CCSDSSecondaryHeader::LENGTH)
   {
     return false;
   }
@@ -196,7 +196,7 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
   {
     return false;
   }
-  if (primaryHeader.packetDataLength < MINIMUM_TELECOMMAND_PACKET_DATA_LENGTH)
+  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
   {
     return false;
   }
