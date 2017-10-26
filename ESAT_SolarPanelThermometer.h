@@ -40,6 +40,7 @@ class ESAT_SolarPanelThermometerClass
 
     // Return the temperature measured by the thermometer.
     // Set the error flag on error.
+    // Readings are updated up to once every PERIOD milliseconds.
     word read();
 
   private:
@@ -51,12 +52,23 @@ class ESAT_SolarPanelThermometerClass
     const byte secondaryAddress;
     const byte secondaryRegister;
 
+    // Temperature readings may update up to once every PERIOD
+    // milliseconds.  Panel thermal dynamics are slow, so measuring
+    // more often would just waste processor time for no real benefit.
+    static const unsigned long PERIOD = 1000;
+
     // True if the last read attempt was successful; false otherwise.
     boolean successfulRead;
 
     // Try to read the temperature.  Set successfulRead to true on
     // success; otherwise set it to false.
     word tryRead(const byte address, const byte registerNumber);
+
+    // Temperature measured in the previous reading operation.
+    word previousReading;
+
+    // System uptime at the previous temperature reading.
+    unsigned long previousReadingTime;
 };
 
 // Thermometer on solar panel 1.
