@@ -38,27 +38,38 @@ ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte prim
   primaryRegister(primaryRegister),
   secondaryAddress(secondaryAddress),
   secondaryRegister(secondaryRegister),
-  error(false)
+  error(false),
+  previousReading(0),
+  previousReadingTime(0)
 {
 }
 
 word ESAT_SolarPanelThermometerClass::read()
 {
+  unsigned long currentReadingTime = millis();
+  if ((currentReadingTime - previousReadingTime) < PERIOD)
+  {
+    return previousReading;
+  }
+  previousReadingTime = currentReadingTime;
   const word primaryTemperature =
     tryRead(primaryAddress, primaryRegister);
   if (successfulRead)
   {
+    previousReading = primaryTemperature;
     return primaryTemperature;
   }
   const word secondaryTemperature =
     tryRead(secondaryAddress, secondaryRegister);
   if (successfulRead)
   {
+    previousReading = secondaryTemperature;
     return secondaryTemperature;
   }
   else
   {
     error = true;
+    previousReading = 0;
     return 0;
   }
 }
