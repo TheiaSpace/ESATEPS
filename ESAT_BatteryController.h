@@ -29,6 +29,9 @@ class ESAT_BatteryControllerClass
     // True after a read error.  Must be reset manually.
     boolean error;
 
+    // Instantiate a battery controller library.
+    ESAT_BatteryControllerClass();
+
     // Read the voltage of battery number 1.
     // Set the error flag on error.
     word readBattery1Voltage();
@@ -65,6 +68,28 @@ class ESAT_BatteryControllerClass
     static const byte BATTERY_CURRENT_REGISTER = 0x0A;
     static const byte STATE_OF_CHARGE_REGISTER = 0x0D;
     static const byte TOTAL_BATTERY_VOLTAGE_REGISTER = 0x09;
+
+    // Readings may update up to once every PERIOD milliseconds.
+    // The EPS cycle isn't fast enough to capture fast transients, and
+    // the quasy-steady dynamics are slow, so measuring more often
+    // would just waste processor time for no real benefit.
+    static const unsigned long PERIOD = 1000;
+
+    // Latest readings.
+    word previousBattery1VoltageReading;
+    word previousBattery2VoltageReading;
+    word previousBatteryCurrentReading;
+    word previousBatteryTemperatureReading;
+    byte previousStateOfChargeReading;
+    word previousTotalBatteryVoltageReading;
+
+    // System uptime at the previous readings.
+    unsigned long previousBattery1VoltageReadingTime;
+    unsigned long previousBattery2VoltageReadingTime;
+    unsigned long previousBatteryCurrentReadingTime;
+    unsigned long previousBatteryTemperatureReadingTime;
+    unsigned long previousStateOfChargeReadingTime;
+    unsigned long previousTotalBatteryVoltageReadingTime;
 
     // Read a byte from the given register.
     // Set the error flag on error.
