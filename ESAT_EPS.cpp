@@ -27,7 +27,6 @@
 #include "ESAT_DirectEnergyTransferSystem.h"
 #include "ESAT_EPSMeasurements.h"
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
-#include "ESAT_OvercurrentDetector.h"
 #include "ESAT_PowerLineSwitch.h"
 #include "ESAT_SolarPanelThermometer.h"
 
@@ -49,7 +48,6 @@ void ESAT_EPSClass::begin()
   ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.OFF);
   ESAT_PowerLine3V3Switch.begin();
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
-  ESAT_OvercurrentDetector.begin();
   Wire1.begin();
   Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   USB.begin();
@@ -286,8 +284,6 @@ void ESAT_EPSClass::updateTelemetry()
   telemetry.writeWord(ESAT_EPSMeasurements.readPanel2Voltage());
   telemetry.writeByte(ESAT_PowerLine3V3Switch.read());
   telemetry.writeByte(ESAT_PowerLine5VSwitch.read());
-  telemetry.writeByte(ESAT_OvercurrentDetector.read3V3LineOvercurrentState());
-  telemetry.writeByte(ESAT_OvercurrentDetector.read5VLineOvercurrentState());
   ESAT_BatteryController.error = false;
   telemetry.writeWord(ESAT_BatteryController.readBatteryCurrent());
   telemetry.writeWord(ESAT_BatteryController.readTotalBatteryVoltage());

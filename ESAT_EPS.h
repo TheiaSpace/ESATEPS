@@ -128,11 +128,6 @@ class ESAT_EPSClass
     // - 5 V line switch state (1 byte).
     static const byte SWITCHES_TELEMETRY_BUFFER_LENGTH = 1*2;
 
-    // Size of the telemetry buffer (overcurrent):
-    // - 3.3 V line overcurrent (1 byte).
-    // - 5 V line overcurrent (1 byte);
-    static const byte OVERCURRENT_TELEMETRY_BUFFER_LENGTH = 1*2;
-
     // Size of the telemetry buffer (battery controller):
     // - Battery current (2 bytes).
     // - Total battery voltage (2 bytes).
@@ -167,18 +162,18 @@ class ESAT_EPSClass
     // Size of the telemetry packet data buffer (total):
     // - Secondary header.
     // - EPS measurements.
+    // - Switches.
     // - Battery controller.
+    // - Maximum power point tracking system.
     // - Panel thermometers.
     // - Direct energy transfer system.
-    // - Switches.
     static const byte TELEMETRY_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
       + EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
       + SWITCHES_TELEMETRY_BUFFER_LENGTH
-      + OVERCURRENT_TELEMETRY_BUFFER_LENGTH
       + BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH
-      + MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH
       + PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH
+      + MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH
       + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
 
     // Real time clock.
