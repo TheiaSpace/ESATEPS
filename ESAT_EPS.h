@@ -164,8 +164,8 @@ class ESAT_EPSClass
     // - EPS measurements.
     // - Switches.
     // - Battery controller.
-    // - Maximum power point tracking system.
     // - Panel thermometers.
+    // - Maximum power point tracking system.
     // - Direct energy transfer system.
     static const byte TELEMETRY_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
