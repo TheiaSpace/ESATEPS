@@ -132,7 +132,7 @@ void ESAT_MaximumPowerPointTrackingDriverClass::updateSweepMode()
   analogWrite(outputPin, dutyCycle);
 }
 
-ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver1(I_P1_IN,
+ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver1(I_P1_OUT,
                                                                                 PWM1);
-ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver2(I_P2_IN,
+ESAT_MaximumPowerPointTrackingDriverClass ESAT_MaximumPowerPointTrackingDriver2(I_P2_OUT,
                                                                                 PWM2);
