@@ -44,13 +44,13 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readBatteryCurrent();
 
+    // Read the state of charge.
+    // Set the error flag on error.
+    byte readBatteryStateOfCharge();
+
     // Read the temperature of the batteries.
     // Set the error flag on error.
     word readBatteryTemperature();
-
-    // Read the state of charge.
-    // Set the error flag on error.
-    byte readStateOfCharge();
 
     // Read the total battery voltage.
     // Set the error flag on error.
@@ -66,7 +66,7 @@ class ESAT_BatteryControllerClass
     static const byte BATTERY_2_VOLTAGE_REGISTER = 0x3F;
     static const byte BATTERY_TEMPERATURE_REGISTER = 0x08;
     static const byte BATTERY_CURRENT_REGISTER = 0x0A;
-    static const byte STATE_OF_CHARGE_REGISTER = 0x0D;
+    static const byte BATTERY_STATE_OF_CHARGE_REGISTER = 0x0D;
     static const byte TOTAL_BATTERY_VOLTAGE_REGISTER = 0x09;
 
     // Readings may update up to once every PERIOD milliseconds.

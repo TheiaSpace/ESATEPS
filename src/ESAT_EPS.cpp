@@ -290,7 +290,7 @@ void ESAT_EPSClass::updateTelemetry()
   telemetry.writeWord(ESAT_BatteryController.readBattery1Voltage());
   telemetry.writeWord(ESAT_BatteryController.readBattery2Voltage());
   telemetry.writeWord(ESAT_BatteryController.readBatteryTemperature());
-  telemetry.writeByte(ESAT_BatteryController.readStateOfCharge());
+  telemetry.writeByte(ESAT_BatteryController.readBatteryStateOfCharge());
   telemetry.writeByte(ESAT_BatteryController.error);
   ESAT_SolarPanel1Thermometer.error = false;
   telemetry.writeWord(ESAT_SolarPanel1Thermometer.read());
