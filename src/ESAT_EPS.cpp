@@ -276,12 +276,12 @@ void ESAT_EPSClass::updateTelemetry()
   telemetry.writeWord(ESAT_EPSMeasurements.read5VLineVoltage());
   telemetry.writeWord(ESAT_EPSMeasurements.readInputLineCurrent());
   telemetry.writeWord(ESAT_EPSMeasurements.readInputLineVoltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readPanel1InputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readPanel1OutputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readPanel1Voltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readPanel2InputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readPanel2OutputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readPanel2Voltage());
+  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1InputCurrent());
+  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1OutputCurrent());
+  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1Voltage());
+  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2InputCurrent());
+  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2OutputCurrent());
+  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2Voltage());
   telemetry.writeByte(ESAT_PowerLine3V3Switch.read());
   telemetry.writeByte(ESAT_PowerLine5VSwitch.read());
   ESAT_BatteryController.error = false;
@@ -290,7 +290,7 @@ void ESAT_EPSClass::updateTelemetry()
   telemetry.writeWord(ESAT_BatteryController.readBattery1Voltage());
   telemetry.writeWord(ESAT_BatteryController.readBattery2Voltage());
   telemetry.writeWord(ESAT_BatteryController.readBatteryTemperature());
-  telemetry.writeByte(ESAT_BatteryController.readStateOfCharge());
+  telemetry.writeByte(ESAT_BatteryController.readBatteryStateOfCharge());
   telemetry.writeByte(ESAT_BatteryController.error);
   ESAT_SolarPanel1Thermometer.error = false;
   telemetry.writeWord(ESAT_SolarPanel1Thermometer.read());

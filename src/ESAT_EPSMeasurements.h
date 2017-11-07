@@ -48,22 +48,22 @@ class ESAT_EPSMeasurementsClass
     word readInputLineVoltage();
 
     // Return the input current of solar panel 1.
-    word readPanel1InputCurrent();
+    word readSolarPanel1InputCurrent();
 
     // Return the output current of solar panel 1.
-    word readPanel1OutputCurrent();
+    word readSolarPanel1OutputCurrent();
 
     // Return the voltage of solar panel 1.
-    word readPanel1Voltage();
+    word readSolarPanel1Voltage();
 
     // Return the input current of solar panel 2.
-    word readPanel2InputCurrent();
+    word readSolarPanel2InputCurrent();
 
     // Return the output current of solar panel 2.
-    word readPanel2OutputCurrent();
+    word readSolarPanel2OutputCurrent();
 
     // Return the voltage of solar panel 2.
-    word readPanel2Voltage();
+    word readSolarPanel2Voltage();
 };
 
 // Global instance of the EPS measurements library.

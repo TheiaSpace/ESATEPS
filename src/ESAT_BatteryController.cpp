@@ -71,6 +71,18 @@ word ESAT_BatteryControllerClass::readBatteryCurrent()
   return previousBatteryCurrentReading;
 }
 
+byte ESAT_BatteryControllerClass::readBatteryStateOfCharge()
+{
+  const unsigned long readingTime = millis();
+  if ((readingTime - previousStateOfChargeReadingTime) < PERIOD)
+  {
+    return previousStateOfChargeReading;
+  }
+  previousStateOfChargeReadingTime = readingTime;
+  previousStateOfChargeReading = readWord(BATTERY_STATE_OF_CHARGE_REGISTER);
+  return previousStateOfChargeReading;
+}
+
 word ESAT_BatteryControllerClass::readBatteryTemperature()
 {
   const unsigned long readingTime = millis();
@@ -81,18 +93,6 @@ word ESAT_BatteryControllerClass::readBatteryTemperature()
   previousBatteryTemperatureReadingTime = readingTime;
   previousBatteryTemperatureReading = readWord(BATTERY_TEMPERATURE_REGISTER);
   return previousBatteryTemperatureReading;
-}
-
-byte ESAT_BatteryControllerClass::readStateOfCharge()
-{
-  const unsigned long readingTime = millis();
-  if ((readingTime - previousStateOfChargeReadingTime) < PERIOD)
-  {
-    return previousStateOfChargeReading;
-  }
-  previousStateOfChargeReadingTime = readingTime;
-  previousStateOfChargeReading = readWord(STATE_OF_CHARGE_REGISTER);
-  return previousStateOfChargeReading;
 }
 
 word ESAT_BatteryControllerClass::readTotalBatteryVoltage()
