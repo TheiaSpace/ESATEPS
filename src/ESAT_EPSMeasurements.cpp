@@ -82,32 +82,32 @@ word ESAT_EPSMeasurementsClass::readInputLineVoltage()
   return read(V_IN, voltageSamples);
 }
 
-word ESAT_EPSMeasurementsClass::readPanel1InputCurrent()
+word ESAT_EPSMeasurementsClass::readSolarPanel1InputCurrent()
 {
   return read(I_P1_IN, currentSamples);
 }
 
-word ESAT_EPSMeasurementsClass::readPanel1OutputCurrent()
+word ESAT_EPSMeasurementsClass::readSolarPanel1OutputCurrent()
 {
   return read(I_P1_OUT, currentSamples);
 }
 
-word ESAT_EPSMeasurementsClass::readPanel1Voltage()
+word ESAT_EPSMeasurementsClass::readSolarPanel1Voltage()
 {
   return read(V_P1, voltageSamples);
 }
 
-word ESAT_EPSMeasurementsClass::readPanel2InputCurrent()
+word ESAT_EPSMeasurementsClass::readSolarPanel2InputCurrent()
 {
   return read(I_P2_IN, currentSamples);
 }
 
-word ESAT_EPSMeasurementsClass::readPanel2OutputCurrent()
+word ESAT_EPSMeasurementsClass::readSolarPanel2OutputCurrent()
 {
   return read(I_P2_OUT, currentSamples);
 }
 
-word ESAT_EPSMeasurementsClass::readPanel2Voltage()
+word ESAT_EPSMeasurementsClass::readSolarPanel2Voltage()
 {
   return read(V_P2, voltageSamples);
 }
