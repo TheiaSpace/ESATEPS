@@ -1,0 +1,16 @@
+ESAT_BatteryController	KEYWORD1
+
+ESAT_DirectEnergyTransferSystem	KEYWORD1
+
+ESAT_EPS	KEYWORD1
+
+ESAT_EPSMeasurements	KEYWORD1
+
+ESAT_MaximumPowerPointTrackingDriver1	KEYWORD1
+ESAT_MaximumPowerPointTrackingDriver2	KEYWORD1
+
+ESAT_PowerLine3V3Switch	KEYWORD1
+ESAT_PowerLine5VSwitch	KEYWORD1
+
+ESAT_SolarPanel1Thermometer	KEYWORD1
+ESAT_SolarPanel2Thermometer	KEYWORD1
