@@ -25,6 +25,13 @@
 // Use the global instances ESAT_SolarPanel1Thermometer (for the
 // thermometer on solar panel 1) and ESAT_SolarPanel2Thermometer (for the
 // thermometer on solar panel 2).
+//
+// The underlying hardware is the ADS7823 analog-to-digital converter
+// from Texas Instruments measuring the AD8494 thermocouple amplifier
+// from Analog Devices.  Communications are done through the EPS I2C
+// bus.  There is also support for a different thermometer chip from
+// an older, in-house testing design that will be removed in a future
+// version of this library.
 class ESAT_SolarPanelThermometerClass
 {
   public:
