@@ -23,6 +23,10 @@
 
 // An interface with the battery controller.
 // Use the global instance ESAT_BatteryController.
+//
+// The underlying hardware is the BQ40Z60 programmable battery
+// management unit from Texas Instruments.  Communications are done
+// through the EPS I2C bus.
 class ESAT_BatteryControllerClass
 {
   public:

@@ -26,6 +26,11 @@
 //
 // The direct energy transfer system dissipates excess power from the
 // solar panels.
+//
+// The underlying hadrware is the ADS1015 analog-to-digital converter
+// from Texas Instruments measuring the INA199 current-shunt monitor
+// from Texas Instruments.  Communications are done through the EPS
+// I2C bus.
 class ESAT_DirectEnergyTransferSystemClass
 {
   public:
