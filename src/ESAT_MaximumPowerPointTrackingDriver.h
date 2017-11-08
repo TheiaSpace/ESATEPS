@@ -25,6 +25,9 @@
 // Use the global instances ESAT_MaximumPowerPointTrackingDriver1 (for
 // solar panel 1) and ESAT_MaximumPowerPointTrackingDriver2 (for solar
 // panel 2).
+//
+// The maximum power point tracking system regulates the operating
+// point of the solar panels to provide the maximum possible power.
 class ESAT_MaximumPowerPointTrackingDriverClass
 {
   public:
