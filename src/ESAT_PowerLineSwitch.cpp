@@ -16,17 +16,48 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <USBSerial.h>
-#include <MspFlash.h>
-#include <ESATEPS.h>
-void setup()
+#include "ESAT_PowerLineSwitch.h"
+
+ESAT_PowerLineSwitchClass::ESAT_PowerLineSwitchClass(const byte line):
+  line(line), state(OFF)
 {
-EPS.init();  
 }
 
-void loop()
+void ESAT_PowerLineSwitchClass::begin()
 {
-  EPS.updateMPPT();
-  EPS.housekeeping();
-  delay(10);//  
+  pinMode(line, OUTPUT);
+  write(state);
 }
+
+ESAT_PowerLineSwitchClass::SwitchState ESAT_PowerLineSwitchClass::read()
+{
+  return state;
+}
+
+void ESAT_PowerLineSwitchClass::toggle()
+{
+  if (state == ON)
+  {
+    write(OFF);
+  }
+  else
+  {
+    write(ON);
+  }
+}
+
+void ESAT_PowerLineSwitchClass::write(const ESAT_PowerLineSwitchClass::SwitchState newState)
+{
+  state = newState;
+  if (state == ON)
+  {
+    digitalWrite(line, HIGH);
+  }
+  else
+  {
+    digitalWrite(line, LOW);
+  }
+}
+
+ESAT_PowerLineSwitchClass ESAT_PowerLine3V3Switch(EN3V3);
+ESAT_PowerLineSwitchClass ESAT_PowerLine5VSwitch(EN5V);
