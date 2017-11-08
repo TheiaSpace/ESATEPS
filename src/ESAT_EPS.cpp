@@ -162,7 +162,7 @@ void ESAT_EPSClass::handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet)
 
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
-  packet.clear();
+  packet.flush();
   if (packet.capacity() < ESAT_CCSDSSecondaryHeader::LENGTH)
   {
     return false;
@@ -244,7 +244,7 @@ void ESAT_EPSClass::updateI2CTelemetry()
 
 void ESAT_EPSClass::updateTelemetry()
 {
-  telemetry.clear();
+  telemetry.flush();
   // Primary header.
   ESAT_CCSDSPrimaryHeader primaryHeader;
   primaryHeader.packetVersionNumber = 0;
@@ -308,7 +308,6 @@ void ESAT_EPSClass::updateTelemetry()
   telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readShuntVoltage());
   telemetry.writeByte(ESAT_DirectEnergyTransferSystem.error);
   // End of user data
-  telemetry.flush();
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
   newTelemetryPacket = true;
 }
