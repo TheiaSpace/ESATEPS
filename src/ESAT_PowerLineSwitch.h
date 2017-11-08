@@ -57,7 +57,10 @@ class ESAT_PowerLineSwitchClass
     SwitchState state;
 };
 
+// Global instance of the 3.3 V power line switch library.
 extern ESAT_PowerLineSwitchClass ESAT_PowerLine3V3Switch;
+
+// Global instance of the 5 V power line switch library.
 extern ESAT_PowerLineSwitchClass ESAT_PowerLine5VSwitch;
 
 #endif /* ESAT_PowerLineSwitch_h */

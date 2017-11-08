@@ -26,16 +26,18 @@
 
 // Library with the functionality of the Electrical Power Subsystem
 // (EPS) board.  Use the global instance EPS.
-// Set up the peripherals with ESAT_EPS.begin().
-// Retrieve a telecommand with ESAT_EPS.readTelecommand().
-// Handle a telecommand with ESAT_EPS.handleTelecommand().
-// Retrieve a telemetry packet with ESAT_EPS.readTelemetry().
-// Write the telemetry packet through the USB interface with
-// ESAT_EPS.writeTelemetry().
-// Update the telemetry measurements and do housekeeping work with
-// ESAT_EPS.update().
-// After ESAT_EPS.begin(), the board will respond to I2C messages
-// on the Wire (SCL_O, SDA_O) interface.
+//
+// * Set up the peripherals with ESAT_EPS.begin().
+// * Retrieve a telecommand with ESAT_EPS.readTelecommand().
+// * Handle a telecommand with ESAT_EPS.handleTelecommand().
+// * Retrieve a telemetry packet with ESAT_EPS.readTelemetry().
+// * Write the telemetry packet through the USB interface with
+//   ESAT_EPS.writeTelemetry().
+// * Update the telemetry measurements and do housekeeping work with
+//   ESAT_EPS.update().
+// * After ESAT_EPS.begin(), the board will respond to I2C messages
+//   on the Wire (SCL_O, SDA_O) interface.
+//
 // See the example EPS program for a functional EPS loop.
 class ESAT_EPSClass
 {
