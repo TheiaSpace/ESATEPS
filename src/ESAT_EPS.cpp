@@ -308,7 +308,6 @@ void ESAT_EPSClass::updateTelemetry()
   telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readShuntVoltage());
   telemetry.writeByte(ESAT_DirectEnergyTransferSystem.error);
   // End of user data
-  telemetry.flush();
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
   newTelemetryPacket = true;
 }
