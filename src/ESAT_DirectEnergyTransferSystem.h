@@ -23,6 +23,9 @@
 
 // Interface with the direct energy transfer system.
 // Use the global instance ESAT_DirectEnergyTransferSystem.
+//
+// The direct energy transfer system dissipates excess power from the
+// solar panels.
 class ESAT_DirectEnergyTransferSystemClass
 {
   public:
