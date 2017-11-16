@@ -20,91 +20,71 @@
 #include <Wire.h>
 
 ESAT_BatteryControllerClass::ESAT_BatteryControllerClass():
-  previousBattery1VoltageReading(0),
-  previousBattery2VoltageReading(0),
-  previousBatteryCurrentReading(0),
-  previousBatteryTemperatureReading(0),
-  previousStateOfChargeReading(0),
-  previousTotalBatteryVoltageReading(0),
-  previousBattery1VoltageReadingTime(0),
-  previousBattery2VoltageReadingTime(0),
-  previousBatteryCurrentReadingTime(0),
-  previousBatteryTemperatureReadingTime(0),
-  previousStateOfChargeReadingTime(0),
-  previousTotalBatteryVoltageReadingTime(0)
+  battery1Voltage(0),
+  battery2Voltage(0),
+  batteryCurrent(0),
+  batteryTemperature(0),
+  batteryStateOfCharge(0),
+  totalBatteryVoltage(0),
+  previousError(false),
+  previousReadingTime(0)
 {
+}
+
+void ESAT_BatteryControllerClass::readAll()
+{
+  const unsigned long readingTime = millis();
+  if ((readingTime - previousReadingTime) >= PERIOD)
+  {
+    error = previousError;
+  }
+  else
+  {
+    previousReadingTime = readingTime;
+    battery1Voltage = readWord(BATTERY_1_VOLTAGE_REGISTER);
+    battery2Voltage = readWord(BATTERY_2_VOLTAGE_REGISTER);
+    batteryCurrent = readWord(BATTERY_CURRENT_REGISTER);
+    batteryTemperature = readWord(BATTERY_CURRENT_REGISTER);
+    batteryStateOfCharge = readByte(BATTERY_STATE_OF_CHARGE_REGISTER);
+    totalBatteryVoltage = readWord(TOTAL_BATTERY_VOLTAGE_REGISTER);
+    previousError = error;
+  }
 }
 
 word ESAT_BatteryControllerClass::readBattery1Voltage()
 {
-  const unsigned long readingTime = millis();
-  if ((readingTime - previousBattery1VoltageReadingTime) < PERIOD)
-  {
-    return previousBattery1VoltageReading;
-  }
-  previousBattery1VoltageReadingTime = readingTime;
-  previousBattery1VoltageReading = readWord(BATTERY_1_VOLTAGE_REGISTER);
-  return previousBattery1VoltageReading;
+  readAll();
+  return battery1Voltage;
 }
 
 word ESAT_BatteryControllerClass::readBattery2Voltage()
 {
-  const unsigned long readingTime = millis();
-  if ((readingTime - previousBattery2VoltageReadingTime) < PERIOD)
-  {
-    return previousBattery2VoltageReading;
-  }
-  previousBattery2VoltageReadingTime = readingTime;
-  previousBattery2VoltageReading = readWord(BATTERY_2_VOLTAGE_REGISTER);
-  return previousBattery2VoltageReading;
+  readAll();
+  return battery2Voltage;
 }
 
 word ESAT_BatteryControllerClass::readBatteryCurrent()
 {
-  const unsigned long readingTime = millis();
-  if ((readingTime - previousBatteryCurrentReadingTime) < PERIOD)
-  {
-    return previousBatteryCurrentReading;
-  }
-  previousBatteryCurrentReadingTime = readingTime;
-  previousBatteryCurrentReading = readWord(BATTERY_CURRENT_REGISTER);
-  return previousBatteryCurrentReading;
+  readAll();
+  return batteryCurrent;
 }
 
 byte ESAT_BatteryControllerClass::readBatteryStateOfCharge()
 {
-  const unsigned long readingTime = millis();
-  if ((readingTime - previousStateOfChargeReadingTime) < PERIOD)
-  {
-    return previousStateOfChargeReading;
-  }
-  previousStateOfChargeReadingTime = readingTime;
-  previousStateOfChargeReading = readWord(BATTERY_STATE_OF_CHARGE_REGISTER);
-  return previousStateOfChargeReading;
+  readAll();
+  return batteryStateOfCharge;
 }
 
 word ESAT_BatteryControllerClass::readBatteryTemperature()
 {
-  const unsigned long readingTime = millis();
-  if ((readingTime - previousBatteryTemperatureReadingTime) < PERIOD)
-  {
-    return previousBatteryTemperatureReading;
-  }
-  previousBatteryTemperatureReadingTime = readingTime;
-  previousBatteryTemperatureReading = readWord(BATTERY_TEMPERATURE_REGISTER);
-  return previousBatteryTemperatureReading;
+  readAll();
+  return batteryTemperature;
 }
 
 word ESAT_BatteryControllerClass::readTotalBatteryVoltage()
 {
-  const unsigned long readingTime = millis();
-  if ((readingTime - previousTotalBatteryVoltageReadingTime) < PERIOD)
-  {
-    return previousTotalBatteryVoltageReading;
-  }
-  previousTotalBatteryVoltageReadingTime = readingTime;
-  previousTotalBatteryVoltageReading = readWord(TOTAL_BATTERY_VOLTAGE_REGISTER);
-  return previousTotalBatteryVoltageReading;
+  readAll();
+  return totalBatteryVoltage;
 }
 
 byte ESAT_BatteryControllerClass::readByte(const byte registerNumber)

@@ -48,6 +48,9 @@ class ESAT_SolarPanelThermometerClass
     // Return the temperature measured by the thermometer.
     // Set the error flag on error.
     // Readings are updated up to once every PERIOD milliseconds.
+    // The error flag is reset to the previous cached value if fewer
+    // than PERIOD milliseconds have ellapsed since the previous
+    // update.
     word read();
 
   private:
@@ -70,6 +73,10 @@ class ESAT_SolarPanelThermometerClass
     // Try to read the temperature.  Set successfulRead to true on
     // success; otherwise set it to false.
     word tryRead(const byte address, const byte registerNumber);
+
+    // True after a read error on the latest read() actual read
+    // operation; false otherwise.
+    boolean previousError;
 
     // Temperature measured in the previous reading operation.
     word previousReading;
