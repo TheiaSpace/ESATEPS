@@ -60,7 +60,6 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readTotalBatteryVoltage();
 
-
   private:
     // I2C address of the battery controller.
     static const byte ADDRESS = 0x0B;
