@@ -81,12 +81,6 @@ word ESAT_BatteryControllerClass::readBatteryTemperature()
   return batteryTemperature;
 }
 
-word ESAT_BatteryControllerClass::readTotalBatteryVoltage()
-{
-  readAll();
-  return totalBatteryVoltage;
-}
-
 byte ESAT_BatteryControllerClass::readByte(const byte registerNumber)
 {
   Wire1.beginTransmission(ADDRESS);
@@ -104,6 +98,12 @@ byte ESAT_BatteryControllerClass::readByte(const byte registerNumber)
     return 0;
   }
   return Wire1.read();
+}
+
+word ESAT_BatteryControllerClass::readTotalBatteryVoltage()
+{
+  readAll();
+  return totalBatteryVoltage;
 }
 
 word ESAT_BatteryControllerClass::readWord(const byte registerNumber)
