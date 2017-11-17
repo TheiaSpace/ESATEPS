@@ -31,9 +31,6 @@
 class ESAT_MaximumPowerPointTrackingDriverClass
 {
   public:
-    // Duty cycle relative to 255.
-    byte dutyCycle;
-
     // Instantiate an MPPT driver that takes input from a sensor pin
     // and drives an output pin with a PWM signal.
     ESAT_MaximumPowerPointTrackingDriverClass(int sensorPin, int outputPin);
@@ -70,6 +67,9 @@ class ESAT_MaximumPowerPointTrackingDriverClass
 
     // Default duty cycle.
     static const byte DEFAULT_DUTY_CYCLE = 50;
+
+    // Duty cycle relative to 255.
+    byte dutyCycle;
 
     // Current mode of operation.
     Mode mode;
