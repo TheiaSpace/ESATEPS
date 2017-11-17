@@ -110,10 +110,8 @@ void ESAT_EPSClass::handleFixedModeCommand(ESAT_CCSDSPacket& packet)
 {
   const byte commandParameter = packet.readByte();
   const byte dutyCycle = constrain(commandParameter, 0, 255);
-  ESAT_MaximumPowerPointTrackingDriver1.setFixedMode();
-  ESAT_MaximumPowerPointTrackingDriver2.setFixedMode();
-  ESAT_MaximumPowerPointTrackingDriver1.dutyCycle = dutyCycle;
-  ESAT_MaximumPowerPointTrackingDriver2.dutyCycle = dutyCycle;
+  ESAT_MaximumPowerPointTrackingDriver1.setFixedMode(dutyCycle);
+  ESAT_MaximumPowerPointTrackingDriver2.setFixedMode(dutyCycle);
 }
 
 void ESAT_EPSClass::handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet)

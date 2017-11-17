@@ -61,9 +61,10 @@ int ESAT_MaximumPowerPointTrackingDriverClass::gradientDirection()
   return -1;
 }
 
-void ESAT_MaximumPowerPointTrackingDriverClass::setFixedMode()
+void ESAT_MaximumPowerPointTrackingDriverClass::setFixedMode(const byte fixedDutyCycle)
 {
   mode = FIXED_MODE;
+  dutyCycle = fixedDutyCycle;
 }
 
 void ESAT_MaximumPowerPointTrackingDriverClass::setMPPTMode()

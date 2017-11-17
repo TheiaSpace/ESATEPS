@@ -48,7 +48,7 @@ class ESAT_MaximumPowerPointTrackingDriverClass
     byte getMode();
 
     // Set the mode of operation to fixed mode.
-    void setFixedMode();
+    void setFixedMode(byte fixedDutyCycle);
 
     // Set the mode of operation to MPPT mode.
     void setMPPTMode();
