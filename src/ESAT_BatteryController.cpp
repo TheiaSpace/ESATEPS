@@ -44,7 +44,7 @@ void ESAT_BatteryControllerClass::readAll()
     battery1Voltage = readWord(BATTERY_1_VOLTAGE_REGISTER);
     battery2Voltage = readWord(BATTERY_2_VOLTAGE_REGISTER);
     batteryCurrent = readWord(BATTERY_CURRENT_REGISTER);
-    batteryTemperature = readWord(BATTERY_CURRENT_REGISTER);
+    batteryTemperature = readWord(BATTERY_TEMPERATURE_REGISTER);
     batteryStateOfCharge = readByte(BATTERY_STATE_OF_CHARGE_REGISTER);
     totalBatteryVoltage = readWord(TOTAL_BATTERY_VOLTAGE_REGISTER);
     previousError = error;
