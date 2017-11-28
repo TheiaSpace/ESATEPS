@@ -92,7 +92,7 @@ class ESAT_EPSClass
     // Software version number.
     static const byte MAJOR_VERSION_NUMBER = 2;
     static const byte MINOR_VERSION_NUMBER = 0;
-    static const byte PATCH_VERSION_NUMBER = 0;
+    static const byte PATCH_VERSION_NUMBER = 1;
 
     // Set current time command size:
     // - Year (2 byte).
