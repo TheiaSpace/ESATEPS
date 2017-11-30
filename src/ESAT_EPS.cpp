@@ -98,8 +98,8 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
     case FIXED_MODE:
       handleFixedModeCommand(packet);
       break;
-    case SET_CURRENT_TIME:
-      handleSetCurrentTimeCommand(packet);
+    case SET_TIME:
+      handleSetTimeCommand(packet);
       break;
     default:
       break;
@@ -152,7 +152,7 @@ void ESAT_EPSClass::handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet)
   }
 }
 
-void ESAT_EPSClass::handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet)
+void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
 {
   const ESAT_Timestamp timestamp = packet.readTimestamp();
   clock.write(timestamp);
