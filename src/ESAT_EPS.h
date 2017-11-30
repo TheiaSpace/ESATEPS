@@ -72,7 +72,7 @@ class ESAT_EPSClass
     // Command codes.
     enum CommandCode
     {
-      SET_CURRENT_TIME = 0x00,
+      SET_TIME = 0x00,
       SWITCH_3V3_LINE = 0x10,
       SWITCH_5V_LINE = 0x11,
       MAXIMUM_POWER_POINT_TRACKING_MODE = 0x20,
@@ -224,7 +224,7 @@ class ESAT_EPSClass
     void handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet);
 
     // Set the time of the real time clock.
-    void handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet);
+    void handleSetTimeCommand(ESAT_CCSDSPacket& packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
