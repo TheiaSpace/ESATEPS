@@ -60,7 +60,6 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readTotalBatteryVoltage();
 
-
   private:
     // I2C address of the battery controller.
     static const byte ADDRESS = 0x0B;
@@ -80,20 +79,25 @@ class ESAT_BatteryControllerClass
     static const unsigned long PERIOD = 1000;
 
     // Latest readings.
-    word previousBattery1VoltageReading;
-    word previousBattery2VoltageReading;
-    word previousBatteryCurrentReading;
-    word previousBatteryTemperatureReading;
-    byte previousStateOfChargeReading;
-    word previousTotalBatteryVoltageReading;
+    word battery1Voltage;
+    word battery2Voltage;
+    word batteryCurrent;
+    word batteryTemperature;
+    byte batteryStateOfCharge;
+    word totalBatteryVoltage;
+
+    // True after a read error on the latest readAll() actual read
+    // operation; false otherwise.
+    boolean previousError;
 
     // System uptime at the previous readings.
-    unsigned long previousBattery1VoltageReadingTime;
-    unsigned long previousBattery2VoltageReadingTime;
-    unsigned long previousBatteryCurrentReadingTime;
-    unsigned long previousBatteryTemperatureReadingTime;
-    unsigned long previousStateOfChargeReadingTime;
-    unsigned long previousTotalBatteryVoltageReadingTime;
+    unsigned long previousReadingTime;
+
+    // If more than PERIOD milliseconds have ellapsed since
+    // previousReadingTime, update all readings, set the error flag on
+    // error and update previousError; otherwise don't update the
+    // readings, but set error to previousError.
+    void readAll();
 
     // Read a byte from the given register.
     // Set the error flag on error.

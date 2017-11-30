@@ -98,8 +98,8 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
     case FIXED_MODE:
       handleFixedModeCommand(packet);
       break;
-    case SET_CURRENT_TIME:
-      handleSetCurrentTimeCommand(packet);
+    case SET_TIME:
+      handleSetTimeCommand(packet);
       break;
     default:
       break;
@@ -110,10 +110,8 @@ void ESAT_EPSClass::handleFixedModeCommand(ESAT_CCSDSPacket& packet)
 {
   const byte commandParameter = packet.readByte();
   const byte dutyCycle = constrain(commandParameter, 0, 255);
-  ESAT_MaximumPowerPointTrackingDriver1.setFixedMode();
-  ESAT_MaximumPowerPointTrackingDriver2.setFixedMode();
-  ESAT_MaximumPowerPointTrackingDriver1.dutyCycle = dutyCycle;
-  ESAT_MaximumPowerPointTrackingDriver2.dutyCycle = dutyCycle;
+  ESAT_MaximumPowerPointTrackingDriver1.setFixedMode(dutyCycle);
+  ESAT_MaximumPowerPointTrackingDriver2.setFixedMode(dutyCycle);
 }
 
 void ESAT_EPSClass::handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet)
@@ -154,7 +152,7 @@ void ESAT_EPSClass::handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet)
   }
 }
 
-void ESAT_EPSClass::handleSetCurrentTimeCommand(ESAT_CCSDSPacket& packet)
+void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
 {
   const ESAT_Timestamp timestamp = packet.readTimestamp();
   clock.write(timestamp);
