@@ -78,13 +78,20 @@ class ESAT_EPSClass
       MAXIMUM_POWER_POINT_TRACKING_MODE = 0x20,
       SWEEP_MODE = 0x21,
       FIXED_MODE = 0x22,
+      SEND_SELECTED_TELEMETRY_PACKET = 0x30,
     };
 
     // Telemetry packet identifiers.
     enum TelemetryPacketIdentifier
     {
       HOUSEKEEPING = 0,
+      BM_HOUSEKEEPING = 1,
     };
+
+    // It is the higher value of the following ones: if the identifiers start
+    // in 0 and they are consecutive it is the number of identifiers,
+    // otherwise is the highest value of the telemetry packet identifiers + 1.
+    static const byte NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS = 2;
 
     // EPS subsystem identifier.
     static const word APPLICATION_PROCESS_IDENTIFIER = 1;
@@ -110,66 +117,48 @@ class ESAT_EPSClass
       ESAT_CCSDSSecondaryHeader::LENGTH
       + MAXIMUM_COMMAND_PARAMETER_LENGTH;
 
-    // Size of the telemetry buffer (EPS measurements):
-    // - 3.3 V line current (2 bytes).
-    // - 3.3 V line voltage (2 bytes).
-    // - 5 V line current (2 bytes).
-    // - 5 V line voltage (2 bytes).
-    // - Input line current (2 bytes).
-    // - Input line voltage (2 bytes).
-    // - Panel 1 input current (2 bytes).
-    // - Panel 1 output current (2 bytes).
-    // - Panel 1 voltage (2 bytes).
-    // - Panel 2 input current (2 bytes).
-    // - Panel 2 output current (2 bytes).
-    // - Panel 2 voltage (2 bytes).
+    // Size of the "housekeeping" telemetry buffer:
+    // - Secondary header.              (ESAT_CCSDSSecondaryHeader::LENGTH).
+    // - EPS measurements.              3.3 V line current (2 bytes).
+    // - EPS measurements.              3.3 V line voltage (2 bytes).
+    // - EPS measurements.              5 V line current (2 bytes).
+    // - EPS measurements.              5 V line voltage (2 bytes).
+    // - EPS measurements.              Input line current (2 bytes).
+    // - EPS measurements.              Input line voltage (2 bytes).
+    // - EPS measurements.              Panel 1 input current (2 bytes).
+    // - EPS measurements.              Panel 1 output current (2 bytes).
+    // - EPS measurements.              Panel 1 voltage (2 bytes).
+    // - EPS measurements.              Panel 2 input current (2 bytes).
+    // - EPS measurements.              Panel 2 output current (2 bytes).
+    // - EPS measurements.              Panel 2 voltage (2 bytes).
+    // - Switches.                      3.3 V line switch state (1 byte).
+    // - Switches.                      5 V line switch state (1 byte).
+    // - Battery controller.            Battery current (2 bytes).
+    // - Battery controller.            Total battery voltage (2 bytes).
+    // - Battery controller.            Battery 1 voltage (2 bytes).
+    // - Battery controller.            Battery 2 voltage (2 bytes).
+    // - Battery controller.            Battery temperature (2 bytes).
+    // - Battery controller.            State of charge (1 byte).
+    // - Battery controller.            Error (1 byte).
+    // - Panel thermometers.            Panel 1 temperature (2 bytes).
+    // - Panel thermometers.            Panel 1 thermometer error (1 byte).
+    // - Panel thermometers.            Panel 2 temperature (2 bytes).
+    // - Panel thermometers.            Panel 2 thermometer error (1 byte).
+    // - Maximum power point tracking.  Driver 1 mode (1 byte).
+    // - Maximum power point tracking.  Driver 1 duty cycle (1 byte).
+    // - Maximum power point tracking.  Driver 2 mode (1 byte).
+    // - Maximum power point tracking.  Driver 2 duty cycle (1 byte).
+    // - Direct energy transfer system. Current (2 bytes).
+    // - Direct energy transfer system. Voltage (2 bytes).
+    // - Direct energy transfer system. Shunt voltage (2 bytes).
+    // - Direct energy transfer system. Error (1 byte).
     static const byte EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*12;
-
-    // Size of the telemetry buffer (switches):
-    // - 3.3 V line switch state (1 byte).
-    // - 5 V line switch state (1 byte).
     static const byte SWITCHES_TELEMETRY_BUFFER_LENGTH = 1*2;
-
-    // Size of the telemetry buffer (battery controller):
-    // - Battery current (2 bytes).
-    // - Total battery voltage (2 bytes).
-    // - Battery 1 voltage (2 bytes).
-    // - Battery 2 voltage (2 bytes).
-    // - Battery temperature (2 bytes).
-    // - State of charge (1 byte).
-    // - Error (1 byte).
     static const byte BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH = 2*5 + 1*2;
-
-    // Size of the telemetry buffer (panel thermometers):
-    // - Panel 1 temperature (2 bytes).
-    // - Panel 1 thermometer error (1 byte).
-    // - Panel 2 temperature (2 bytes).
-    // - Panel 2 thermometer error (1 byte).
     static const byte PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH = 2*2 + 1*2;
-
-    // Size of the telemetry buffer (maximum power point tracking):
-    // - Driver 1 mode (1 byte).
-    // - Driver 1 duty cycle (1 byte).
-    // - Driver 2 mode (1 byte).
-    // - Driver 2 duty cycle (1 byte).
     static const byte MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH = 1*4;
-
-    // Size of the telemetry buffer (direct energy transfer system):
-    // - Current (2 bytes).
-    // - Voltage (2 bytes).
-    // - Shunt voltage (2 bytes).
-    // - Error (1 byte).
     static const byte DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH = 2*3 + 1*1;
-
-    // Size of the telemetry packet data buffer (total):
-    // - Secondary header.
-    // - EPS measurements.
-    // - Switches.
-    // - Battery controller.
-    // - Panel thermometers.
-    // - Maximum power point tracking system.
-    // - Direct energy transfer system.
-    static const byte TELEMETRY_PACKET_DATA_LENGTH =
+    static const byte HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
       + EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
       + SWITCHES_TELEMETRY_BUFFER_LENGTH
@@ -178,19 +167,64 @@ class ESAT_EPSClass
       + MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH
       + DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH;
 
+    // Size of the "BM housekeeping"  telemetry buffer:
+    // - Secondary header.      (ESAT_CCSDSSecondaryHeader::LENGTH).
+    // - BM status registers.   Operation status (4 bytes).
+    // - BM status registers.   Charging status (4 bytes).
+    // - BM status registers.   Manufacuring status (4 bytes).
+    // - BM status registers.   Safety status (4 bytes).
+    // - BM measurements.       Battery current (2 bytes).
+    // - BM measurements.       Total battery voltage (2 bytes).
+    // - BM measurements.       Battery 1 voltage (2 bytes).
+    // - BM measurements.       Battery 2 voltage (2 bytes).
+    // - BM measurements.       Battery temperature (2 bytes).
+    // - BM measurements.       Relative state of charge (1 byte).
+    // - BM measurements.       Absolute state of charge (1 byte).
+    // - BM measurements.       Desired charging current (2 byte).
+    // - BM measurements.       Desired charging voltage (2 byte).
+    // - BM measurements.       Error (1 byte).
+    // - Battery configuration. Serial number (2 bytes).
+    // - Battery configuration. Cycle count (2 bytes).
+    // - Battery configuration. Design capacity (2 bytes).
+    // - Battery configuration. Design voltage (2 bytes).
+    // - Battery configuration. Enabled protections (4 bytes).
+    // - Battery configuration. Device configuration (1 bytes).
+    // - Battery configuration. Balancing configuration (1 bytes).
+    // - Battery configuration. COV threshold (2 bytes).
+    // - Battery configuration. COV recovery threshold (2 bytes).
+    // - Battery configuration. COV recovery delay (1 bytes).
+    // - Battery configuration. CUV threshold (2 bytes).
+    // - Battery configuration. CUV recovery threshold (2 bytes).
+    // - Battery configuration. CUV recovery delay (1 bytes).
+    // - Battery configuration. Chemical ID (2 bytes).
+    // - Battery configuration. Firmware version (11 bytes).
+    static const byte BM_STATUS_REGISTERS_TELEMETRY_BUFFER_LENGTH = 4*4;
+    static const byte BM_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*7 + 1*3;
+    static const byte BM_CONFIGURATION_TELEMETRY_BUFFER_LENGTH = 11*1+4*1+2*9+1*4;
+    static const byte BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH =
+      ESAT_CCSDSSecondaryHeader::LENGTH
+      + BM_STATUS_REGISTERS_TELEMETRY_BUFFER_LENGTH
+      + BM_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
+      + BM_CONFIGURATION_TELEMETRY_BUFFER_LENGTH;
+
+    // Telemetry with the highest packet data length
+    static const byte MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH = 
+      BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH;
+
     // Real time clock.
     // Useful for generating timestamps for telemetry packets.
     ESAT_SoftwareClock clock;
 
     // I2C packet buffers.
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
-    byte i2cTelemetryPacketData[TELEMETRY_PACKET_DATA_LENGTH];
+    byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
     // True when there is a new telemetry packet that was not
     // requested with readTelemetry():
     // - true after updateTelemetry()
     // - false after readTelemetry()
-    boolean newTelemetryPacket;
+    boolean usbPendingTelemetry[NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS];
+    boolean i2cPendingTelemetry[NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS];
 
     // Decode USB KISS frames with this stream.
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
@@ -201,7 +235,7 @@ class ESAT_EPSClass
     ESAT_CCSDSPacket telemetry;
 
     // Telemetry packet data buffer.
-    byte telemetryPacketData[TELEMETRY_PACKET_DATA_LENGTH];
+    byte telemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
     // Packet sequence count of the telemetry packets.
     // It grows by 1 every time we generate a new telemetry packet.
@@ -225,6 +259,9 @@ class ESAT_EPSClass
 
     // Set the time of the real time clock.
     void handleSetTimeCommand(ESAT_CCSDSPacket& packet);
+    
+    // Set the BM housekeeping telemetry as pending
+    void handleSendSelectedTelemetryPacket(ESAT_CCSDSPacket& packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
@@ -241,7 +278,7 @@ class ESAT_EPSClass
 
     // Update the telemetry buffer.
     // This sets newTelemetryPacket to true.
-    void updateTelemetry();
+    boolean updateTelemetry(byte ID);
 };
 
 // Global instance of the EPS library.

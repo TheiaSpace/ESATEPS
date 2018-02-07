@@ -32,10 +32,14 @@
 
 void ESAT_EPSClass::begin()
 {
-  newTelemetryPacket = false;
+  for(byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
+  {
+    usbPendingTelemetry[id] = false;
+    i2cPendingTelemetry[id] = false;
+  }
   telemetryPacketSequenceCount = 0;
   telemetry = ESAT_CCSDSPacket(telemetryPacketData,
-                               TELEMETRY_PACKET_DATA_LENGTH);
+                               MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
   usbTelecommandDecoder = ESAT_KISSStream(USB,
                                           usbTelecommandBuffer,
                                           sizeof(usbTelecommandBuffer));
@@ -55,7 +59,7 @@ void ESAT_EPSClass::begin()
                       i2cTelecommandPacketData,
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                       i2cTelemetryPacketData,
-                      TELEMETRY_PACKET_DATA_LENGTH);
+                      MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
 }
 
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
@@ -100,6 +104,9 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
       break;
     case SET_TIME:
       handleSetTimeCommand(packet);
+      break;
+    case SEND_SELECTED_TELEMETRY_PACKET:
+      handleSendSelectedTelemetryPacket(packet);
       break;
     default:
       break;
@@ -158,6 +165,25 @@ void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
   clock.write(timestamp);
 }
 
+void ESAT_EPSClass::handleSendSelectedTelemetryPacket(ESAT_CCSDSPacket& packet)
+{
+  boolean idFound = false;
+  byte receivedId = packet.readByte();
+  for (byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
+  {
+    if(id == receivedId)
+    {
+      usbPendingTelemetry[id] = true;
+      i2cPendingTelemetry[id] = true;
+      idFound = true;
+    }
+  }
+  if (!idFound)
+  {
+    ;
+  }
+}
+
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.flush();
@@ -203,19 +229,29 @@ boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
 
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
 {
-  if (!newTelemetryPacket)
+  boolean newPacket = false;
+  for (byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
+  {
+    if (usbPendingTelemetry[id])
+    {
+      newPacket = updateTelemetry(id);
+      usbPendingTelemetry[id] = false;
+      break;
+    }
+  }
+  if (!newPacket)
   {
     return false;
   }
-  newTelemetryPacket = false;
-  return telemetry.copyTo(packet);
+  telemetry.copyTo(packet);
+  return true;
 }
 
 void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
-  updateTelemetry();
   updateI2CTelemetry();
+  usbPendingTelemetry[HOUSEKEEPING] = true;
 }
 
 void ESAT_EPSClass::updateMaximumPowerPointTracking()
@@ -227,20 +263,41 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 void ESAT_EPSClass::updateI2CTelemetry()
 {
   const int packetIdentifier = ESAT_I2CSlave.requestedTelemetryPacket();
-  switch (packetIdentifier)
+  if (packetIdentifier == ESAT_I2CSlave.NO_TELEMETRY_PACKET_REQUESTED)
   {
-    case ESAT_I2CSlave.NO_TELEMETRY_PACKET_REQUESTED:
-      break;
-    case HOUSEKEEPING:
+    ;
+  }
+  else if (packetIdentifier == ESAT_I2CSlave.NEXT_TELEMETRY_PACKET_REQUESTED)
+  {
+    boolean newPacket = false;
+    for (byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
+    {
+      if (i2cPendingTelemetry[id])
+      {
+        (void) updateTelemetry((byte)id);
+        i2cPendingTelemetry[id] = false;
+        newPacket = true;
+        break;
+      }
+    }
+    if (newPacket)
+    {
       (void) ESAT_I2CSlave.writeTelemetry(telemetry);
-      break;
-    default:
+    }
+    else
+    {
       ESAT_I2CSlave.rejectTelemetryRequest();
-      break;
+      i2cPendingTelemetry[HOUSEKEEPING] = true;
+    }
+  }
+  else
+  {
+    (void) updateTelemetry((byte)packetIdentifier);
+    (void) ESAT_I2CSlave.writeTelemetry(telemetry);
   }
 }
 
-void ESAT_EPSClass::updateTelemetry()
+boolean ESAT_EPSClass::updateTelemetry(byte ID)
 {
   telemetry.flush();
   // Primary header.
@@ -265,49 +322,95 @@ void ESAT_EPSClass::updateTelemetry()
   secondaryHeader.majorVersionNumber = MAJOR_VERSION_NUMBER;
   secondaryHeader.minorVersionNumber = MINOR_VERSION_NUMBER;
   secondaryHeader.patchVersionNumber = PATCH_VERSION_NUMBER;
-  secondaryHeader.packetIdentifier = HOUSEKEEPING;
-  telemetry.writeSecondaryHeader(secondaryHeader);
-  // User data.
-  telemetry.writeWord(ESAT_EPSMeasurements.read3V3LineCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.read3V3LineVoltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.read5VLineCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.read5VLineVoltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readInputLineCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readInputLineVoltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1InputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1OutputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1Voltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2InputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2OutputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2Voltage());
-  telemetry.writeByte(ESAT_PowerLine3V3Switch.read());
-  telemetry.writeByte(ESAT_PowerLine5VSwitch.read());
-  ESAT_BatteryController.error = false;
-  telemetry.writeWord(ESAT_BatteryController.readBatteryCurrent());
-  telemetry.writeWord(ESAT_BatteryController.readTotalBatteryVoltage());
-  telemetry.writeWord(ESAT_BatteryController.readBattery1Voltage());
-  telemetry.writeWord(ESAT_BatteryController.readBattery2Voltage());
-  telemetry.writeWord(ESAT_BatteryController.readBatteryTemperature());
-  telemetry.writeByte(ESAT_BatteryController.readBatteryStateOfCharge());
-  telemetry.writeByte(ESAT_BatteryController.error);
-  ESAT_SolarPanel1Thermometer.error = false;
-  telemetry.writeWord(ESAT_SolarPanel1Thermometer.read());
-  telemetry.writeByte(ESAT_SolarPanel1Thermometer.error);
-  ESAT_SolarPanel2Thermometer.error = false;
-  telemetry.writeWord(ESAT_SolarPanel2Thermometer.read());
-  telemetry.writeByte(ESAT_SolarPanel2Thermometer.error);
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver1.getMode());
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver1.getDutyCycle());
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver2.getMode());
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver2.getDutyCycle());
-  ESAT_DirectEnergyTransferSystem.error = false;
-  telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readCurrent());
-  telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readVoltage());
-  telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readShuntVoltage());
-  telemetry.writeByte(ESAT_DirectEnergyTransferSystem.error);
-  // End of user data
+  switch(ID)
+  {
+    case HOUSEKEEPING:
+      secondaryHeader.packetIdentifier = HOUSEKEEPING;
+      telemetry.writeSecondaryHeader(secondaryHeader);
+      // User data.
+      telemetry.writeWord(ESAT_EPSMeasurements.read3V3LineCurrent());
+      telemetry.writeWord(ESAT_EPSMeasurements.read3V3LineVoltage());
+      telemetry.writeWord(ESAT_EPSMeasurements.read5VLineCurrent());
+      telemetry.writeWord(ESAT_EPSMeasurements.read5VLineVoltage());
+      telemetry.writeWord(ESAT_EPSMeasurements.readInputLineCurrent());
+      telemetry.writeWord(ESAT_EPSMeasurements.readInputLineVoltage());
+      telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1InputCurrent());
+      telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1OutputCurrent());
+      telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1Voltage());
+      telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2InputCurrent());
+      telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2OutputCurrent());
+      telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2Voltage());
+      telemetry.writeByte(ESAT_PowerLine3V3Switch.read());
+      telemetry.writeByte(ESAT_PowerLine5VSwitch.read());
+      ESAT_BatteryController.error = false;
+      telemetry.writeWord(ESAT_BatteryController.readBatteryCurrent());
+      telemetry.writeWord(ESAT_BatteryController.readTotalBatteryVoltage());
+      telemetry.writeWord(ESAT_BatteryController.readBattery1Voltage());
+      telemetry.writeWord(ESAT_BatteryController.readBattery2Voltage());
+      telemetry.writeWord(ESAT_BatteryController.readBatteryTemperature());
+      telemetry.writeByte(ESAT_BatteryController.readRelativeStateOfCharge());
+      telemetry.writeByte(ESAT_BatteryController.error);
+      ESAT_SolarPanel1Thermometer.error = false;
+      telemetry.writeWord(ESAT_SolarPanel1Thermometer.read());
+      telemetry.writeByte(ESAT_SolarPanel1Thermometer.error);
+      ESAT_SolarPanel2Thermometer.error = false;
+      telemetry.writeWord(ESAT_SolarPanel2Thermometer.read());
+      telemetry.writeByte(ESAT_SolarPanel2Thermometer.error);
+      telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver1.getMode());
+      telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver1.getDutyCycle());
+      telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver2.getMode());
+      telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver2.getDutyCycle());
+      ESAT_DirectEnergyTransferSystem.error = false;
+      telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readCurrent());
+      telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readVoltage());
+      telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readShuntVoltage());
+      telemetry.writeByte(ESAT_DirectEnergyTransferSystem.error);
+      break;
+    case BM_HOUSEKEEPING:
+      secondaryHeader.packetIdentifier = BM_HOUSEKEEPING;
+      telemetry.writeSecondaryHeader(secondaryHeader);
+      // User data.
+      telemetry.writeUnsignedLong(ESAT_BatteryController.readOperationStatus());
+      telemetry.writeUnsignedLong(ESAT_BatteryController.readChargingStatus());
+      telemetry.writeUnsignedLong(ESAT_BatteryController.readManufacturingStatus());
+      telemetry.writeUnsignedLong(ESAT_BatteryController.readSafetyStatus());
+      telemetry.writeWord(ESAT_BatteryController.readBatteryCurrent());
+      telemetry.writeWord(ESAT_BatteryController.readTotalBatteryVoltage());
+      telemetry.writeWord(ESAT_BatteryController.readBattery1Voltage());
+      telemetry.writeWord(ESAT_BatteryController.readBattery2Voltage());
+      telemetry.writeWord(ESAT_BatteryController.readBatteryTemperature());
+      telemetry.writeByte(ESAT_BatteryController.readRelativeStateOfCharge());
+      telemetry.writeByte(ESAT_BatteryController.readAbsoluteStateOfCharge());
+      telemetry.writeWord(ESAT_BatteryController.readDesiredChargingCurrent());
+      telemetry.writeWord(ESAT_BatteryController.readDesiredChargingVoltage());
+      telemetry.writeByte(ESAT_BatteryController.error);
+      telemetry.writeWord(ESAT_BatteryController.readSerialNumber());
+      telemetry.writeWord(ESAT_BatteryController.readCycleCount());
+      telemetry.writeWord(ESAT_BatteryController.readDesignCapacity());
+      telemetry.writeWord(ESAT_BatteryController.readDesignVoltage());
+      telemetry.writeUnsignedLong(ESAT_BatteryController.readEnabledProtections());
+      telemetry.writeByte(ESAT_BatteryController.readDeviceConfiguration());
+      telemetry.writeByte(ESAT_BatteryController.readBalancingConfiguration());
+      telemetry.writeWord(ESAT_BatteryController.readCellUndervoltageThreshold());
+      telemetry.writeByte(ESAT_BatteryController.readCellUndervoltageRecoveryDelay());
+      telemetry.writeWord(ESAT_BatteryController.readCellUndervoltageRecoveryThreshold());
+      telemetry.writeWord(ESAT_BatteryController.readCellOvervoltageThreshold());
+      telemetry.writeByte(ESAT_BatteryController.readCellOvervoltageRecoveryDelay());
+      telemetry.writeWord(ESAT_BatteryController.readCellOvervoltageRecoveryThreshold());
+      telemetry.writeWord(ESAT_BatteryController.readChemicalID());
+      byte BMFirmwareVersion[ESAT_BatteryController.BM_FIRMWARE_VERSION_LENGTH];
+      ESAT_BatteryController.readFirmwareVersion(BMFirmwareVersion);
+      for(byte index = 0;
+        index < ESAT_BatteryController.BM_FIRMWARE_VERSION_LENGTH; index++)
+      {
+        telemetry.writeByte(BMFirmwareVersion[index]);
+      }
+      break;
+    default:
+      return false;
+  }
   telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
-  newTelemetryPacket = true;
+  return true;
 }
 
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
