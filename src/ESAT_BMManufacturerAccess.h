@@ -142,7 +142,7 @@ class ESAT_BMManufacturerAccessClass
                                                - TM_FOOTER_LENGTH;
 
     // CRC used in the writeFrame method to append a CRC byte to the I2C frame.
-    ESAT_CRC8Class CRC;
+    ESAT_CRC8 CRC;
 
     // SM Bus CRC polinomial (x8+x2+x+1)
     static const byte CRC_POLYNOMIAL = 0b00000111;
