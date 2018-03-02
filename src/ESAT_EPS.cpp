@@ -110,6 +110,9 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
     case ACTIVATE_TELEMETRY_DELIVERY:
       handleActivateTelemetryDelivery(packet);
       break;
+    case DEACTIVATE_TELEMETRY_DELIVERY:
+      handleDeactivateTelemetryDelivery(packet);
+      break;
     default:
       break;
   }
@@ -169,11 +172,19 @@ void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
 
 void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
-  boolean idFound = false;
   byte receivedId = packet.readByte();
   if(AvailableTelemetry.read(receivedId))
   {
     ActiveTelemetry.write(receivedId, true);
+  }
+}
+
+void ESAT_EPSClass::handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
+{
+  byte receivedId = packet.readByte();
+  if(AvailableTelemetry.read(receivedId))
+  {
+    ActiveTelemetry.write(receivedId, false);
   }
 }
 

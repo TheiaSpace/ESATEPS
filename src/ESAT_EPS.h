@@ -262,6 +262,9 @@ class ESAT_EPSClass
     // Set the BM housekeeping telemetry as pending
     void handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
 
+    // Set the BM housekeeping telemetry as pending
+    void handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
+
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
 
