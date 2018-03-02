@@ -23,6 +23,7 @@
 #include <ESAT_CCSDSPacket.h>
 #include <ESAT_KISSStream.h>
 #include <ESAT_SoftwareClock.h>
+#include <ESAT_FlagContainer.h>
 
 // Library with the functionality of the Electrical Power Subsystem
 // (EPS) board.  Use the global instance EPS.
@@ -78,7 +79,8 @@ class ESAT_EPSClass
       MAXIMUM_POWER_POINT_TRACKING_MODE = 0x20,
       SWEEP_MODE = 0x21,
       FIXED_MODE = 0x22,
-      SEND_SELECTED_TELEMETRY_PACKET = 0x30,
+      ACTIVATE_TELEMETRY_DELIVERY = 0x30,
+      DEACTIVATE_TELEMETRY_DELIVERY = 0x31,
     };
 
     // Telemetry packet identifiers.
@@ -223,8 +225,10 @@ class ESAT_EPSClass
     // requested with readTelemetry():
     // - true after updateTelemetry()
     // - false after readTelemetry()
-    boolean usbPendingTelemetry[NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS];
-    boolean i2cPendingTelemetry[NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS];
+    ESAT_FlagContainer UsbPendingTelemetry;
+    ESAT_FlagContainer I2cPendingTelemetry;
+    ESAT_FlagContainer ActiveTelemetry;
+    ESAT_FlagContainer AvailableTelemetry;
 
     // Decode USB KISS frames with this stream.
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
@@ -261,7 +265,7 @@ class ESAT_EPSClass
     void handleSetTimeCommand(ESAT_CCSDSPacket& packet);
     
     // Set the BM housekeeping telemetry as pending
-    void handleSendSelectedTelemetryPacket(ESAT_CCSDSPacket& packet);
+    void handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();

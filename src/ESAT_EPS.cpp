@@ -32,11 +32,13 @@
 
 void ESAT_EPSClass::begin()
 {
-  for(byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
-  {
-    usbPendingTelemetry[id] = false;
-    i2cPendingTelemetry[id] = false;
-  }
+  AvailableTelemetry.clear();
+  AvailableTelemetry.write(HOUSEKEEPING,true);
+  AvailableTelemetry.write(BM_HOUSEKEEPING,true);
+  ActiveTelemetry.clear();
+  ActiveTelemetry.write(HOUSEKEEPING,true);
+  UsbPendingTelemetry.clear();
+  I2cPendingTelemetry.clear();
   telemetryPacketSequenceCount = 0;
   telemetry = ESAT_CCSDSPacket(telemetryPacketData,
                                MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
@@ -105,8 +107,8 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
     case SET_TIME:
       handleSetTimeCommand(packet);
       break;
-    case SEND_SELECTED_TELEMETRY_PACKET:
-      handleSendSelectedTelemetryPacket(packet);
+    case ACTIVATE_TELEMETRY_DELIVERY:
+      handleActivateTelemetryDelivery(packet);
       break;
     default:
       break;
@@ -165,22 +167,13 @@ void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
   clock.write(timestamp);
 }
 
-void ESAT_EPSClass::handleSendSelectedTelemetryPacket(ESAT_CCSDSPacket& packet)
+void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
   boolean idFound = false;
   byte receivedId = packet.readByte();
-  for (byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
+  if(AvailableTelemetry.read(receivedId))
   {
-    if(id == receivedId)
-    {
-      usbPendingTelemetry[id] = true;
-      i2cPendingTelemetry[id] = true;
-      idFound = true;
-    }
-  }
-  if (!idFound)
-  {
-    ;
+    ActiveTelemetry.write(receivedId, true);
   }
 }
 
@@ -230,14 +223,11 @@ boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
 {
   boolean newPacket = false;
-  for (byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
+  int id = UsbPendingTelemetry.readNext();
+  if(id >= 0)
   {
-    if (usbPendingTelemetry[id])
-    {
-      newPacket = updateTelemetry(id);
-      usbPendingTelemetry[id] = false;
-      break;
-    }
+    newPacket = updateTelemetry((byte)id);
+    UsbPendingTelemetry.write((byte)id,false);
   }
   if (!newPacket)
   {
@@ -251,7 +241,7 @@ void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
   updateI2CTelemetry();
-  usbPendingTelemetry[HOUSEKEEPING] = true;
+  UsbPendingTelemetry.copyFrom(ActiveTelemetry);
 }
 
 void ESAT_EPSClass::updateMaximumPowerPointTracking()
@@ -270,15 +260,12 @@ void ESAT_EPSClass::updateI2CTelemetry()
   else if (packetIdentifier == ESAT_I2CSlave.NEXT_TELEMETRY_PACKET_REQUESTED)
   {
     boolean newPacket = false;
-    for (byte id = 0; id < NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS; id++)
+    int id = I2cPendingTelemetry.readNext();
+    if (id >= 0)
     {
-      if (i2cPendingTelemetry[id])
-      {
-        (void) updateTelemetry((byte)id);
-        i2cPendingTelemetry[id] = false;
-        newPacket = true;
-        break;
-      }
+      (void) updateTelemetry((byte)id);
+      I2cPendingTelemetry.write((byte)id, false);
+      newPacket = true;
     }
     if (newPacket)
     {
@@ -287,7 +274,7 @@ void ESAT_EPSClass::updateI2CTelemetry()
     else
     {
       ESAT_I2CSlave.rejectTelemetryRequest();
-      i2cPendingTelemetry[HOUSEKEEPING] = true;
+      I2cPendingTelemetry.copyFrom(ActiveTelemetry);
     }
   }
   else
