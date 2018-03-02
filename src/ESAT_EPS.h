@@ -90,11 +90,6 @@ class ESAT_EPSClass
       BM_HOUSEKEEPING = 1,
     };
 
-    // It is the higher value of the following ones: if the identifiers start
-    // in 0 and they are consecutive it is the number of identifiers,
-    // otherwise is the highest value of the telemetry packet identifiers + 1.
-    static const byte NUMBER_OF_TELEMETRY_PACKET_IDENTIFIERS = 2;
-
     // EPS subsystem identifier.
     static const word APPLICATION_PROCESS_IDENTIFIER = 1;
 
