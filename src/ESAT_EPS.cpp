@@ -377,13 +377,14 @@ boolean ESAT_EPSClass::updateTelemetry(byte ID)
       telemetry.writeWord(ESAT_BatteryController.readBattery1Voltage());
       telemetry.writeWord(ESAT_BatteryController.readBattery2Voltage());
       telemetry.writeWord(ESAT_BatteryController.readBatteryTemperature());
+      telemetry.writeWord(ESAT_BatteryController.readMicrocontrollerTemperature());
       telemetry.writeByte(ESAT_BatteryController.readRelativeStateOfCharge());
       telemetry.writeByte(ESAT_BatteryController.readAbsoluteStateOfCharge());
       telemetry.writeWord(ESAT_BatteryController.readDesiredChargingCurrent());
       telemetry.writeWord(ESAT_BatteryController.readDesiredChargingVoltage());
+      telemetry.writeWord(ESAT_BatteryController.readCycleCount());
       telemetry.writeByte(ESAT_BatteryController.error);
       telemetry.writeWord(ESAT_BatteryController.readSerialNumber());
-      telemetry.writeWord(ESAT_BatteryController.readCycleCount());
       telemetry.writeWord(ESAT_BatteryController.readDesignCapacity());
       telemetry.writeWord(ESAT_BatteryController.readDesignVoltage());
       telemetry.writeUnsignedLong(ESAT_BatteryController.readEnabledProtections());

@@ -133,6 +133,10 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     unsigned long readManufacturingStatus();
 
+    // Read the microcontroller temperature.
+    // Set the error flag on error.
+    word readMicrocontrollerTemperature();
+
     // Read the operation status.
     // Set the error flag on error.
     unsigned long readOperationStatus();
@@ -188,6 +192,7 @@ class ESAT_BatteryControllerClass
     static const word ENABLED_PROTECTIONS_REGISTER = 0x4845;
     static const word FIRMWARE_VERSION_REGISTER = 0x0002;
     static const word MANUFACTURING_STATUS_REGISTER = 0x57;
+    static const word MICROCONTROLLER_TEMPERATURE_REGISTER = 0x72;
     static const word OPERATION_STATUS_REGISTER = 0x54;
     static const word RELATIVE_STATE_OF_CHARGE_REGISTER = 0x0D;
     static const word SAFETY_STATUS_REGISTER = 0x51;

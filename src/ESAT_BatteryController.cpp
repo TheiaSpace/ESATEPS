@@ -240,6 +240,11 @@ unsigned long ESAT_BatteryControllerClass::readManufacturingStatus()
   return readUnsignedLong(MANUFACTURING_STATUS_REGISTER, BLOCK_PROTOCOL);
 }
 
+word ESAT_BatteryControllerClass::readMicrocontrollerTemperature()
+{
+  return readWord(MICROCONTROLLER_TEMPERATURE_REGISTER, WORD_PROTOCOL);
+}
+
 unsigned long ESAT_BatteryControllerClass::readOperationStatus()
 {
   return readUnsignedLong(OPERATION_STATUS_REGISTER, BLOCK_PROTOCOL);

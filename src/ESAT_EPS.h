@@ -175,6 +175,7 @@ class ESAT_EPSClass
     // - BM measurements.       Battery 1 voltage (2 bytes).
     // - BM measurements.       Battery 2 voltage (2 bytes).
     // - BM measurements.       Battery temperature (2 bytes).
+    // - BM measurements.       Microcontroller temperature (2 bytes).
     // - BM measurements.       Relative state of charge (1 byte).
     // - BM measurements.       Absolute state of charge (1 byte).
     // - BM measurements.       Desired charging current (2 byte).
@@ -196,7 +197,7 @@ class ESAT_EPSClass
     // - Battery configuration. Chemical ID (2 bytes).
     // - Battery configuration. Firmware version (11 bytes).
     static const byte BM_STATUS_REGISTERS_TELEMETRY_BUFFER_LENGTH = 4*4;
-    static const byte BM_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*7 + 1*3;
+    static const byte BM_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*8 + 1*3;
     static const byte BM_CONFIGURATION_TELEMETRY_BUFFER_LENGTH = 11*1+4*1+2*9+1*4;
     static const byte BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
