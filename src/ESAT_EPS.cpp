@@ -252,7 +252,7 @@ void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
   updateI2CTelemetry();
-  UsbPendingTelemetry.copyFrom(ActiveTelemetry);
+  UsbPendingTelemetry = ActiveTelemetry;
 }
 
 void ESAT_EPSClass::updateMaximumPowerPointTracking()
@@ -285,7 +285,7 @@ void ESAT_EPSClass::updateI2CTelemetry()
     else
     {
       ESAT_I2CSlave.rejectTelemetryRequest();
-      I2cPendingTelemetry.copyFrom(ActiveTelemetry);
+      I2cPendingTelemetry = ActiveTelemetry;
     }
   }
   else
