@@ -217,14 +217,17 @@ class ESAT_EPSClass
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
-    // True when there is a new telemetry packet that was not
-    // requested with readTelemetry():
-    // - true after updateTelemetry()
-    // - false after readTelemetry()
+    // List of all the telemetry IDs that can be delivered.
+    ESAT_FlagContainer AvailableTelemetry;
+
+    // List of the telemetry IDs that have to be delivered every cycle.
+    ESAT_FlagContainer ActiveTelemetry;
+
+    // List of the telemetry IDs that are pending to be delivered in the current 
+    // cycle. There is one for the telemetry sent through the USB bus and 
+    // another one for the telemetry sent through the I2C bus.
     ESAT_FlagContainer UsbPendingTelemetry;
     ESAT_FlagContainer I2cPendingTelemetry;
-    ESAT_FlagContainer ActiveTelemetry;
-    ESAT_FlagContainer AvailableTelemetry;
 
     // Decode USB KISS frames with this stream.
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
