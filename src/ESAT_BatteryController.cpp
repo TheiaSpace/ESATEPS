@@ -42,6 +42,7 @@ void ESAT_BatteryControllerClass::read(word registerAddress, byte byteArray[], b
       Wire1.beginTransmission(ADDRESS);
       Wire1.write((byte)registerAddress);
       writeStatus = Wire1.endTransmission();
+      delay(DELAY_MILLIS);
       if (writeStatus != 0)
       {
         error = true;
@@ -49,6 +50,7 @@ void ESAT_BatteryControllerClass::read(word registerAddress, byte byteArray[], b
       }
       // In the block protocol, the first sent byte is the parameter size
       bytesRead = Wire1.requestFrom((byte)ADDRESS, (byte)(1 + byteArraySize));
+      delay(DELAY_MILLIS);
       if (bytesRead != 1 + byteArraySize)
       {
         error = true;
@@ -75,12 +77,14 @@ void ESAT_BatteryControllerClass::read(word registerAddress, byte byteArray[], b
       Wire1.beginTransmission(ADDRESS);
       Wire1.write((byte)registerAddress);
       writeStatus = Wire1.endTransmission();
+      delay(DELAY_MILLIS);
       if (writeStatus != 0)
       {
         error = true;
         return;
       }
       bytesRead = Wire1.requestFrom((byte)ADDRESS, byteArraySize);
+      delay(DELAY_MILLIS);
       if (bytesRead != byteArraySize)
       {
         error = true;

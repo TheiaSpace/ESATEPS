@@ -205,6 +205,9 @@ class ESAT_BatteryControllerClass
     // would just waste processor time for no real benefit.
     static const unsigned long PERIOD = 1000;
 
+    // milliseconds waited after any communication.
+    static const byte DELAY_MILLIS = 2;
+
     // Latest readings.
     word battery1Voltage;
     word battery2Voltage;
