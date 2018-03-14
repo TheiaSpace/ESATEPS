@@ -216,12 +216,12 @@ word ESAT_BatteryControllerClass::readDesignVoltage()
 
 word ESAT_BatteryControllerClass::readDesiredChargingCurrent()
 {
-  return readWord(DESIRED_CHARGING_CURRENT_REGISTER, WORD_PROTOCOL);
+  return readWord(DESIRED_CHARGING_CURRENT_REGISTER, MANUFACTURER_PROTOCOL);
 }
 
 word ESAT_BatteryControllerClass::readDesiredChargingVoltage()
 {
-  return readWord(DESIRED_CHARGING_VOLTAGE_REGISTER, WORD_PROTOCOL);
+  return readWord(DESIRED_CHARGING_VOLTAGE_REGISTER, MANUFACTURER_PROTOCOL);
 }
 
 byte ESAT_BatteryControllerClass::readDeviceConfiguration()
@@ -246,7 +246,7 @@ unsigned long ESAT_BatteryControllerClass::readManufacturingStatus()
 
 word ESAT_BatteryControllerClass::readMicrocontrollerTemperature()
 {
-  return readWord(MICROCONTROLLER_TEMPERATURE_REGISTER, WORD_PROTOCOL);
+  return readWord(MICROCONTROLLER_TEMPERATURE_REGISTER, MANUFACTURER_PROTOCOL);
 }
 
 unsigned long ESAT_BatteryControllerClass::readOperationStatus()
