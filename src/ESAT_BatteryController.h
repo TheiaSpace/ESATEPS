@@ -20,7 +20,7 @@
 #define ESAT_BatteryController_h
 
 #include <Arduino.h>
-#include <ESAT_BMManufacturerAccess.h>
+#include <ESAT_CRC8.h>
 
 // An interface with the battery controller.
 // Use the global instance ESAT_BatteryController.
@@ -40,13 +40,10 @@ class ESAT_BatteryControllerClass
     // Instantiate a battery controller library.
     ESAT_BatteryControllerClass();
 
-    // Read the absolute state of charge.
-    // Set the error flag on error.
-    byte readAbsoluteStateOfCharge();
-
     // Read the battery balancing configuration.
     // Set the error flag on error.
     byte readBalancingConfiguration();
+
 
     // Read the voltage of battery number 1.
     // Set the error flag on error.
@@ -56,9 +53,17 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readBattery2Voltage();
 
+    // Read the absolute state of charge.
+    // Set the error flag on error.
+    byte readBatteryAbsoluteStateOfCharge();
+
     // Read the current flowing through the batteries.
     // Set the error flag on error.
     word readBatteryCurrent();
+
+    // Read the state of charge.
+    // Set the error flag on error.
+    byte readBatteryRelativeStateOfCharge();
 
     // Read the temperature of the batteries.
     // Set the error flag on error.
@@ -141,10 +146,6 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     unsigned long readOperationStatus();
 
-    // Read the state of charge.
-    // Set the error flag on error.
-    byte readRelativeStateOfCharge();
-
     // Read the safety status.
     // Set the error flag on error.
     unsigned long readSafetyStatus();
@@ -156,6 +157,33 @@ class ESAT_BatteryControllerClass
     // Read the total battery voltage.
     // Set the error flag on error.
     word readTotalBatteryVoltage();
+    
+
+    // This method must be called after finishing the read/write operations.
+    // It seals the MCU.
+    // Return STATUS_SUCCESS when the MCU is successfully sealed, otherwise
+    // return STATUS_FAIL.
+    byte seal();
+
+    // This method must be called before the read/write operations.
+    // It unseals the MCU.
+    // Return STATUS_SUCCESS when the MCU is successfully unsealed, otherwise
+    // return STATUS_FAIL.
+    byte unseal();
+
+    // Write the dataMemory array in the MCU data flash starting in the
+    // given dataMemoryAddress. It uses the "alternate manufacturer access"
+    // and the CRC checksum.
+    // Return STATUS_SUCCESS when the communcation with the MCU was successful,
+    // otherwise return STATUS_FAIL.
+    byte write(word dataMemoryAddress, byte dataMemory[], byte dataMemoryLength);
+
+    // Write the data memory address using the "alternate manufacturer access"
+    // and the CRC checksum. It is used when the data memory address is
+    // actually a command.
+    // Return STATUS_SUCCESS when the communcation with the MCU was successful,
+    // otherwise return STATUS_FAIL.
+    byte write(word dataMemoryAddress);
 
     enum Protocol
     {
@@ -167,6 +195,26 @@ class ESAT_BatteryControllerClass
   private:
     // I2C address of the battery controller.
     static const byte ADDRESS = 0x0B;
+
+    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
+
+    // length of the buffer used to comunicate with the BM.
+    static const byte BM_COMM_BUFFER = 16;
+
+    // SBS command used to access to the MCU data flash.
+    static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_ID = 0x44;
+
+    // The operation status register is used to read the current security mode.
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_MASK        = (unsigned long)0B11 << 8;
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_SEALED      = (unsigned long)0B11 << 8;
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_UNSEALED    = (unsigned long)0B10 << 8;
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS = (unsigned long)0B01 << 8;
+
+    enum CRCCommand
+    {
+      APPEND_CRC_BYTE,
+      DO_NOT_APPEND_CRC_BYTE
+    };
 
     // Registers.
     static const word ABSOLUTE_STATE_OF_CHARGE_REGISTER = 0x0E;
@@ -196,8 +244,10 @@ class ESAT_BatteryControllerClass
     static const word OPERATION_STATUS_REGISTER = 0x54;
     static const word RELATIVE_STATE_OF_CHARGE_REGISTER = 0x0D;
     static const word SAFETY_STATUS_REGISTER = 0x51;
+    static const word SEAL_REGISTER = 0x0030;
     static const word SERIAL_NUMBER_REGISTER = 0x1C;
     static const word TOTAL_BATTERY_VOLTAGE_REGISTER = 0x09;
+    static constexpr word UNSEAL_REGISTERS[2] = {0x0414, 0x3672};
 
     // Readings may update up to once every PERIOD milliseconds.
     // The EPS cycle isn't fast enough to capture fast transients, and
@@ -209,22 +259,86 @@ class ESAT_BatteryControllerClass
     static const byte DELAY_MILLIS = 2;
 
     // Latest readings.
+    byte balancingConfiguration;
     word battery1Voltage;
     word battery2Voltage;
+    byte batteryAbsoluteStateOfCharge;
     word batteryCurrent;
+    byte batteryRelativeStateOfCharge;
     word batteryTemperature;
-    byte batteryStateOfCharge;
+    byte cellOvervoltageRecoveryDelay;
+    word cellOvervoltageRecoveryThreshold;
+    word cellOvervoltageThreshold;
+    byte cellUndervoltageRecoveryDelay;
+    word cellUndervoltageRecoveryThreshold;
+    word cellUndervoltageThreshold;
+    unsigned long chargingStatus;
+    word chemicalId;
+    word cycleCount;
+    word designCapacity;
+    word designVoltage;
+    word desiredChargingCurrent;
+    word desiredChargingVoltage;
+    byte deviceConfiguration;
+    unsigned long enabledProtections;
+    byte firmwareVersion[BM_FIRMWARE_VERSION_LENGTH];
+    unsigned long manufacturingStatus;
+    word microcontrollerTemperature;
+    unsigned long operationStatus;
+    unsigned long safetyStatus;
+    word serialNumber;
     word totalBatteryVoltage;
 
     // True after a read error on the latest readAll() actual read
     // operation; false otherwise.
     boolean previousError;
-    
-    // Manufacturer access handler
-    ESAT_BMManufacturerAccessClass BMManufacturerAccess;
 
     // System uptime at the previous readings.
     unsigned long previousReadingTime;
+
+    // TC packet definition
+    // 1. TC header.
+    //      "command ID" field (1 byte).
+    //      "Packet data length" field (1 byte).
+    // 2. Packet data field.
+    //      "memory address" field (2 bytes).
+    //      "user data" fields (variable).
+    // 3. TC footer.
+    //      "CRC8 checksum" field (1 byte).
+    static const byte TC_HEADER_LENGTH = 2;
+    static const byte TC_MEMORY_ADDRESS_FIELD_LENGTH = MEMORY_ADDRESS_FIELD_LENGTH;
+    static const byte TC_FOOTER_LENGTH = 1;
+    static const byte TC_USER_DATA_MAX_LENGTH = BM_COMM_BUFFER
+                                               - TC_HEADER_LENGTH
+                                               - TC_MEMORY_ADDRESS_FIELD_LENGTH
+                                               - TC_FOOTER_LENGTH;
+
+    // TM packet definition
+    // 1. TM header.
+    //      "Packet data length" field (1 byte).
+    // 2. Packet data field.
+    //      "memory address" field (2 bytes).
+    //      "user data" fields (variable).
+    // 3. TM footer.
+    //      "CRC8 checksum" field (1 byte).
+    // The telemetry length depends on the telemetry type, you cannot specify
+    // it, if it is higher than BM_COMM_BUFFER, something that usually happens,
+    // you cannot read the CRC byte. In this case you are loosing the last byte,
+    // which is actually part of the user data. To keep it simple, we just deal
+    // with it. We do not check the CRC but we do not use it as user data.
+    static const byte TM_HEADER_LENGTH = 1;
+    static const byte TM_MEMORY_ADDRESS_FIELD_LENGTH = MEMORY_ADDRESS_FIELD_LENGTH;
+    static const byte TM_FOOTER_LENGTH = 1;
+    static const byte TM_USER_DATA_MAX_LENGTH =BM_COMM_BUFFER
+                                               - TM_HEADER_LENGTH
+                                               - TM_MEMORY_ADDRESS_FIELD_LENGTH
+                                               - TM_FOOTER_LENGTH;
+
+    // CRC used in the writeFrame method to append a CRC byte to the I2C frame.
+    ESAT_CRC8 CRC;
+
+    // SM Bus CRC polinomial (x8+x2+x+1)
+    static const byte CRC_POLYNOMIAL = 0b00000111;
 
     // If more than PERIOD milliseconds have ellapsed since
     // previousReadingTime, update all readings, set the error flag on
@@ -247,6 +361,30 @@ class ESAT_BatteryControllerClass
     // Read from "registerAddress" "contentSize" bytes and stores it in "content".
     // Set the error flag on error.
     void read(word registerAddress, byte content[], byte contentSize, Protocol theProtocol);
+
+    // 
+    void readWithBlockProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
+
+    // 
+    void readWithManufacturerProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
+
+    // 
+    void readWithWordProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
+
+    // It received the frame to send without the CRC byte.
+    // It calculates the CRC and appends it to the frame when requested
+    // with "command".
+    // Return STATUS_SUCCESS when the communcation with the MCU was successful,
+    // otherwise return STATUS_FAIL.
+    byte writeFrame(byte frame[],byte frameLength, CRCCommand command);
+
+    // Return STATUS_SUCCESS when the communication is successfully done,
+    // otherwise return STATUS_FAIL.
+    byte writeSealRegister();
+
+    // Return STATUS_SUCCESS when the communication is successfully done,
+    // otherwise return STATUS_FAIL.
+    byte writeUnsealRegister();
 };
 
 // Global instance of the battery controller library.
