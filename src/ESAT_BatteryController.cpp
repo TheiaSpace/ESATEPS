@@ -527,7 +527,7 @@ byte ESAT_BatteryControllerClass::writeFrame(byte frame[],
 
 
 
-byte ESAT_BMManufacturerAccessClass::seal()
+byte ESAT_BatteryControllerClass::seal()
 {
   if(writeSealRegister() == STATUS_FAIL)
   {
@@ -545,7 +545,7 @@ byte ESAT_BMManufacturerAccessClass::seal()
   }
 }
 
-byte ESAT_BMManufacturerAccessClass::unseal()
+byte ESAT_BatteryControllerClass::unseal()
 {
   if(writeUnsealRegister() == STATUS_FAIL)
   {
@@ -564,12 +564,12 @@ byte ESAT_BMManufacturerAccessClass::unseal()
   }
 }
 
-byte ESAT_BMManufacturerAccessClass::writeSealRegister()
+byte ESAT_BatteryControllerClass::writeSealRegister()
 {
   return write(SEAL_REGISTER);
 }
 
-byte ESAT_BMManufacturerAccessClass::writeUnsealRegister()
+byte ESAT_BatteryControllerClass::writeUnsealRegister()
 {
   byte theStatus;
   for(byte indx = 0; indx < (sizeof(UNSEAL_REGISTERS)/2); indx++)

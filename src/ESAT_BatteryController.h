@@ -215,6 +215,12 @@ class ESAT_BatteryControllerClass
       APPEND_CRC_BYTE,
       DO_NOT_APPEND_CRC_BYTE
     };
+    
+    enum statusValue
+    {
+      STATUS_SUCCESS = 0,
+      STATUS_FAIL = 1
+    };
 
     // Registers.
     static const word ABSOLUTE_STATE_OF_CHARGE_REGISTER = 0x0E;
