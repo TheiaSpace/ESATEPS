@@ -21,6 +21,7 @@
 
 #include <Arduino.h>
 #include <ESAT_CRC8.h>
+#include <Wire.h>
 
 // An interface with the battery controller.
 // Use the global instance ESAT_BatteryController.
@@ -31,6 +32,13 @@
 class ESAT_BatteryControllerClass
 {
   public:
+    enum Protocol
+    {
+      BLOCK_PROTOCOL,
+      MANUFACTURER_PROTOCOL,
+      WORD_PROTOCOL,
+    };
+
     // True after a read error.  Must be reset manually.
     boolean error;
 
@@ -40,10 +48,15 @@ class ESAT_BatteryControllerClass
     // Instantiate a battery controller library.
     ESAT_BatteryControllerClass();
 
+    // Read from "registerAddress" "contentSize" bytes and stores it in "content".
+    // The protocol has to be selected among: BLOCK_PROTOCOL,
+    // MANUFACTURER_PROTOCOL and WORD_PROTOCOL.
+    // Set the error flag on error.
+    void read(word registerAddress, byte content[], byte contentSize, Protocol theProtocol);
+
     // Read the battery balancing configuration.
     // Set the error flag on error.
     byte readBalancingConfiguration();
-
 
     // Read the voltage of battery number 1.
     // Set the error flag on error.
@@ -157,15 +170,14 @@ class ESAT_BatteryControllerClass
     // Read the total battery voltage.
     // Set the error flag on error.
     word readTotalBatteryVoltage();
-    
 
-    // This method must be called after finishing the read/write operations.
+    // This method must be called after finishing the write operations.
     // It seals the MCU.
     // Return STATUS_SUCCESS when the MCU is successfully sealed, otherwise
     // return STATUS_FAIL.
     byte seal();
 
-    // This method must be called before the read/write operations.
+    // This method must be called before the write operations.
     // It unseals the MCU.
     // Return STATUS_SUCCESS when the MCU is successfully unsealed, otherwise
     // return STATUS_FAIL.
@@ -185,21 +197,18 @@ class ESAT_BatteryControllerClass
     // otherwise return STATUS_FAIL.
     byte write(word dataMemoryAddress);
 
-    enum Protocol
-    {
-      BLOCK_PROTOCOL,
-      MANUFACTURER_PROTOCOL,
-      WORD_PROTOCOL,
-    };
-
   private:
     // I2C address of the battery controller.
     static const byte ADDRESS = 0x0B;
 
-    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
+    // length of the buffer used to comunicate with the BM. It is get from Wire.h.
+    static const byte BM_COMM_BUFFER = BUFFER_LENGTH;
 
-    // length of the buffer used to comunicate with the BM.
-    static const byte BM_COMM_BUFFER = 16;
+    // SM Bus CRC polinomial (x8+x2+x+1)
+    static const byte CRC_POLYNOMIAL = 0b00000111;
+
+    // CRC used in the writeFrame method to append a CRC byte to the I2C frame.
+    ESAT_CRC8 CRC;
 
     // SBS command used to access to the MCU data flash.
     static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_ID = 0x44;
@@ -302,6 +311,8 @@ class ESAT_BatteryControllerClass
     // System uptime at the previous readings.
     unsigned long previousReadingTime;
 
+    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
+
     // TC packet definition
     // 1. TC header.
     //      "command ID" field (1 byte).
@@ -340,12 +351,6 @@ class ESAT_BatteryControllerClass
                                                - TM_MEMORY_ADDRESS_FIELD_LENGTH
                                                - TM_FOOTER_LENGTH;
 
-    // CRC used in the writeFrame method to append a CRC byte to the I2C frame.
-    ESAT_CRC8 CRC;
-
-    // SM Bus CRC polinomial (x8+x2+x+1)
-    static const byte CRC_POLYNOMIAL = 0b00000111;
-
     // If more than PERIOD milliseconds have ellapsed since
     // previousReadingTime, update all readings, set the error flag on
     // error and update previousError; otherwise don't update the
@@ -365,16 +370,18 @@ class ESAT_BatteryControllerClass
     unsigned long readUnsignedLong(word registerAddress, Protocol theProtocol);
 
     // Read from "registerAddress" "contentSize" bytes and stores it in "content".
+    // It use the block protocol.
     // Set the error flag on error.
-    void read(word registerAddress, byte content[], byte contentSize, Protocol theProtocol);
-
-    // 
     void readWithBlockProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
 
-    // 
+    // Read from "registerAddress" "contentSize" bytes and stores it in "content".
+    // It use the manufacturer protocol.
+    // Set the error flag on error.
     void readWithManufacturerProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
 
-    // 
+    // Read from "registerAddress" "contentSize" bytes and stores it in "content".
+    // It use the word protocol.
+    // Set the error flag on error.
     void readWithWordProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
 
     // It received the frame to send without the CRC byte.
