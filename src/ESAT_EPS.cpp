@@ -270,6 +270,10 @@ void ESAT_EPSClass::updateI2CTelemetry()
   }
   else if (packetIdentifier == ESAT_I2CSlave.NEXT_TELEMETRY_PACKET_REQUESTED)
   {
+    if (ESAT_I2CSlave.telemetryQueueResetReceived())
+    {
+      I2cPendingTelemetry = ActiveTelemetry;
+    }
     boolean newPacket = false;
     int id = I2cPendingTelemetry.readNext();
     if (id >= 0)
@@ -285,7 +289,6 @@ void ESAT_EPSClass::updateI2CTelemetry()
     else
     {
       ESAT_I2CSlave.rejectTelemetryRequest();
-      I2cPendingTelemetry = ActiveTelemetry;
     }
   }
   else
