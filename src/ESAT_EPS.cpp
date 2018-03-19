@@ -284,7 +284,7 @@ void ESAT_EPSClass::updateI2CTelemetry()
     }
     if (newPacket)
     {
-      (void) ESAT_I2CSlave.writeTelemetry(telemetry);
+      (void) ESAT_I2CSlave.writePacket(telemetry);
     }
     else
     {
@@ -294,7 +294,7 @@ void ESAT_EPSClass::updateI2CTelemetry()
   else
   {
     (void) updateTelemetry((byte)packetIdentifier);
-    (void) ESAT_I2CSlave.writeTelemetry(telemetry);
+    (void) ESAT_I2CSlave.writePacket(telemetry);
   }
 }
 
