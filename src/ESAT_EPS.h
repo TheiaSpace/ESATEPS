@@ -21,6 +21,8 @@
 
 #include <Arduino.h>
 #include <ESAT_CCSDSPacket.h>
+#include <ESAT_CCSDSPacketBuilder.h>
+#include <ESAT_CCSDSPacketContents.h>
 #include <ESAT_KISSStream.h>
 #include <ESAT_SoftwareClock.h>
 #include <ESAT_FlagContainer.h>
@@ -43,6 +45,9 @@
 class ESAT_EPSClass
 {
   public:
+    // Add a telemetry packet to the list of available telemetry packets.
+    void addTelemetryPacket(ESAT_CCSDSPacketContents& packet);
+
     // Set up the EPS board.
     void begin();
 
@@ -209,9 +214,21 @@ class ESAT_EPSClass
     static const byte MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH = 
       BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH;
 
+    // Maximum number of available telemetry packets.
+    static const word MAXIMUM_NUMBER_OF_TELEMETRY_PACKETS = 16;
+
     // Real time clock.
     // Useful for generating timestamps for telemetry packets.
     ESAT_SoftwareClock clock;
+
+    // Telemetry packet builder.
+    ESAT_CCSDSPacketBuilder telemetryPacketBuilder;
+
+    // Number of available telemetry packets.
+    word numberOfTelemetryPackets;
+
+    // Available telemetry packets.
+    ESAT_CCSDSPacketContents* telemetryPackets[MAXIMUM_NUMBER_OF_TELEMETRY_PACKETS];
 
     // I2C packet buffers.
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
@@ -227,7 +244,8 @@ class ESAT_EPSClass
     // cycle. There is one for the telemetry sent through the USB bus and 
     // another one for the telemetry sent through the I2C bus.
     ESAT_FlagContainer UsbPendingTelemetry;
-    ESAT_FlagContainer I2cPendingTelemetry;
+    ESAT_FlagContainer i2cPendingTelemetryBackList;
+    ESAT_FlagContainer i2cPendingTelemetryFrontList;
 
     // Decode USB KISS frames with this stream.
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
@@ -239,10 +257,6 @@ class ESAT_EPSClass
 
     // Telemetry packet data buffer.
     byte telemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
-
-    // Packet sequence count of the telemetry packets.
-    // It grows by 1 every time we generate a new telemetry packet.
-    word telemetryPacketSequenceCount;
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
@@ -281,6 +295,9 @@ class ESAT_EPSClass
 
     // Update the I2C slave telemetry buffer.
     void updateI2CTelemetry();
+
+    // Update the pending telemetry lists.
+    void updatePendingTelemetryLists();
 
     // Update the telemetry buffer.
     // This sets newTelemetryPacket to true.
