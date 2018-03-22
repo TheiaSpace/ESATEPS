@@ -54,7 +54,6 @@ void ESAT_EPSClass::begin()
                             MINOR_VERSION_NUMBER,
                             PATCH_VERSION_NUMBER,
                             ESAT_CCSDSPrimaryHeader::TELEMETRY,
-                            0,
                             clock);
   telemetry = ESAT_CCSDSPacket(telemetryPacketData,
                                MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
