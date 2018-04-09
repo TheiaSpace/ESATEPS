@@ -44,6 +44,9 @@ class ESAT_BatteryControllerClass
 
     // Number of bytes used by the BM MCU Firmware version.
     static const byte BM_FIRMWARE_VERSION_LENGTH = 11;
+    
+    // Length (number of octecs) of the memory address field
+    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
 
     // Instantiate a battery controller library.
     ESAT_BatteryControllerClass();
@@ -175,27 +178,27 @@ class ESAT_BatteryControllerClass
     // It seals the MCU.
     // Return STATUS_SUCCESS when the MCU is successfully sealed, otherwise
     // return STATUS_FAIL.
-    byte seal();
+    void seal();
 
     // This method must be called before the write operations.
     // It unseals the MCU.
     // Return STATUS_SUCCESS when the MCU is successfully unsealed, otherwise
     // return STATUS_FAIL.
-    byte unseal();
+    void unseal();
 
     // Write the dataMemory array in the MCU data flash starting in the
     // given dataMemoryAddress. It uses the "alternate manufacturer access"
     // and the CRC checksum.
     // Return STATUS_SUCCESS when the communcation with the MCU was successful,
     // otherwise return STATUS_FAIL.
-    byte write(word dataMemoryAddress, byte dataMemory[], byte dataMemoryLength);
+    void write(word dataMemoryAddress, byte dataMemory[], byte dataMemoryLength);
 
     // Write the data memory address using the "alternate manufacturer access"
     // and the CRC checksum. It is used when the data memory address is
     // actually a command.
     // Return STATUS_SUCCESS when the communcation with the MCU was successful,
     // otherwise return STATUS_FAIL.
-    byte write(word dataMemoryAddress);
+    void write(word dataMemoryAddress);
 
   private:
     // I2C address of the battery controller.
@@ -223,12 +226,6 @@ class ESAT_BatteryControllerClass
     {
       APPEND_CRC_BYTE,
       DO_NOT_APPEND_CRC_BYTE
-    };
-    
-    enum statusValue
-    {
-      STATUS_SUCCESS = 0,
-      STATUS_FAIL = 1
     };
 
     // Registers.
@@ -311,8 +308,6 @@ class ESAT_BatteryControllerClass
     // System uptime at the previous readings.
     unsigned long previousReadingTime;
 
-    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
-
     // TC packet definition
     // 1. TC header.
     //      "command ID" field (1 byte).
@@ -389,15 +384,15 @@ class ESAT_BatteryControllerClass
     // with "command".
     // Return STATUS_SUCCESS when the communcation with the MCU was successful,
     // otherwise return STATUS_FAIL.
-    byte writeFrame(byte frame[],byte frameLength, CRCCommand command);
+    void writeFrame(byte frame[],byte frameLength, CRCCommand command);
 
     // Return STATUS_SUCCESS when the communication is successfully done,
     // otherwise return STATUS_FAIL.
-    byte writeSealRegister();
+    void writeSealRegister();
 
     // Return STATUS_SUCCESS when the communication is successfully done,
     // otherwise return STATUS_FAIL.
-    byte writeUnsealRegister();
+    void writeUnsealRegister();
 };
 
 // Global instance of the battery controller library.
