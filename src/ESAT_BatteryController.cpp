@@ -58,18 +58,18 @@ ESAT_BatteryControllerClass::ESAT_BatteryControllerClass()
   CRC.begin(CRC_POLYNOMIAL);
 }
 
-void ESAT_BatteryControllerClass::read(word registerAddress, byte byteArray[], byte byteArraySize, Protocol theProtocol)
+boolean ESAT_BatteryControllerClass::read(word registerAddress, byte byteArray[], byte byteArraySize, Protocol theProtocol)
 {
   switch(theProtocol)
   {
     case BLOCK_PROTOCOL:
-      readWithBlockProtocol(registerAddress, byteArray, byteArraySize);
+      return readWithBlockProtocol(registerAddress, byteArray, byteArraySize);
       break;
     case MANUFACTURER_PROTOCOL:
-      readWithManufacturerProtocol(registerAddress, byteArray, byteArraySize);
+      return readWithManufacturerProtocol(registerAddress, byteArray, byteArraySize);
       break;
     case WORD_PROTOCOL:
-      readWithWordProtocol(registerAddress, byteArray, byteArraySize);
+      return readWithWordProtocol(registerAddress, byteArray, byteArraySize);
       break;
   }
 }
@@ -312,16 +312,16 @@ unsigned long ESAT_BatteryControllerClass::readUnsignedLong(word registerAddress
          (unsigned long)byteArray[0];
 }
 
-void ESAT_BatteryControllerClass::readWithBlockProtocol(word registerAddress, byte byteArray[], byte byteArraySize)
+boolean ESAT_BatteryControllerClass::readWithBlockProtocol(word registerAddress, byte byteArray[], byte byteArraySize)
 {
   Wire1.beginTransmission(ADDRESS);
   Wire1.write((byte)registerAddress);
-  byte writeStatus = Wire1.endTransmission();
+  byte transmissionStatus = Wire1.endTransmission();
   delay(DELAY_MILLIS);
-  if (writeStatus != 0)
+  if (transmissionStatus)
   {
     error = true;
-    return;
+    return true;
   }
   // In the block protocol, the first sent byte is the parameter size
   byte bytesRead = Wire1.requestFrom((byte)ADDRESS, (byte)(1 + byteArraySize));
@@ -329,7 +329,7 @@ void ESAT_BatteryControllerClass::readWithBlockProtocol(word registerAddress, by
   if (bytesRead != 1 + byteArraySize)
   {
     error = true;
-    return;
+    return true;
   }
   // We read the parameter size.
   (void) Wire1.read();
@@ -337,9 +337,10 @@ void ESAT_BatteryControllerClass::readWithBlockProtocol(word registerAddress, by
   {
     byteArray[index] = Wire1.read();
   }
+  return false;
 }
 
-void ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerAddress, byte byteArray[], byte byteArraySize)
+boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerAddress, byte byteArray[], byte byteArraySize)
 {
   byte nFrames = ceil((float)byteArraySize/TM_USER_DATA_MAX_LENGTH);
   word actualRegisterAddress;
@@ -358,7 +359,7 @@ void ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerAddr
     // Data memory address.
     actualRegisterAddress = registerAddress + frame*TM_USER_DATA_MAX_LENGTH;
     registerAddressLow = actualRegisterAddress % 0x100;
-    registerAddressHigh = (actualRegisterAddress / 0x100)%0x100;
+    registerAddressHigh = (actualRegisterAddress / 0x100) % 0x100;
     // Frame length.
     if(frame == (nFrames - 1))
     {
@@ -373,29 +374,27 @@ void ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerAddr
                       TM_HEADER_LENGTH +
                       TM_FOOTER_LENGTH;
     // Send data memory address.
-    write(actualRegisterAddress);
-    if(error)
+    boolean transmissionStatus = write(actualRegisterAddress);
+    if(transmissionStatus)
     {
-      return;
+      return true;
     }
-    delay(DELAY_MILLIS);
     // Send command to request the data.
     TCFrameIndx = 0;
     TCFrame[TCFrameIndx] = ALTERNATE_MANUFACTURER_ACCESS_COMMAND_ID;
     TCFrameIndx++;
-    writeFrame(TCFrame, TCFrameIndx,DO_NOT_APPEND_CRC_BYTE);
-    if(error)
+    transmissionStatus = writeFrame(TCFrame, TCFrameIndx,DO_NOT_APPEND_CRC_BYTE);
+    if(transmissionStatus)
     {
-      return;
+      return true;
     }
-    delay(DELAY_MILLIS);
     // request the data memory.
     byte nBytesReceived = Wire1.requestFrom(ADDRESS, nBytesToRequest);
     delay(DELAY_MILLIS);
     if(nBytesReceived != nBytesToRequest)
     {
       error = true;
-      return;
+      return true;
     }
     receivedPacketDataLength = Wire1.read();
     receivedRegisterAddressLow = Wire1.read();
@@ -411,39 +410,41 @@ void ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerAddr
                                    TM_MEMORY_ADDRESS_FIELD_LENGTH))
     {
       error = true;
-      return;
+      return true;
     }
     if((receivedRegisterAddressLow != registerAddressLow) ||
       (receivedRegisterAddressHigh != registerAddressHigh))
     {
       error = true;
-      return;
+      return true;
     }
   }
+  return false;
 }
 
-void ESAT_BatteryControllerClass::readWithWordProtocol(word registerAddress, byte byteArray[], byte byteArraySize)
+boolean ESAT_BatteryControllerClass::readWithWordProtocol(word registerAddress, byte byteArray[], byte byteArraySize)
 {
   Wire1.beginTransmission(ADDRESS);
   Wire1.write((byte)registerAddress);
-  byte writeStatus = Wire1.endTransmission();
+  byte transmissionStatus = Wire1.endTransmission();
   delay(DELAY_MILLIS);
-  if (writeStatus != 0)
+  if (transmissionStatus)
   {
     error = true;
-    return;
+    return true;
   }
   byte bytesRead = Wire1.requestFrom((byte)ADDRESS, byteArraySize);
   delay(DELAY_MILLIS);
   if (bytesRead != byteArraySize)
   {
     error = true;
-    return;
+    return true;
   }
   for (byte index = 0; index < byteArraySize; index ++)
   {
     byteArray[index] = Wire1.read();
   }
+  return false;
 }
 
 word ESAT_BatteryControllerClass::readWord(word registerAddress, Protocol theProtocol)
@@ -453,46 +454,55 @@ word ESAT_BatteryControllerClass::readWord(word registerAddress, Protocol thePro
   return word(byteArray[1], byteArray[0]);
 }
 
-void ESAT_BatteryControllerClass::seal()
+boolean ESAT_BatteryControllerClass::seal()
 {
-  writeSealRegister();
-  if(error)
+  if(writeSealRegister())
   {
-    return;
+    return true;
   }
-  operationStatus = readUnsignedLong(OPERATION_STATUS_REGISTER, MANUFACTURER_PROTOCOL);
-  if(error)
+  byte operationStatus8[4];
+  if(read(OPERATION_STATUS_REGISTER, operationStatus8, 4, MANUFACTURER_PROTOCOL))
   {
-    return;
+    return true;
   }
-  unsigned long securityMode = operationStatus & OPERATION_STATUS_SECURITY_MODE_MASK;
+  unsigned long operationStatus32 = ((unsigned long)operationStatus8[3] << 24) |
+         ((unsigned long)operationStatus8[2] << 16) |
+         ((unsigned long)operationStatus8[1] << 8) |
+         (unsigned long)operationStatus8[0];
+  unsigned long securityMode = operationStatus32 & OPERATION_STATUS_SECURITY_MODE_MASK;
   if(securityMode != OPERATION_STATUS_SECURITY_MODE_SEALED)
   {
     error = true;
+    return true;
   }
+  return false;
 }
 
-void ESAT_BatteryControllerClass::unseal()
+boolean ESAT_BatteryControllerClass::unseal()
 {
-  writeUnsealRegister();
-  if(error)
+  if(writeUnsealRegister())
   {
-    return;
+    return true;
   }
-  operationStatus = readUnsignedLong(OPERATION_STATUS_REGISTER, MANUFACTURER_PROTOCOL);
-  if(error)
+  byte operationStatus8[4];
+  if(read(OPERATION_STATUS_REGISTER, operationStatus8, 4, MANUFACTURER_PROTOCOL))
   {
-    return;
+    return true;
   }
-  unsigned long securityMode = operationStatus & OPERATION_STATUS_SECURITY_MODE_MASK;
-  if ((securityMode != OPERATION_STATUS_SECURITY_MODE_UNSEALED) &&
-      (securityMode != OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS))
+  unsigned long operationStatus32 = ((unsigned long)operationStatus8[3] << 24) |
+         ((unsigned long)operationStatus8[2] << 16) |
+         ((unsigned long)operationStatus8[1] << 8) |
+         (unsigned long)operationStatus8[0];
+  unsigned long securityMode = operationStatus32 & OPERATION_STATUS_SECURITY_MODE_MASK;
+  if (securityMode != OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS)
   {
     error = true;
+    return true;
   }
+  return false;
 }
 
-void ESAT_BatteryControllerClass::write(word dataMemoryAddress,
+boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress,
                                          byte dataMemory[],
                                          byte dataMemoryLength)
 {
@@ -536,15 +546,15 @@ void ESAT_BatteryControllerClass::write(word dataMemoryAddress,
       TCFrame[TCFrameIndx] = dataMemory[(TC_USER_DATA_MAX_LENGTH*frame) + indx];
       TCFrameIndx++;
     }
-    writeFrame(TCFrame, TCFrameIndx, APPEND_CRC_BYTE);
-    if(error)
+    if(writeFrame(TCFrame, TCFrameIndx, APPEND_CRC_BYTE))
     {
-      return;
+      return true;
     }
   }
+  return false;
 }
 
-void ESAT_BatteryControllerClass::write(word dataMemoryAddress)
+boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress)
 {
   byte dataMemoryAddressLow;
   byte dataMemoryAddressHigh;
@@ -555,7 +565,7 @@ void ESAT_BatteryControllerClass::write(word dataMemoryAddress)
   byte TCFrameIndx;
   // Data memory address.
   dataMemoryAddressLow = dataMemoryAddress % 0x100;
-  dataMemoryAddressHigh = (dataMemoryAddress / 0x100)%0x100;
+  dataMemoryAddressHigh = (dataMemoryAddress / 0x100) % 0x100;
   // Frame length.
   userDataLength = 0;
   PacketDataLength = userDataLength + TC_MEMORY_ADDRESS_FIELD_LENGTH;
@@ -568,10 +578,10 @@ void ESAT_BatteryControllerClass::write(word dataMemoryAddress)
   TCFrameIndx++;
   TCFrame[TCFrameIndx] = dataMemoryAddressHigh;
   TCFrameIndx++;
-  writeFrame(TCFrame, TCFrameIndx,APPEND_CRC_BYTE);
+  return writeFrame(TCFrame, TCFrameIndx,APPEND_CRC_BYTE);
 }
 
-void ESAT_BatteryControllerClass::writeFrame(byte frame[],
+boolean ESAT_BatteryControllerClass::writeFrame(byte frame[],
                                               byte frameLength,
                                               CRCCommand command)
 {
@@ -591,28 +601,41 @@ void ESAT_BatteryControllerClass::writeFrame(byte frame[],
     CRCValue = CRC.add(CRCValue,frame,frameLength);
     Wire1.write(CRCValue);
   }
-  if(Wire1.endTransmission())
+  byte transmissionStatus = Wire1.endTransmission();
+  delay(DELAY_MILLIS);
+  if(transmissionStatus)
   {
     error = true;
+    return true;
   }
-  delay(DELAY_MILLIS);
+  else
+  {
+    return false;
+  }
 }
 
-void ESAT_BatteryControllerClass::writeSealRegister()
+boolean ESAT_BatteryControllerClass::writeSealRegister()
 {
-  write(SEAL_REGISTER);
+  return write(SEAL_REGISTER);
 }
 
-void ESAT_BatteryControllerClass::writeUnsealRegister()
+boolean ESAT_BatteryControllerClass::writeUnsealRegister()
 {
   for(byte indx = 0; indx < (sizeof(UNSEAL_REGISTERS)/2); indx++)
   {
-    write(UNSEAL_REGISTERS[indx]);
-    if(error)
+    if(write(UNSEAL_REGISTERS[indx]))
     {
-      return;
+      return true;
     }
   }
+  for(byte indx = 0; indx < (sizeof(UNSEAL_FULL_ACCESS_REGISTERS)/2); indx++)
+  {
+    if(write(UNSEAL_FULL_ACCESS_REGISTERS[indx]))
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 ESAT_BatteryControllerClass ESAT_BatteryController;
