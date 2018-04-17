@@ -28,6 +28,7 @@
 #include "ESAT_EPSMeasurements.h"
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
 #include "ESAT_PowerLineSwitch.h"
+#include "ESAT_BatteryController.h"
 
 void ESAT_EPSClass::addTelemetryPacket(ESAT_CCSDSPacketContents& packet)
 {
@@ -70,6 +71,7 @@ void ESAT_EPSClass::begin()
   ESAT_PowerLine3V3Switch.begin();
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
   Wire1.begin();
+  ESAT_BatteryController.writeDelayBetweenCommunications((byte)2);
   Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   USB.begin();
   ESAT_I2CSlave.begin(Wire,
@@ -268,6 +270,8 @@ void ESAT_EPSClass::update()
   updateMaximumPowerPointTracking();
   updatePendingTelemetryLists();
   updateI2CTelemetry();
+  USB.println();
+  USB.println(String("updating ESAT_EPS"));
 }
 
 void ESAT_EPSClass::updateMaximumPowerPointTracking()

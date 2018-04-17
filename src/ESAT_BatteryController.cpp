@@ -317,7 +317,7 @@ boolean ESAT_BatteryControllerClass::readWithBlockProtocol(word registerAddress,
   Wire1.beginTransmission(ADDRESS);
   Wire1.write((byte)registerAddress);
   byte transmissionStatus = Wire1.endTransmission();
-  delay(DELAY_MILLIS);
+  delay(delayMillis);
   if (transmissionStatus)
   {
     error = true;
@@ -325,7 +325,7 @@ boolean ESAT_BatteryControllerClass::readWithBlockProtocol(word registerAddress,
   }
   // In the block protocol, the first sent byte is the parameter size
   byte bytesRead = Wire1.requestFrom((byte)ADDRESS, (byte)(1 + byteArraySize));
-  delay(DELAY_MILLIS);
+  delay(delayMillis);
   if (bytesRead != 1 + byteArraySize)
   {
     error = true;
@@ -390,7 +390,7 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerA
     }
     // request the data memory.
     byte nBytesReceived = Wire1.requestFrom(ADDRESS, nBytesToRequest);
-    delay(DELAY_MILLIS);
+    delay(delayMillis);
     if(nBytesReceived != nBytesToRequest)
     {
       error = true;
@@ -427,14 +427,14 @@ boolean ESAT_BatteryControllerClass::readWithWordProtocol(word registerAddress, 
   Wire1.beginTransmission(ADDRESS);
   Wire1.write((byte)registerAddress);
   byte transmissionStatus = Wire1.endTransmission();
-  delay(DELAY_MILLIS);
+  delay(delayMillis);
   if (transmissionStatus)
   {
     error = true;
     return true;
   }
   byte bytesRead = Wire1.requestFrom((byte)ADDRESS, byteArraySize);
-  delay(DELAY_MILLIS);
+  delay(delayMillis);
   if (bytesRead != byteArraySize)
   {
     error = true;
@@ -581,6 +581,11 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress)
   return writeFrame(TCFrame, TCFrameIndx,APPEND_CRC_BYTE);
 }
 
+void ESAT_BatteryControllerClass::writeDelayBetweenCommunications(byte delayInMillis)
+{
+  delayMillis = delayInMillis;
+}
+
 boolean ESAT_BatteryControllerClass::writeFrame(byte frame[],
                                               byte frameLength,
                                               CRCCommand command)
@@ -602,7 +607,7 @@ boolean ESAT_BatteryControllerClass::writeFrame(byte frame[],
     Wire1.write(CRCValue);
   }
   byte transmissionStatus = Wire1.endTransmission();
-  delay(DELAY_MILLIS);
+  delay(delayMillis);
   if(transmissionStatus)
   {
     error = true;
