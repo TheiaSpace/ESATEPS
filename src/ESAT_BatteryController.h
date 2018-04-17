@@ -205,6 +205,10 @@ class ESAT_BatteryControllerClass
     // Return false when the MCU is successfully sealed, otherwise
     // return true.
     boolean write(word dataMemoryAddress);
+    
+    // Update the value of delayMillis, in millis. delayMillis is the millis waited
+    // after every I2C comm.
+    void writeDelayBetweenCommunications(byte delayInMillis);
 
   private:
     // I2C address of the battery controller.
@@ -275,7 +279,7 @@ class ESAT_BatteryControllerClass
     static const unsigned long PERIOD = 1000;
 
     // milliseconds waited after any communication.
-    static const byte DELAY_MILLIS = 15;
+    byte delayMillis = 15;
 
     // Latest readings.
     byte balancingConfiguration;
