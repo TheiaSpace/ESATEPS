@@ -34,21 +34,21 @@ void ESAT_EPSClass::addTelemetryPacket(ESAT_CCSDSPacketContents& packet)
 {
   telemetryPackets[numberOfTelemetryPackets] = &packet;
   numberOfTelemetryPackets = numberOfTelemetryPackets + 1;
-  AvailableTelemetry.write(packet.packetIdentifier(), true);
+  AvailableTelemetry.set(packet.packetIdentifier());
 }
 
 void ESAT_EPSClass::begin()
 {
-  AvailableTelemetry.clear();
+  AvailableTelemetry.clearAll();
   numberOfTelemetryPackets = 0;
   addTelemetryPacket(ESAT_EPSHousekeeping);
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
-  ActiveTelemetry.clear();
-  ActiveTelemetry.write(ESAT_EPSHousekeeping.packetIdentifier(), true);
-  ActiveTelemetry.write(ESAT_BatteryModuleHousekeeping.packetIdentifier(), true);
-  UsbPendingTelemetry.clear();
-  i2cPendingTelemetryBackList.clear();
-  i2cPendingTelemetryFrontList.clear();
+  ActiveTelemetry.clearAll();
+  ActiveTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
+  ActiveTelemetry.set(ESAT_BatteryModuleHousekeeping.packetIdentifier());
+  UsbPendingTelemetry.clearAll();
+  i2cPendingTelemetryBackList.clearAll();
+  i2cPendingTelemetryFrontList.clearAll();
   telemetryPacketBuilder =
     ESAT_CCSDSPacketBuilder(APPLICATION_PROCESS_IDENTIFIER,
                             MAJOR_VERSION_NUMBER,
@@ -67,7 +67,7 @@ void ESAT_EPSClass::begin()
   ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
   ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
   ESAT_PowerLine5VSwitch.begin();
-  ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.OFF);
+  ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.ON);
   ESAT_PowerLine3V3Switch.begin();
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
   Wire1.begin();
@@ -192,7 +192,7 @@ void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
   byte receivedId = packet.readByte();
   if(AvailableTelemetry.read(receivedId))
   {
-    ActiveTelemetry.write(receivedId, true);
+    ActiveTelemetry.set(receivedId);
   }
 }
 
@@ -201,7 +201,7 @@ void ESAT_EPSClass::handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
   byte receivedId = packet.readByte();
   if(AvailableTelemetry.read(receivedId))
   {
-    ActiveTelemetry.write(receivedId, false);
+    ActiveTelemetry.clear(receivedId);
   }
 }
 
@@ -255,7 +255,7 @@ boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
   if(id >= 0)
   {
     newPacket = updateTelemetry((byte)id);
-    UsbPendingTelemetry.write((byte)id,false);
+    UsbPendingTelemetry.clear(byte(id));
   }
   if (!newPacket)
   {
@@ -292,14 +292,14 @@ void ESAT_EPSClass::updateI2CTelemetry()
     if (ESAT_I2CSlave.telemetryQueueResetReceived())
     {
       i2cPendingTelemetryFrontList = i2cPendingTelemetryBackList;
-      i2cPendingTelemetryBackList.clear();
+      i2cPendingTelemetryBackList.clearAll();
     }
     boolean newPacket = false;
     int id = i2cPendingTelemetryFrontList.readNext();
     if (id >= 0)
     {
       (void) updateTelemetry((byte)id);
-      i2cPendingTelemetryFrontList.write((byte)id, false);
+      i2cPendingTelemetryFrontList.clear(byte(id));
       newPacket = true;
     }
     if (newPacket)
@@ -320,15 +320,15 @@ void ESAT_EPSClass::updateI2CTelemetry()
 
 void ESAT_EPSClass::updatePendingTelemetryLists()
 {
-  UsbPendingTelemetry.clear();
+  UsbPendingTelemetry.clearAll();
   for (int index = 0; index < numberOfTelemetryPackets; index++)
   {
     const byte packetIdentifier = telemetryPackets[index]->packetIdentifier();
     if (ActiveTelemetry.read(packetIdentifier)
         && telemetryPackets[index]->available())
     {
-      UsbPendingTelemetry.write(packetIdentifier, true);
-      i2cPendingTelemetryBackList.write(packetIdentifier, true);
+      UsbPendingTelemetry.set(packetIdentifier);
+      i2cPendingTelemetryBackList.set(packetIdentifier);
     }
   }
 }
