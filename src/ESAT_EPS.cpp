@@ -345,8 +345,6 @@ void ESAT_EPSClass::update()
   updateMaximumPowerPointTracking();
   updatePendingTelemetryList();
   respondToI2CRequest();
-  USB.println();
-  USB.println(String("updating ESAT_EPS"));
 }
 
 void ESAT_EPSClass::updateMaximumPowerPointTracking()
