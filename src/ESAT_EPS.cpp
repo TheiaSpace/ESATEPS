@@ -212,7 +212,7 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
   {
     return false;
   }
-  boolean pendingTelecommand = ESAT_I2CSlave.readTelecommand(packet);
+  boolean pendingTelecommand = ESAT_I2CSlave.readPacket(packet);
   if (!pendingTelecommand)
   {
     pendingTelecommand = readTelecommandFromUSB(packet);
@@ -282,8 +282,8 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 
 void ESAT_EPSClass::updateI2CTelemetry()
 {
-  const int packetIdentifier = ESAT_I2CSlave.requestedTelemetryPacket();
-  if (packetIdentifier == ESAT_I2CSlave.NO_TELEMETRY_PACKET_REQUESTED)
+  const int packetIdentifier = ESAT_I2CSlave.requestedPacket();
+  if (packetIdentifier == ESAT_I2CSlave.NO_PACKET_REQUESTED)
   {
     ;
   }
@@ -308,7 +308,7 @@ void ESAT_EPSClass::updateI2CTelemetry()
     }
     else
     {
-      ESAT_I2CSlave.rejectTelemetryRequest();
+      ESAT_I2CSlave.rejectPacket();
     }
   }
   else
