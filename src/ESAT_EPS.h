@@ -240,12 +240,13 @@ class ESAT_EPSClass
     // List of the telemetry IDs that have to be delivered every cycle.
     ESAT_FlagContainer ActiveTelemetry;
 
-    // List of the telemetry IDs that are pending to be delivered in the current 
-    // cycle. There is one for the telemetry sent through the USB bus and 
-    // another one for the telemetry sent through the I2C bus.
-    ESAT_FlagContainer UsbPendingTelemetry;
-    ESAT_FlagContainer i2cPendingTelemetryBackList;
-    ESAT_FlagContainer i2cPendingTelemetryFrontList;
+    // List of telemetry identifiers that are pending to be delivered in the
+    // current I2C next-packet telemetry read cycle.
+    ESAT_FlagContainer i2cPendingTelemetry;
+
+    // List of the telemetry identifiers that are pending to be delivered
+    // in the current EPS cycle.
+    ESAT_FlagContainer pendingTelemetry;
 
     // Decode USB KISS frames with this stream.
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
@@ -257,6 +258,11 @@ class ESAT_EPSClass
 
     // Telemetry packet data buffer.
     byte telemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
+
+    // Fill the contents of a packet with the registered telemetry
+    // packet of given identifier.
+    // Return true on success; otherwise return false.
+    boolean fillTelemetryPacket(ESAT_CCSDSPacket& packet, byte identifier);
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
@@ -290,18 +296,26 @@ class ESAT_EPSClass
     // Return true on success; otherwise return false.
     boolean readTelecommandFromUSB(ESAT_CCSDSPacket& packet);
 
+    // Respond to telemetry and telecommand requests coming from the I2C bus.
+    void respondToI2CRequest();
+
+    // Respond to a named-packet (of given identifier) telemetry
+    // request coming from the I2C bus.
+    void respondToNamedPacketTelemetryRequest(byte identifier);
+
+    // Respond to a next-packet telecommand request coming from the
+    // I2C bus.
+    void respondToNextPacketTelecommandRequest();
+
+    // Respond to a next-packet telemetry request coming from the I2C
+    // bus.
+    void respondToNextPacketTelemetryRequest();
+
     // Update the maximum power point tracking system.
     void updateMaximumPowerPointTracking();
 
-    // Update the I2C slave telemetry buffer.
-    void updateI2CTelemetry();
-
-    // Update the pending telemetry lists.
-    void updatePendingTelemetryLists();
-
-    // Update the telemetry buffer.
-    // This sets newTelemetryPacket to true.
-    boolean updateTelemetry(byte ID);
+    // Update the pending telemetry list.
+    void updatePendingTelemetryList();
 };
 
 // Global instance of the EPS library.

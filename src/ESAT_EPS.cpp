@@ -46,9 +46,8 @@ void ESAT_EPSClass::begin()
   ActiveTelemetry.clearAll();
   ActiveTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
   ActiveTelemetry.set(ESAT_BatteryModuleHousekeeping.packetIdentifier());
-  UsbPendingTelemetry.clearAll();
-  i2cPendingTelemetryBackList.clearAll();
-  i2cPendingTelemetryFrontList.clearAll();
+  pendingTelemetry.clearAll();
+  i2cPendingTelemetry.clearAll();
   telemetryPacketBuilder =
     ESAT_CCSDSPacketBuilder(APPLICATION_PROCESS_IDENTIFIER,
                             MAJOR_VERSION_NUMBER,
@@ -79,6 +78,29 @@ void ESAT_EPSClass::begin()
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                       i2cTelemetryPacketData,
                       MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
+}
+
+boolean ESAT_EPSClass::fillTelemetryPacket(ESAT_CCSDSPacket& packet,
+                                           const byte identifier)
+{
+  if (packet.capacity() < ESAT_CCSDSSecondaryHeader::LENGTH)
+  {
+    return false;
+  }
+  for (word index = 0; index < numberOfTelemetryPackets; index++)
+  {
+    if (!telemetryPackets[index])
+    {
+      return false;
+    }
+    if (telemetryPackets[index]->packetIdentifier() == identifier)
+    {
+      packet.flush();
+      return telemetryPacketBuilder.buildPacket(packet,
+                                                *(telemetryPackets[index]));
+    }
+  }
+  return false;
 }
 
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
@@ -250,26 +272,79 @@ boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
 
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
 {
-  boolean newPacket = false;
-  int id = UsbPendingTelemetry.readNext();
-  if(id >= 0)
+  const int identifier = pendingTelemetry.readNext();
+  if (identifier >= 0)
   {
-    newPacket = updateTelemetry((byte)id);
-    UsbPendingTelemetry.clear(byte(id));
+    pendingTelemetry.clear(byte(identifier));
+    return fillTelemetryPacket(packet, byte(identifier));
   }
-  if (!newPacket)
+  else
   {
     return false;
   }
-  telemetry.copyTo(packet);
-  return true;
+}
+
+void ESAT_EPSClass::respondToI2CRequest()
+{
+  const int requestedPacket = ESAT_I2CSlave.requestedPacket();
+  switch (requestedPacket)
+  {
+    case ESAT_I2CSlave.NO_PACKET_REQUESTED:
+      break;
+    case ESAT_I2CSlave.NEXT_TELEMETRY_PACKET_REQUESTED:
+      respondToNextPacketTelemetryRequest();
+      break;
+    case ESAT_I2CSlave.NEXT_TELECOMMAND_PACKET_REQUESTED:
+      respondToNextPacketTelecommandRequest();
+      break;
+    default:
+      respondToNamedPacketTelemetryRequest(byte(requestedPacket));
+      break;
+  }
+}
+
+void ESAT_EPSClass::respondToNamedPacketTelemetryRequest(const byte identifier)
+{
+  if (pendingTelemetry.read(identifier))
+  {
+    byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
+    ESAT_CCSDSPacket packet(packetData, MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
+    const boolean gotPacket = fillTelemetryPacket(packet, identifier);
+    ESAT_I2CSlave.writePacket(packet);
+  }
+}
+
+void ESAT_EPSClass::respondToNextPacketTelecommandRequest()
+{
+  ESAT_I2CSlave.rejectPacket();
+}
+
+void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
+{
+  if (ESAT_I2CSlave.telemetryQueueResetReceived())
+  {
+    i2cPendingTelemetry = pendingTelemetry;
+  }
+  const int identifier = i2cPendingTelemetry.readNext();
+  if (identifier >= 0)
+  {
+    byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
+    ESAT_CCSDSPacket packet(packetData, MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
+    const boolean gotPacket = fillTelemetryPacket(packet, identifier);
+    ESAT_I2CSlave.writePacket(packet);
+    i2cPendingTelemetry.clear(byte(identifier));
+  }
+  else
+  {
+    ESAT_I2CSlave.rejectPacket();
+  }
 }
 
 void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
-  updatePendingTelemetryLists();
-  updateI2CTelemetry();
+  updatePendingTelemetryList();
+  respondToI2CRequest();
   USB.println();
   USB.println(String("updating ESAT_EPS"));
 }
@@ -280,71 +355,18 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
   ESAT_MaximumPowerPointTrackingDriver2.update();
 }
 
-void ESAT_EPSClass::updateI2CTelemetry()
+void ESAT_EPSClass::updatePendingTelemetryList()
 {
-  const int packetIdentifier = ESAT_I2CSlave.requestedPacket();
-  if (packetIdentifier == ESAT_I2CSlave.NO_PACKET_REQUESTED)
-  {
-    ;
-  }
-  else if (packetIdentifier == ESAT_I2CSlave.NEXT_TELEMETRY_PACKET_REQUESTED)
-  {
-    if (ESAT_I2CSlave.telemetryQueueResetReceived())
-    {
-      i2cPendingTelemetryFrontList = i2cPendingTelemetryBackList;
-      i2cPendingTelemetryBackList.clearAll();
-    }
-    boolean newPacket = false;
-    int id = i2cPendingTelemetryFrontList.readNext();
-    if (id >= 0)
-    {
-      (void) updateTelemetry((byte)id);
-      i2cPendingTelemetryFrontList.clear(byte(id));
-      newPacket = true;
-    }
-    if (newPacket)
-    {
-      (void) ESAT_I2CSlave.writePacket(telemetry);
-    }
-    else
-    {
-      ESAT_I2CSlave.rejectPacket();
-    }
-  }
-  else
-  {
-    (void) updateTelemetry((byte)packetIdentifier);
-    (void) ESAT_I2CSlave.writePacket(telemetry);
-  }
-}
-
-void ESAT_EPSClass::updatePendingTelemetryLists()
-{
-  UsbPendingTelemetry.clearAll();
+  pendingTelemetry.clearAll();
   for (int index = 0; index < numberOfTelemetryPackets; index++)
   {
     const byte packetIdentifier = telemetryPackets[index]->packetIdentifier();
     if (ActiveTelemetry.read(packetIdentifier)
         && telemetryPackets[index]->available())
     {
-      UsbPendingTelemetry.set(packetIdentifier);
-      i2cPendingTelemetryBackList.set(packetIdentifier);
+      pendingTelemetry.set(packetIdentifier);
     }
   }
-}
-
-boolean ESAT_EPSClass::updateTelemetry(byte ID)
-{
-  for (word index = 0; index < numberOfTelemetryPackets; index++)
-  {
-    if (telemetryPackets[index]->packetIdentifier() == ID)
-    {
-      telemetry.flush();
-      return telemetryPacketBuilder.buildPacket(telemetry,
-                                                *(telemetryPackets[index]));
-    }
-  }
-  return false;
 }
 
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
