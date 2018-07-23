@@ -167,12 +167,14 @@ void ESAT_EPSClass::handleFixedModeCommand(ESAT_CCSDSPacket& packet)
 
 void ESAT_EPSClass::handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet)
 {
+  (void) packet;
   ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
   ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
 }
 
 void ESAT_EPSClass::handleSweepModeCommand(ESAT_CCSDSPacket& packet)
 {
+  (void) packet;
   ESAT_MaximumPowerPointTrackingDriver1.setSweepMode();
   ESAT_MaximumPowerPointTrackingDriver2.setSweepMode();
 }
