@@ -81,10 +81,10 @@ class ESAT_MaximumPowerPointTrackingDriverClass
     int dutyCycleIncrement;
 
     // Read the current from this pin.
-    const int sensorPin;
+    int sensorPin;
 
     // Write a PWM signal to this pin.
-    const int outputPin;
+    int outputPin;
 
     // Compute the sign of setpointIncrement for increasing the
     // delivered power.  Helper function for updateMPPTMode().

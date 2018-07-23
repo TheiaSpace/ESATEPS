@@ -55,12 +55,12 @@ class ESAT_SolarPanelThermometerClass
 
   private:
     // First try to read the temperature from this I2C address/register pair.
-    const byte primaryAddress;
-    const byte primaryRegister;
+    byte primaryAddress;
+    byte primaryRegister;
 
     // Fall back to this I2C address/register pair on error.
-    const byte secondaryAddress;
-    const byte secondaryRegister;
+    byte secondaryAddress;
+    byte secondaryRegister;
 
     // Temperature readings may update up to once every PERIOD
     // milliseconds.  Panel thermal dynamics are slow, so measuring

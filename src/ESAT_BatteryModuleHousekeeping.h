@@ -49,7 +49,7 @@ class ESAT_BatteryModuleHousekeepingClass: public ESAT_CCSDSPacketContents
 
     // Generate packets up to once every PERIOD milliseconds.
     // The EPS cycle isn't fast enough to capture fast transients, and
-    // the quasy-steady dynamics are slow, so measuring more often
+    // the quasi-steady dynamics are slow, so measuring more often
     // would just waste time for no real benefit.
     static const unsigned long PERIOD = 1000;
 

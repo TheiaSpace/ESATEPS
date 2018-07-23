@@ -18,15 +18,15 @@
 
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
 
-ESAT_MaximumPowerPointTrackingDriverClass::ESAT_MaximumPowerPointTrackingDriverClass(int sensorPin,
-                                                                                     int outputPin):
-  sensorPin(sensorPin),
-  outputPin(outputPin),
-  mode(FIXED_MODE),
-  dutyCycle(DEFAULT_DUTY_CYCLE),
-  dutyCycleIncrement(0),
-  previousReading(0)
+ESAT_MaximumPowerPointTrackingDriverClass::ESAT_MaximumPowerPointTrackingDriverClass(const int theSensorPin,
+                                                                                     const int theOutputPin)
 {
+  sensorPin = theSensorPin;
+  outputPin = theOutputPin;
+  mode = FIXED_MODE;
+  dutyCycle = DEFAULT_DUTY_CYCLE;
+  dutyCycleIncrement = 0;
+  previousReading = 0;
 }
 
 void ESAT_MaximumPowerPointTrackingDriverClass::begin()

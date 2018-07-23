@@ -30,19 +30,19 @@ static const byte solarPanel2SecondaryAddress = 0x1c;
 static const byte solarPanel2SecondaryRegister = 0x05;
 
 
-ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte primaryAddress,
-                                                                 const byte primaryRegister,
-                                                                 const byte secondaryAddress,
-                                                                 const byte secondaryRegister):
-  primaryAddress(primaryAddress),
-  primaryRegister(primaryRegister),
-  secondaryAddress(secondaryAddress),
-  secondaryRegister(secondaryRegister),
-  error(false),
-  previousError(false),
-  previousReading(0),
-  previousReadingTime(0)
+ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte thePrimaryAddress,
+                                                                 const byte thePrimaryRegister,
+                                                                 const byte theSecondaryAddress,
+                                                                 const byte theSecondaryRegister)
 {
+  primaryAddress = thePrimaryAddress;
+  primaryRegister = thePrimaryRegister;
+  secondaryAddress = theSecondaryAddress;
+  secondaryRegister = theSecondaryRegister;
+  error = false;
+  previousError = false;
+  previousReading = 0;
+  previousReadingTime = 0;
 }
 
 word ESAT_SolarPanelThermometerClass::read()
