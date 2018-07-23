@@ -18,6 +18,7 @@
 
 #include "ESAT_BatteryController.h"
 #include <ESAT_Buffer.h>
+#include <ESAT_Util.h>
 #include <Wire.h>
 
 ESAT_BatteryControllerClass::ESAT_BatteryControllerClass()
@@ -358,10 +359,10 @@ unsigned long ESAT_BatteryControllerClass::readUnsignedLong(const word registerA
 {
   byte byteArray[4];
   read(registerAddress, byteArray, 4, theProtocol);
-  return ((unsigned long)byteArray[3] << 24) |
-         ((unsigned long)byteArray[2] << 16) |
-         ((unsigned long)byteArray[1] << 8) |
-         (unsigned long)byteArray[0];
+  return ESAT_Util.unsignedLong(byteArray[3],
+                                byteArray[2],
+                                byteArray[1],
+                                byteArray[0]);
 }
 
 boolean ESAT_BatteryControllerClass::readWithBlockProtocol(const word registerAddress,
@@ -523,10 +524,10 @@ boolean ESAT_BatteryControllerClass::seal()
     return true;
   }
   const unsigned long operationStatus32 =
-    ((unsigned long)operationStatus8[3] << 24) |
-    ((unsigned long)operationStatus8[2] << 16) |
-    ((unsigned long)operationStatus8[1] << 8) |
-    (unsigned long)operationStatus8[0];
+    ESAT_Util.unsignedLong(operationStatus8[3],
+                           operationStatus8[2],
+                           operationStatus8[1],
+                           operationStatus8[0]);
   const unsigned long securityMode =
     operationStatus32 & OPERATION_STATUS_SECURITY_MODE_MASK;
   if (securityMode != OPERATION_STATUS_SECURITY_MODE_SEALED)
@@ -552,10 +553,10 @@ boolean ESAT_BatteryControllerClass::unseal()
     return true;
   }
   const unsigned long operationStatus32 =
-    ((unsigned long)operationStatus8[3] << 24) |
-    ((unsigned long)operationStatus8[2] << 16) |
-    ((unsigned long)operationStatus8[1] << 8) |
-    (unsigned long)operationStatus8[0];
+    ESAT_Util.unsignedLong(operationStatus8[3],
+                           operationStatus8[2],
+                           operationStatus8[1],
+                           operationStatus8[0]);
   const unsigned long securityMode =
     operationStatus32 & OPERATION_STATUS_SECURITY_MODE_MASK;
   if (securityMode != OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS)
