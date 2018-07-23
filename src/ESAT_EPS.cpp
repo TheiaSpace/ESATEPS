@@ -340,8 +340,15 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
     byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
     ESAT_CCSDSPacket packet(packetData, MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
     const boolean gotPacket = fillTelemetryPacket(packet, identifier);
-    ESAT_I2CSlave.writePacket(packet);
-    i2cPendingTelemetry.clear(byte(identifier));
+    if (gotPacket)
+    {
+      ESAT_I2CSlave.writePacket(packet);
+      i2cPendingTelemetry.clear(byte(identifier));
+    }
+    else
+    {
+      ESAT_I2CSlave.rejectPacket();
+    }
   }
   else
   {
