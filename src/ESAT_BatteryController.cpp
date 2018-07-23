@@ -511,15 +511,17 @@ word ESAT_BatteryControllerClass::readWord(const word registerAddress,
 
 boolean ESAT_BatteryControllerClass::seal()
 {
-  if (writeSealRegister())
+  const boolean writeError = writeSealRegister();
+  if (writeError)
   {
     return true;
   }
   byte operationStatus8[4];
-  if (read(OPERATION_STATUS_REGISTER,
-           operationStatus8,
-           sizeof(operationStatus8),
-           MANUFACTURER_PROTOCOL))
+  const boolean readError = read(OPERATION_STATUS_REGISTER,
+                                 operationStatus8,
+                                 sizeof(operationStatus8),
+                                 MANUFACTURER_PROTOCOL);
+  if (readError)
   {
     return true;
   }
