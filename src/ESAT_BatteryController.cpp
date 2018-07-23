@@ -482,7 +482,7 @@ boolean ESAT_BatteryControllerClass::readWithWordProtocol(const word registerAdd
   Wire1.write(byte(registerAddress));
   const byte transmissionStatus = Wire1.endTransmission();
   delay(delayMilliseconds);
-  if (transmissionStatus)
+  if (transmissionStatus != 0)
   {
     error = true;
     return true;
