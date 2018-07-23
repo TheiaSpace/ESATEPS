@@ -662,7 +662,7 @@ boolean ESAT_BatteryControllerClass::writeFrame(const byte frame[],
   }
   const byte transmissionStatus = Wire1.endTransmission();
   delay(delayMilliseconds);
-  if (transmissionStatus)
+  if (transmissionStatus != 0)
   {
     error = true;
     return true;
