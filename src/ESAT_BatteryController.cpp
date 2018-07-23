@@ -547,10 +547,11 @@ boolean ESAT_BatteryControllerClass::unseal()
     return true;
   }
   byte operationStatus8[4];
-  if (read(OPERATION_STATUS_REGISTER,
-           operationStatus8,
-           sizeof(operationStatus8),
-           MANUFACTURER_PROTOCOL))
+  const boolean readError = read(OPERATION_STATUS_REGISTER,
+                                 operationStatus8,
+                                 sizeof(operationStatus8),
+                                 MANUFACTURER_PROTOCOL);
+  if (readError)
   {
     return true;
   }
