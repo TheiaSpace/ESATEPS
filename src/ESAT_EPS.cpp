@@ -167,12 +167,14 @@ void ESAT_EPSClass::handleFixedModeCommand(ESAT_CCSDSPacket& packet)
 
 void ESAT_EPSClass::handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet)
 {
+  (void) packet;
   ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
   ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
 }
 
 void ESAT_EPSClass::handleSweepModeCommand(ESAT_CCSDSPacket& packet)
 {
+  (void) packet;
   ESAT_MaximumPowerPointTrackingDriver1.setSweepMode();
   ESAT_MaximumPowerPointTrackingDriver2.setSweepMode();
 }
@@ -356,7 +358,7 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 void ESAT_EPSClass::updatePendingTelemetryList()
 {
   pendingTelemetry.clearAll();
-  for (int index = 0; index < numberOfTelemetryPackets; index++)
+  for (word index = 0; index < numberOfTelemetryPackets; index++)
   {
     const byte packetIdentifier = telemetryPackets[index]->packetIdentifier();
     if (ActiveTelemetry.read(packetIdentifier)

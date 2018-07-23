@@ -71,7 +71,11 @@ boolean ESAT_BatteryControllerClass::read(word registerAddress, byte byteArray[]
     case WORD_PROTOCOL:
       return readWithWordProtocol(registerAddress, byteArray, byteArraySize);
       break;
+    default:
+      return false;
+      break;
   }
+  return false;
 }
 
 void ESAT_BatteryControllerClass::readAll()
@@ -348,7 +352,6 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerA
   byte registerAddressHigh;
   byte receivedRegisterAddressLow;
   byte receivedRegisterAddressHigh;
-  byte theStatus;
   byte userDataLength;
   byte TCFrame[BM_COMM_BUFFER - 1];
   byte TCFrameIndx;
