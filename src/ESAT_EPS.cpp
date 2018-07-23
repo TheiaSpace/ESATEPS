@@ -358,7 +358,7 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 void ESAT_EPSClass::updatePendingTelemetryList()
 {
   pendingTelemetry.clearAll();
-  for (int index = 0; index < numberOfTelemetryPackets; index++)
+  for (word index = 0; index < numberOfTelemetryPackets; index++)
   {
     const byte packetIdentifier = telemetryPackets[index]->packetIdentifier();
     if (ActiveTelemetry.read(packetIdentifier)
