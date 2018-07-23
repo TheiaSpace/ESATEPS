@@ -410,8 +410,8 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(const word reg
     // Data memory address.
     const word actualRegisterAddress =
       registerAddress + frame * TELEMETRY_USER_DATA_MAX_LENGTH;
-    const byte registerAddressLow = actualRegisterAddress % 0x100;
-    const byte registerAddressHigh = (actualRegisterAddress / 0x100) % 0x100;
+    const byte registerAddressLow = lowByte(actualRegisterAddress);
+    const byte registerAddressHigh = highByte(actualRegisterAddress);
     // Frame length.
     byte userDataLength;
     if (frame == (numberOfFrames - 1))
@@ -590,8 +590,8 @@ boolean ESAT_BatteryControllerClass::write(const word dataMemoryAddress,
     // Data memory address.
     const word actualDataMemoryAddress =
       dataMemoryAddress + frame * TELECOMMAND_USER_DATA_MAX_LENGTH;
-    const byte dataMemoryAddressLow = actualDataMemoryAddress % 0x100;
-    const byte dataMemoryAddressHigh = (actualDataMemoryAddress / 0x100) % 0x100;
+    const byte dataMemoryAddressLow = lowByte(actualDataMemoryAddress);
+    const byte dataMemoryAddressHigh = highByte(actualDataMemoryAddress);
     // Frame length.
     byte userDataLength;
     if (frame == (numberOfFrames - 1))
@@ -632,8 +632,8 @@ boolean ESAT_BatteryControllerClass::write(const word dataMemoryAddress)
   ESAT_Buffer telecommandFrame(telecommandFrameBuffer,
                                sizeof(telecommandFrameBuffer));
   // Data memory address.
-  const byte dataMemoryAddressLow = dataMemoryAddress % 0x100;
-  const byte dataMemoryAddressHigh = (dataMemoryAddress / 0x100) % 0x100;
+  const byte dataMemoryAddressLow = lowByte(dataMemoryAddress);
+  const byte dataMemoryAddressHigh = highByte(dataMemoryAddress);
   // Frame length.
   const byte userDataLength = 0;
   const byte packetDataLength =
