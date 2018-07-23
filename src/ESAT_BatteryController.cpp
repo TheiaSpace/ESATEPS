@@ -352,7 +352,6 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerA
   byte registerAddressHigh;
   byte receivedRegisterAddressLow;
   byte receivedRegisterAddressHigh;
-  byte theStatus;
   byte userDataLength;
   byte TCFrame[BM_COMM_BUFFER - 1];
   byte TCFrameIndx;
