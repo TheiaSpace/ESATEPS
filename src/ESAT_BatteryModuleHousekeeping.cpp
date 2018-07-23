@@ -73,7 +73,7 @@ boolean ESAT_BatteryModuleHousekeepingClass::fillUserData(ESAT_CCSDSPacket& pack
   packet.writeWord(ESAT_BatteryController.readCellOvervoltageThreshold());
   packet.writeByte(ESAT_BatteryController.readCellOvervoltageRecoveryDelay());
   packet.writeWord(ESAT_BatteryController.readCellOvervoltageRecoveryThreshold());
-  packet.writeWord(ESAT_BatteryController.readChemicalID());
+  packet.writeWord(ESAT_BatteryController.readChemicalIdentifier());
   byte BMFirmwareVersion[ESAT_BatteryController.BM_FIRMWARE_VERSION_LENGTH];
   ESAT_BatteryController.readFirmwareVersion(BMFirmwareVersion);
   for (byte index = 0;

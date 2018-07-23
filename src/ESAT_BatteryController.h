@@ -100,9 +100,13 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     unsigned long readChargingStatus();
 
-    // Read the battery chemical ID.
+    // Same functionality as readChemicalIdentifier().
+    // Use readChemicalIdentifier() instead of this function.
+    word readChemicalID() __attribute__((deprecated));
+
+    // Read the battery chemical identifier.
     // Set the error flag on error.
-    word readChemicalID();
+    word readChemicalIdentifier();
 
     // Read the cell overvoltage recovery delay.
     // Set the error flag on error.
@@ -219,9 +223,9 @@ class ESAT_BatteryControllerClass
     // return true.
     boolean write(word dataMemoryAddress);
 
-    // Update the value of delayMillis, in milliseconds. delayMillis is the
-    // milliseconds waited after every I2C comm.
-    void writeDelayBetweenCommunications(byte delayInMillis);
+    // Update the time delay between I2C communications,
+    // expressed in milliseconds.
+    void writeDelayBetweenCommunications(byte delayInMilliseconds);
 
   private:
     // I2C address of the battery controller.
@@ -229,7 +233,7 @@ class ESAT_BatteryControllerClass
 
     // Length of the buffer used to comunicate with the BM.
     // Taken from Wire.h.
-    static const byte BM_COMM_BUFFER = BUFFER_LENGTH;
+    static const byte BM_COMMUNICATION_BUFFER_LENGTH = BUFFER_LENGTH;
 
     // SM Bus CRC polynomial (x8+x2+x+1)
     static const byte CRC_POLYNOMIAL = 0b00000111;
@@ -238,7 +242,7 @@ class ESAT_BatteryControllerClass
     ESAT_CRC8 CRC;
 
     // SBS command used to access to the MCU data flash.
-    static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_ID = 0x44;
+    static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER = 0x44;
 
     // The operation status register is used to read the current security mode.
     static const unsigned long OPERATION_STATUS_SECURITY_MODE_MASK =
@@ -271,7 +275,7 @@ class ESAT_BatteryControllerClass
     static const word CELL_UNDERVOLTAGE_RECOVERY_THRESHOLD_REGISTER = 0x484C;
     static const word CELL_UNDERVOLTAGE_THRESHOLD_REGISTER = 0x4849;
     static const word CHARGING_STATUS_REGISTER = 0x55;
-    static const word CHEMICAL_ID_REGISTER = 0x0006;
+    static const word CHEMICAL_IDENTIFIER_REGISTER = 0x0006;
     static const word CYCLE_COUNT_REGISTER = 0x17;
     static const word DESIGN_CAPACITY_REGISTER = 0x18;
     static const word DESIGN_VOLTAGE_REGISTER = 0x19;
@@ -298,7 +302,8 @@ class ESAT_BatteryControllerClass
     static const unsigned long PERIOD = 1000;
 
     // Milliseconds waited after any communication.
-    byte delayMillis = 15;
+    // Set by writeDelayBetweenCommunications().
+    byte delayMilliseconds = 15;
 
     // Latest readings.
     byte balancingConfiguration;
@@ -315,7 +320,7 @@ class ESAT_BatteryControllerClass
     word cellUndervoltageRecoveryThreshold;
     word cellUndervoltageThreshold;
     unsigned long chargingStatus;
-    word chemicalId;
+    word chemicalIdentifier;
     word cycleCount;
     word designCapacity;
     word designVoltage;
@@ -338,46 +343,49 @@ class ESAT_BatteryControllerClass
     // System uptime at the previous readings.
     unsigned long previousReadingTime;
 
-    // TC packet definition:
-    // 1. TC header.
-    //      "command ID" field (1 byte).
-    //      "Packet data length" field (1 byte).
-    // 2. Packet data field.
-    //      "memory address" field (2 bytes).
-    //      "user data" fields (variable).
-    // 3. TC footer.
-    //      "CRC8 checksum" field (1 byte).
-    static const byte TC_HEADER_LENGTH = 2;
-    static const byte TC_MEMORY_ADDRESS_FIELD_LENGTH =
+    // Telecommand packet definition:
+    // 1. Telecommand header:
+    //   - "command identifier" field (1 byte);
+    //   - "packet data length" field (1 byte).
+    // 2. Packet data field:
+    //   - "memory address" field (2 bytes);
+    //   - "user data" fields (variable).
+    // 3. Telecommand footer:
+    //   - "CRC8 checksum" field (1 byte).
+    static const byte TELECOMMAND_HEADER_LENGTH = 2;
+    static const byte TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH =
       MEMORY_ADDRESS_FIELD_LENGTH;
-    static const byte TC_FOOTER_LENGTH = 1;
-    static const byte TC_USER_DATA_MAX_LENGTH = BM_COMM_BUFFER
-                                              - TC_HEADER_LENGTH
-                                              - TC_MEMORY_ADDRESS_FIELD_LENGTH
-                                              - TC_FOOTER_LENGTH;
+    static const byte TELECOMMAND_FOOTER_LENGTH = 1;
+    static const byte TELECOMMAND_USER_DATA_MAX_LENGTH =
+      BM_COMMUNICATION_BUFFER_LENGTH
+      - TELECOMMAND_HEADER_LENGTH
+      - TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH
+      - TELECOMMAND_FOOTER_LENGTH;
 
-    // TM packet definition:
-    // 1. TM header.
-    //      "Packet data length" field (1 byte).
-    // 2. Packet data field.
-    //      "memory address" field (2 bytes).
-    //      "user data" fields (variable).
-    // 3. TM footer.
-    //      "CRC8 checksum" field (1 byte).
+    // Telemetry packet definition:
+    // 1. Telemetry header:
+    //   - "packet data length" field (1 byte).
+    // 2. Packet data field:
+    //   - "memory address" field (2 bytes);
+    //   - "user data" fields (variable).
+    // 3. Telemetry footer:
+    //   - "CRC8 checksum" field (1 byte).
     // The telemetry length depends on the telemetry type, you cannot
-    // specify it, if it is higher than BM_COMM_BUFFER, something that
-    // usually happens, you cannot read the CRC byte.  In this case
-    // you are losing the last byte, which is actually part of the
-    // user data.  To keep it simple, we just deal with it.  We do not
-    // check the CRC but we do not use it as user data.
-    static const byte TM_HEADER_LENGTH = 1;
-    static const byte TM_MEMORY_ADDRESS_FIELD_LENGTH =
+    // specify it, if it is higher than
+    // BM_COMMUNICATION_BUFFER_LENGTH, something that usually happens,
+    // you cannot read the CRC byte.  In this case you are losing the
+    // last byte, which is actually part of the user data.  To keep it
+    // simple, we just deal with it.  We do not check the CRC but we
+    // do not use it as user data.
+    static const byte TELEMETRY_HEADER_LENGTH = 1;
+    static const byte TELEMETRY_MEMORY_ADDRESS_FIELD_LENGTH =
       MEMORY_ADDRESS_FIELD_LENGTH;
-    static const byte TM_FOOTER_LENGTH = 1;
-    static const byte TM_USER_DATA_MAX_LENGTH = BM_COMM_BUFFER
-                                              - TM_HEADER_LENGTH
-                                              - TM_MEMORY_ADDRESS_FIELD_LENGTH
-                                              - TM_FOOTER_LENGTH;
+    static const byte TELEMETRY_FOOTER_LENGTH = 1;
+    static const byte TELEMETRY_USER_DATA_MAX_LENGTH =
+      BM_COMMUNICATION_BUFFER_LENGTH
+      - TELEMETRY_HEADER_LENGTH
+      - TELEMETRY_MEMORY_ADDRESS_FIELD_LENGTH
+      - TELEMETRY_FOOTER_LENGTH;
 
     // If more than PERIOD milliseconds have ellapsed since
     // previousReadingTime, update all readings, set the error flag on
