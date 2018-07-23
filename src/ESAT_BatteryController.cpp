@@ -579,7 +579,7 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress,
   word actualDataMemoryAddress;
   byte dataMemoryAddressLow;
   byte dataMemoryAddressHigh;
-  byte PacketDataLength;
+  byte packetDataLength;
   byte userDataLength;
   // We fill the whole frame except the checksum byte.
   byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
@@ -599,9 +599,9 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress,
     {
       userDataLength = TELECOMMAND_USER_DATA_MAX_LENGTH;
     }
-    PacketDataLength = userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
+    packetDataLength = userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
     telecommandFrame.write(ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER);
-    telecommandFrame.write(PacketDataLength);
+    telecommandFrame.write(packetDataLength);
     telecommandFrame.write(dataMemoryAddressLow);
     telecommandFrame.write(dataMemoryAddressHigh);
     for (byte index = 0; index < userDataLength; index++)
@@ -622,7 +622,7 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress)
 {
   byte dataMemoryAddressLow;
   byte dataMemoryAddressHigh;
-  byte PacketDataLength;
+  byte packetDataLength;
   byte userDataLength;
   // We fill the whole frame except the checksum byte.
   byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
@@ -632,9 +632,9 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress)
   dataMemoryAddressHigh = (dataMemoryAddress / 0x100) % 0x100;
   // Frame length.
   userDataLength = 0;
-  PacketDataLength = userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
+  packetDataLength = userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
   telecommandFrame.write(ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER);
-  telecommandFrame.write(PacketDataLength);
+  telecommandFrame.write(packetDataLength);
   telecommandFrame.write(dataMemoryAddressLow);
   telecommandFrame.write(dataMemoryAddressHigh);
   return writeFrame(telecommandFrameBuffer,
