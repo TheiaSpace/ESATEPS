@@ -400,9 +400,11 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(const word reg
                                                                   byte byteArray[],
                                                                   const byte byteArraySize)
 {
-  const byte numberOfFrames = ceil(float(byteArraySize) / TELEMETRY_USER_DATA_MAX_LENGTH);
+  const byte numberOfFrames =
+    ceil(float(byteArraySize) / TELEMETRY_USER_DATA_MAX_LENGTH);
   byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
-  ESAT_Buffer telecommandFrame(telecommandFrameBuffer, sizeof(telecommandFrameBuffer));
+  ESAT_Buffer telecommandFrame(telecommandFrameBuffer,
+                               sizeof(telecommandFrameBuffer));
   for (byte frame = 0; frame < numberOfFrames; frame++)
   {
     // Data memory address.
@@ -414,7 +416,8 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(const word reg
     byte userDataLength;
     if (frame == (numberOfFrames - 1))
     {
-      userDataLength = byteArraySize - (numberOfFrames - 1) * TELEMETRY_USER_DATA_MAX_LENGTH;
+      userDataLength =
+        byteArraySize - (numberOfFrames - 1) * TELEMETRY_USER_DATA_MAX_LENGTH;
     }
     else
     {
@@ -441,7 +444,8 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(const word reg
       return true;
     }
     // Request the data memory.
-    const byte numberOfBytesReceived = Wire1.requestFrom(ADDRESS, numberOfBytesToRequest);
+    const byte numberOfBytesReceived =
+      Wire1.requestFrom(ADDRESS, numberOfBytesToRequest);
     delay(delayMilliseconds);
     if (numberOfBytesReceived != numberOfBytesToRequest)
     {
@@ -453,7 +457,8 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(const word reg
     const byte receivedRegisterAddressHigh = Wire1.read();
     for (byte index = 0; index < userDataLength; index++)
     {
-      byteArray[(TELEMETRY_USER_DATA_MAX_LENGTH * frame) + index] = Wire1.read();
+      const word position = (TELEMETRY_USER_DATA_MAX_LENGTH * frame) + index;
+      byteArray[position] = Wire1.read();
     }
     // We do noting with the last byte.  We do not know if it is a CRC byte or
     // part of the user data.
@@ -578,7 +583,8 @@ boolean ESAT_BatteryControllerClass::write(const word dataMemoryAddress,
     ceil(float(dataMemoryLength) / TELECOMMAND_USER_DATA_MAX_LENGTH);
   // We fill the whole frame except the checksum byte.
   byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
-  ESAT_Buffer telecommandFrame(telecommandFrameBuffer, sizeof(telecommandFrameBuffer));
+  ESAT_Buffer telecommandFrame(telecommandFrameBuffer,
+                               sizeof(telecommandFrameBuffer));
   for (byte frame = 0; frame < numberOfFrames; frame++)
   {
     // Data memory address.
@@ -590,7 +596,9 @@ boolean ESAT_BatteryControllerClass::write(const word dataMemoryAddress,
     byte userDataLength;
     if (frame == (numberOfFrames - 1))
     {
-      userDataLength = dataMemoryLength - (numberOfFrames - 1) * TELECOMMAND_USER_DATA_MAX_LENGTH;
+      userDataLength =
+        dataMemoryLength
+        - (numberOfFrames - 1) * TELECOMMAND_USER_DATA_MAX_LENGTH;
     }
     else
     {
@@ -604,7 +612,8 @@ boolean ESAT_BatteryControllerClass::write(const word dataMemoryAddress,
     telecommandFrame.write(dataMemoryAddressHigh);
     for (byte index = 0; index < userDataLength; index++)
     {
-      telecommandFrame.write(dataMemory[(TELECOMMAND_USER_DATA_MAX_LENGTH * frame) + index]);
+      const word position = TELECOMMAND_USER_DATA_MAX_LENGTH * frame + index;
+      telecommandFrame.write(dataMemory[position]);
     }
     if (writeFrame(telecommandFrameBuffer,
                    telecommandFrame.length(),
@@ -620,13 +629,15 @@ boolean ESAT_BatteryControllerClass::write(const word dataMemoryAddress)
 {
   // We fill the whole frame except the checksum byte.
   byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
-  ESAT_Buffer telecommandFrame(telecommandFrameBuffer, sizeof(telecommandFrameBuffer));
+  ESAT_Buffer telecommandFrame(telecommandFrameBuffer,
+                               sizeof(telecommandFrameBuffer));
   // Data memory address.
   const byte dataMemoryAddressLow = dataMemoryAddress % 0x100;
   const byte dataMemoryAddressHigh = (dataMemoryAddress / 0x100) % 0x100;
   // Frame length.
   const byte userDataLength = 0;
-  const byte packetDataLength = userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
+  const byte packetDataLength =
+    userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
   telecommandFrame.write(ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER);
   telecommandFrame.write(packetDataLength);
   telecommandFrame.write(dataMemoryAddressLow);
@@ -680,14 +691,18 @@ boolean ESAT_BatteryControllerClass::writeSealRegister()
 
 boolean ESAT_BatteryControllerClass::writeUnsealRegister()
 {
-  for (byte index = 0; index < (sizeof(UNSEAL_REGISTERS) / 2); index++)
+  for (byte index = 0;
+       index < (sizeof(UNSEAL_REGISTERS) / 2);
+       index++)
   {
     if (write(UNSEAL_REGISTERS[index]))
     {
       return true;
     }
   }
-  for (byte index = 0; index < (sizeof(UNSEAL_FULL_ACCESS_REGISTERS) / 2); index++)
+  for (byte index = 0;
+       index < (sizeof(UNSEAL_FULL_ACCESS_REGISTERS) / 2);
+       index++)
   {
     if (write(UNSEAL_FULL_ACCESS_REGISTERS[index]))
     {
