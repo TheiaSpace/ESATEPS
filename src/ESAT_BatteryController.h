@@ -212,7 +212,7 @@ class ESAT_BatteryControllerClass
     // Return false when the MCU is successfully sealed, otherwise
     // return true.
     boolean write(word dataMemoryAddress,
-                  byte dataMemory[],
+                  const byte dataMemory[],
                   byte dataMemoryLength);
 
     // Write the data memory address using the "alternate manufacturer access"
@@ -444,7 +444,7 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     // Return true when the communication is successfully done,
     // otherwise return false.
-    boolean writeFrame(byte frame[],
+    boolean writeFrame(const byte frame[],
                        byte frameLength,
                        CRCCommand command);
 
