@@ -370,7 +370,7 @@ boolean ESAT_BatteryControllerClass::readWithBlockProtocol(word registerAddress,
     error = true;
     return true;
   }
-  // In the block protocol, the first sent byte is the parameter size
+  // In the block protocol, the first sent byte is the parameter size.
   byte bytesRead = Wire1.requestFrom(byte(ADDRESS), byte(1 + byteArraySize));
   delay(delayMillis);
   if (bytesRead != 1 + byteArraySize)
@@ -438,7 +438,7 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerA
     {
       return true;
     }
-    // request the data memory.
+    // Request the data memory.
     byte nBytesReceived = Wire1.requestFrom(ADDRESS, nBytesToRequest);
     delay(delayMillis);
     if (nBytesReceived != nBytesToRequest)
@@ -453,7 +453,7 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerA
     {
       byteArray[(TM_USER_DATA_MAX_LENGTH * frame) + indx] = Wire1.read();
     }
-    // We do noting with the last byte. We do not know if it is a CRC byte or
+    // We do noting with the last byte.  We do not know if it is a CRC byte or
     // part of the user data.
     (void) Wire1.read();
     if (receivedPacketDataLength < (userDataLength +
