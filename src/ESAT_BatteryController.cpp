@@ -209,7 +209,7 @@ byte ESAT_BatteryControllerClass::readByte(const word registerAddress,
                                            const Protocol theProtocol)
 {
   byte byteArray[1];
-  read(registerAddress, byteArray, 1, theProtocol);
+  read(registerAddress, byteArray, sizeof(byteArray), theProtocol);
   return byteArray[0];
 }
 
@@ -358,7 +358,7 @@ unsigned long ESAT_BatteryControllerClass::readUnsignedLong(const word registerA
                                                             const Protocol theProtocol)
 {
   byte byteArray[4];
-  read(registerAddress, byteArray, 4, theProtocol);
+  read(registerAddress, byteArray, sizeof(byteArray), theProtocol);
   return ESAT_Util.unsignedLong(byteArray[3],
                                 byteArray[2],
                                 byteArray[1],
@@ -505,7 +505,7 @@ word ESAT_BatteryControllerClass::readWord(const word registerAddress,
                                            const Protocol theProtocol)
 {
   byte byteArray[2];
-  read(registerAddress, byteArray, 2, theProtocol);
+  read(registerAddress, byteArray, sizeof(byteArray), theProtocol);
   return word(byteArray[1], byteArray[0]);
 }
 
@@ -518,7 +518,7 @@ boolean ESAT_BatteryControllerClass::seal()
   byte operationStatus8[4];
   if (read(OPERATION_STATUS_REGISTER,
            operationStatus8,
-           4,
+           sizeof(operationStatus8),
            MANUFACTURER_PROTOCOL))
   {
     return true;
@@ -547,7 +547,7 @@ boolean ESAT_BatteryControllerClass::unseal()
   byte operationStatus8[4];
   if (read(OPERATION_STATUS_REGISTER,
            operationStatus8,
-           4,
+           sizeof(operationStatus8),
            MANUFACTURER_PROTOCOL))
   {
     return true;
