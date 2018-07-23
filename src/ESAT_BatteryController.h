@@ -63,7 +63,10 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     // Return false when the MCU is successfully sealed (see seal()),
     // otherwise return true.
-    boolean read(word registerAddress, byte content[], byte contentSize, Protocol theProtocol);
+    boolean read(word registerAddress,
+                 byte content[],
+                 byte contentSize,
+                 Protocol theProtocol);
 
     // Read the battery balancing configuration.
     // Set the error flag on error.
@@ -204,7 +207,9 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     // Return false when the MCU is successfully sealed, otherwise
     // return true.
-    boolean write(word dataMemoryAddress, byte dataMemory[], byte dataMemoryLength);
+    boolean write(word dataMemoryAddress,
+                  byte dataMemory[],
+                  byte dataMemoryLength);
 
     // Write the data memory address using the "alternate manufacturer access"
     // and the CRC checksum. It is used when the data memory address is
@@ -213,7 +218,7 @@ class ESAT_BatteryControllerClass
     // Return false when the MCU is successfully sealed, otherwise
     // return true.
     boolean write(word dataMemoryAddress);
-    
+
     // Update the value of delayMillis, in milliseconds. delayMillis is the
     // milliseconds waited after every I2C comm.
     void writeDelayBetweenCommunications(byte delayInMillis);
@@ -236,10 +241,14 @@ class ESAT_BatteryControllerClass
     static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_ID = 0x44;
 
     // The operation status register is used to read the current security mode.
-    static const unsigned long OPERATION_STATUS_SECURITY_MODE_MASK        = (unsigned long)0B11 << 8;
-    static const unsigned long OPERATION_STATUS_SECURITY_MODE_SEALED      = (unsigned long)0B11 << 8;
-    static const unsigned long OPERATION_STATUS_SECURITY_MODE_UNSEALED    = (unsigned long)0B10 << 8;
-    static const unsigned long OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS = (unsigned long)0B01 << 8;
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_MASK =
+      ((unsigned long) 0B11) << 8;
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_SEALED =
+      ((unsigned long) 0B11) << 8;
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_UNSEALED =
+      ((unsigned long) 0B10) << 8;
+    static const unsigned long OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS =
+      ((unsigned long) 0B01) << 8;
 
     // Mode of operation of writeFrame: append or don't append the CRC byte.
     enum CRCCommand
@@ -339,12 +348,13 @@ class ESAT_BatteryControllerClass
     // 3. TC footer.
     //      "CRC8 checksum" field (1 byte).
     static const byte TC_HEADER_LENGTH = 2;
-    static const byte TC_MEMORY_ADDRESS_FIELD_LENGTH = MEMORY_ADDRESS_FIELD_LENGTH;
+    static const byte TC_MEMORY_ADDRESS_FIELD_LENGTH =
+      MEMORY_ADDRESS_FIELD_LENGTH;
     static const byte TC_FOOTER_LENGTH = 1;
     static const byte TC_USER_DATA_MAX_LENGTH = BM_COMM_BUFFER
-                                               - TC_HEADER_LENGTH
-                                               - TC_MEMORY_ADDRESS_FIELD_LENGTH
-                                               - TC_FOOTER_LENGTH;
+                                              - TC_HEADER_LENGTH
+                                              - TC_MEMORY_ADDRESS_FIELD_LENGTH
+                                              - TC_FOOTER_LENGTH;
 
     // TM packet definition:
     // 1. TM header.
@@ -361,12 +371,13 @@ class ESAT_BatteryControllerClass
     // user data.  To keep it simple, we just deal with it.  We do not
     // check the CRC but we do not use it as user data.
     static const byte TM_HEADER_LENGTH = 1;
-    static const byte TM_MEMORY_ADDRESS_FIELD_LENGTH = MEMORY_ADDRESS_FIELD_LENGTH;
+    static const byte TM_MEMORY_ADDRESS_FIELD_LENGTH =
+      MEMORY_ADDRESS_FIELD_LENGTH;
     static const byte TM_FOOTER_LENGTH = 1;
-    static const byte TM_USER_DATA_MAX_LENGTH =BM_COMM_BUFFER
-                                               - TM_HEADER_LENGTH
-                                               - TM_MEMORY_ADDRESS_FIELD_LENGTH
-                                               - TM_FOOTER_LENGTH;
+    static const byte TM_USER_DATA_MAX_LENGTH = BM_COMM_BUFFER
+                                              - TM_HEADER_LENGTH
+                                              - TM_MEMORY_ADDRESS_FIELD_LENGTH
+                                              - TM_FOOTER_LENGTH;
 
     // If more than PERIOD milliseconds have ellapsed since
     // previousReadingTime, update all readings, set the error flag on
@@ -376,15 +387,18 @@ class ESAT_BatteryControllerClass
 
     // Read a byte from the given register using the given protocol.
     // Set the error flag on error.
-    byte readByte(word registerAddress, Protocol theProtocol);
+    byte readByte(word registerAddress,
+                  Protocol theProtocol);
 
     // Read a 16-bit integer from the given register using the given protocol.
     // Set the error flag on error.
-    word readWord(word registerAddress, Protocol theProtocol);
+    word readWord(word registerAddress,
+                  Protocol theProtocol);
 
     // Read a 32-bit integer from the given register using the given protocol.
     // Set the error flag on error.
-    unsigned long readUnsignedLong(word registerAddress, Protocol theProtocol);
+    unsigned long readUnsignedLong(word registerAddress,
+                                   Protocol theProtocol);
 
     // Read "contentSize" bytes from "registerAddress"
     // and store them in "content".
@@ -392,7 +406,9 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     // Return true when the communication is successfully done,
     // otherwise return false.
-    boolean readWithBlockProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
+    boolean readWithBlockProtocol(word registerAddress,
+                                  byte byteArray[],
+                                  byte byteArraySize);
 
     // Read "contentSize" bytes from "registerAddress"
     // and store them in "content".
@@ -400,7 +416,9 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     // Return true when the communication is successfully done,
     // otherwise return false.
-    boolean readWithManufacturerProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
+    boolean readWithManufacturerProtocol(word registerAddress,
+                                         byte byteArray[],
+                                         byte byteArraySize);
 
     // Read "contentSize" bytes from "registerAddress"
     // and store them in "content".
@@ -408,7 +426,9 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     // Return true when the communication is successfully done,
     // otherwise return false.
-    boolean readWithWordProtocol(word registerAddress, byte byteArray[], byte byteArraySize);
+    boolean readWithWordProtocol(word registerAddress,
+                                 byte byteArray[],
+                                 byte byteArraySize);
 
     // Receive the frame to send (without the CRC byte).
     // Compute the CRC and append it to the frame when requested
@@ -416,7 +436,9 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     // Return true when the communication is successfully done,
     // otherwise return false.
-    boolean writeFrame(byte frame[],byte frameLength, CRCCommand command);
+    boolean writeFrame(byte frame[],
+                       byte frameLength,
+                       CRCCommand command);
 
     // Write the seal register.
     // Set the error flag on error.
