@@ -17,6 +17,7 @@
  */
 
 #include "ESAT_BatteryController.h"
+#include <ESAT_Buffer.h>
 #include <Wire.h>
 
 ESAT_BatteryControllerClass::ESAT_BatteryControllerClass()
@@ -403,8 +404,8 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerA
   byte receivedRegisterAddressLow;
   byte receivedRegisterAddressHigh;
   byte userDataLength;
-  byte telecommandFrame[BM_COMMUNICATION_BUFFER_LENGTH - 1];
-  byte telecommandFrameIndex;
+  byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
+  ESAT_Buffer telecommandFrame(telecommandFrameBuffer, sizeof(telecommandFrameBuffer));
   byte numberOfBytesToRequest;
   byte receivedPacketDataLength;
   for (byte frame = 0; frame < numberOfFrames; frame++)
@@ -434,11 +435,9 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(word registerA
       return true;
     }
     // Send command to request the data.
-    telecommandFrameIndex = 0;
-    telecommandFrame[telecommandFrameIndex] = ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER;
-    telecommandFrameIndex++;
-    transmissionStatus = writeFrame(telecommandFrame,
-                                    telecommandFrameIndex,
+    telecommandFrame.write(ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER);
+    transmissionStatus = writeFrame(telecommandFrameBuffer,
+                                    telecommandFrame.length(),
                                     DO_NOT_APPEND_CRC_BYTE);
     if (transmissionStatus)
     {
@@ -583,8 +582,8 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress,
   byte PacketDataLength;
   byte userDataLength;
   // We fill the whole frame except the checksum byte.
-  byte telecommandFrame[BM_COMMUNICATION_BUFFER_LENGTH - 1];
-  byte telecommandFrameIndex;
+  byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
+  ESAT_Buffer telecommandFrame(telecommandFrameBuffer, sizeof(telecommandFrameBuffer));
   for (byte frame = 0; frame < numberOfFrames; frame++)
   {
     // Data memory address.
@@ -601,21 +600,17 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress,
       userDataLength = TELECOMMAND_USER_DATA_MAX_LENGTH;
     }
     PacketDataLength = userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
-    telecommandFrameIndex = 0;
-    telecommandFrame[telecommandFrameIndex] = ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER;
-    telecommandFrameIndex++;
-    telecommandFrame[telecommandFrameIndex] = PacketDataLength;
-    telecommandFrameIndex++;
-    telecommandFrame[telecommandFrameIndex] = dataMemoryAddressLow;
-    telecommandFrameIndex++;
-    telecommandFrame[telecommandFrameIndex] = dataMemoryAddressHigh;
-    telecommandFrameIndex++;
+    telecommandFrame.write(ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER);
+    telecommandFrame.write(PacketDataLength);
+    telecommandFrame.write(dataMemoryAddressLow);
+    telecommandFrame.write(dataMemoryAddressHigh);
     for (byte index = 0; index < userDataLength; index++)
     {
-      telecommandFrame[telecommandFrameIndex] = dataMemory[(TELECOMMAND_USER_DATA_MAX_LENGTH * frame) + index];
-      telecommandFrameIndex++;
+      telecommandFrame.write(dataMemory[(TELECOMMAND_USER_DATA_MAX_LENGTH * frame) + index]);
     }
-    if (writeFrame(telecommandFrame, telecommandFrameIndex, APPEND_CRC_BYTE))
+    if (writeFrame(telecommandFrameBuffer,
+                   telecommandFrame.length(),
+                   APPEND_CRC_BYTE))
     {
       return true;
     }
@@ -630,24 +625,21 @@ boolean ESAT_BatteryControllerClass::write(word dataMemoryAddress)
   byte PacketDataLength;
   byte userDataLength;
   // We fill the whole frame except the checksum byte.
-  byte telecommandFrame[BM_COMMUNICATION_BUFFER_LENGTH - 1];
-  byte telecommandFrameIndex;
+  byte telecommandFrameBuffer[BM_COMMUNICATION_BUFFER_LENGTH - 1];
+  ESAT_Buffer telecommandFrame(telecommandFrameBuffer, sizeof(telecommandFrameBuffer));
   // Data memory address.
   dataMemoryAddressLow = dataMemoryAddress % 0x100;
   dataMemoryAddressHigh = (dataMemoryAddress / 0x100) % 0x100;
   // Frame length.
   userDataLength = 0;
   PacketDataLength = userDataLength + TELECOMMAND_MEMORY_ADDRESS_FIELD_LENGTH;
-  telecommandFrameIndex = 0;
-  telecommandFrame[telecommandFrameIndex] = ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER;
-  telecommandFrameIndex++;
-  telecommandFrame[telecommandFrameIndex] = PacketDataLength;
-  telecommandFrameIndex++;
-  telecommandFrame[telecommandFrameIndex] = dataMemoryAddressLow;
-  telecommandFrameIndex++;
-  telecommandFrame[telecommandFrameIndex] = dataMemoryAddressHigh;
-  telecommandFrameIndex++;
-  return writeFrame(telecommandFrame, telecommandFrameIndex, APPEND_CRC_BYTE);
+  telecommandFrame.write(ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER);
+  telecommandFrame.write(PacketDataLength);
+  telecommandFrame.write(dataMemoryAddressLow);
+  telecommandFrame.write(dataMemoryAddressHigh);
+  return writeFrame(telecommandFrameBuffer,
+                    telecommandFrame.length(),
+                    APPEND_CRC_BYTE);
 }
 
 void ESAT_BatteryControllerClass::writeDelayBetweenCommunications(byte delayInMilliseconds)
