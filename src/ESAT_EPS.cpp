@@ -321,6 +321,10 @@ void ESAT_EPSClass::respondToNamedPacketTelemetryRequest(const byte identifier)
       ESAT_I2CSlave.rejectPacket();
     }
   }
+  else
+  {
+    ESAT_I2CSlave.rejectPacket();
+  }
 }
 
 void ESAT_EPSClass::respondToNextPacketTelecommandRequest()
