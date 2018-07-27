@@ -211,7 +211,7 @@ class ESAT_EPSClass
       + BM_CONFIGURATION_TELEMETRY_BUFFER_LENGTH;
 
     // Telemetry with the highest packet data length.
-    static const byte MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH = 
+    static const byte MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH =
       BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH;
 
     // Maximum number of available telemetry packets.
@@ -282,7 +282,7 @@ class ESAT_EPSClass
 
     // Set the time of the real time clock.
     void handleSetTimeCommand(ESAT_CCSDSPacket& packet);
-    
+
     // Set the BM housekeeping telemetry as pending
     void handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
 
