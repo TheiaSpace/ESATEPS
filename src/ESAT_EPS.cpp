@@ -213,7 +213,7 @@ void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
 void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
   byte receivedIdentifier = packet.readByte();
-  if(availableTelemetry.read(receivedIdentifier))
+  if (availableTelemetry.read(receivedIdentifier))
   {
     activeTelemetry.set(receivedIdentifier);
   }
@@ -222,7 +222,7 @@ void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 void ESAT_EPSClass::handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
   byte receivedIdentifier = packet.readByte();
-  if(availableTelemetry.read(receivedIdentifier))
+  if (availableTelemetry.read(receivedIdentifier))
   {
     activeTelemetry.clear(receivedIdentifier);
   }
