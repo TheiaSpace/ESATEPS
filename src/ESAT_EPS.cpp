@@ -53,7 +53,6 @@ void ESAT_EPSClass::begin()
                             MAJOR_VERSION_NUMBER,
                             MINOR_VERSION_NUMBER,
                             PATCH_VERSION_NUMBER,
-                            ESAT_CCSDSPrimaryHeader::TELEMETRY,
                             clock);
   telemetry = ESAT_CCSDSPacket(telemetryPacketData,
                                MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
@@ -96,8 +95,8 @@ boolean ESAT_EPSClass::fillTelemetryPacket(ESAT_CCSDSPacket& packet,
     if (telemetryPackets[index]->packetIdentifier() == identifier)
     {
       packet.flush();
-      return telemetryPacketBuilder.buildPacket(packet,
-                                                *(telemetryPackets[index]));
+      return telemetryPacketBuilder.buildTelemetryPacket(packet,
+                                                         *(telemetryPackets[index]));
     }
   }
   return false;
