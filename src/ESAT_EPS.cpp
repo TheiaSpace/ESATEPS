@@ -34,18 +34,18 @@ void ESAT_EPSClass::addTelemetryPacket(ESAT_CCSDSPacketContents& packet)
 {
   telemetryPackets[numberOfTelemetryPackets] = &packet;
   numberOfTelemetryPackets = numberOfTelemetryPackets + 1;
-  AvailableTelemetry.set(packet.packetIdentifier());
+  availableTelemetry.set(packet.packetIdentifier());
 }
 
 void ESAT_EPSClass::begin()
 {
-  AvailableTelemetry.clearAll();
+  availableTelemetry.clearAll();
   numberOfTelemetryPackets = 0;
   addTelemetryPacket(ESAT_EPSHousekeeping);
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
-  ActiveTelemetry.clearAll();
-  ActiveTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
-  ActiveTelemetry.set(ESAT_BatteryModuleHousekeeping.packetIdentifier());
+  activeTelemetry.clearAll();
+  activeTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
+  activeTelemetry.set(ESAT_BatteryModuleHousekeeping.packetIdentifier());
   pendingTelemetry.clearAll();
   i2cPendingTelemetry.clearAll();
   telemetryPacketBuilder =
@@ -213,18 +213,18 @@ void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
 void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
   byte receivedId = packet.readByte();
-  if(AvailableTelemetry.read(receivedId))
+  if(availableTelemetry.read(receivedId))
   {
-    ActiveTelemetry.set(receivedId);
+    activeTelemetry.set(receivedId);
   }
 }
 
 void ESAT_EPSClass::handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
   byte receivedId = packet.readByte();
-  if(AvailableTelemetry.read(receivedId))
+  if(availableTelemetry.read(receivedId))
   {
-    ActiveTelemetry.clear(receivedId);
+    activeTelemetry.clear(receivedId);
   }
 }
 
@@ -378,7 +378,7 @@ void ESAT_EPSClass::updatePendingTelemetryList()
   for (word index = 0; index < numberOfTelemetryPackets; index++)
   {
     const byte packetIdentifier = telemetryPackets[index]->packetIdentifier();
-    if (ActiveTelemetry.read(packetIdentifier)
+    if (activeTelemetry.read(packetIdentifier)
         && telemetryPackets[index]->available())
     {
       pendingTelemetry.set(packetIdentifier);

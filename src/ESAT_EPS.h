@@ -235,10 +235,10 @@ class ESAT_EPSClass
     byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
     // List of all the telemetry IDs that can be delivered.
-    ESAT_FlagContainer AvailableTelemetry;
+    ESAT_FlagContainer availableTelemetry;
 
     // List of the telemetry IDs that have to be delivered every cycle.
-    ESAT_FlagContainer ActiveTelemetry;
+    ESAT_FlagContainer activeTelemetry;
 
     // List of telemetry identifiers that are pending to be delivered in the
     // current I2C next-packet telemetry read cycle.
