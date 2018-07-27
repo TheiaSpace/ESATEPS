@@ -154,12 +154,18 @@ class ESAT_EPSClass
     // - Direct energy transfer system. Voltage (2 bytes).
     // - Direct energy transfer system. Shunt voltage (2 bytes).
     // - Direct energy transfer system. Error (1 byte).
-    static const byte EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*12;
-    static const byte SWITCHES_TELEMETRY_BUFFER_LENGTH = 1*2;
-    static const byte BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH = 2*5 + 1*2;
-    static const byte PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH = 2*2 + 1*2;
-    static const byte MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH = 1*4;
-    static const byte DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH = 2*3 + 1*1;
+    static const byte EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH =
+      2*12;
+    static const byte SWITCHES_TELEMETRY_BUFFER_LENGTH =
+      1*2;
+    static const byte BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH =
+      2*5 + 1*2;
+    static const byte PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH =
+      2*2 + 1*2;
+    static const byte MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH =
+      1*4;
+    static const byte DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH =
+      2*3 + 1*1;
     static const byte HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
       + EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
