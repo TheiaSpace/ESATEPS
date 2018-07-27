@@ -210,7 +210,7 @@ class ESAT_EPSClass
       + BM_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
       + BM_CONFIGURATION_TELEMETRY_BUFFER_LENGTH;
 
-    // Telemetry with the highest packet data length
+    // Telemetry with the highest packet data length.
     static const byte MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH = 
       BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH;
 
@@ -234,10 +234,10 @@ class ESAT_EPSClass
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
-    // List of all the telemetry IDs that can be delivered.
+    // List of all the telemetry identifiers that can be delivered.
     ESAT_FlagContainer availableTelemetry;
 
-    // List of the telemetry IDs that have to be delivered every cycle.
+    // List of the telemetry identifiers that have to be delivered every cycle.
     ESAT_FlagContainer activeTelemetry;
 
     // List of telemetry identifiers that are pending to be delivered in the
