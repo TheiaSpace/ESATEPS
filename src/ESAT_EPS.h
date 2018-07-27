@@ -154,12 +154,18 @@ class ESAT_EPSClass
     // - Direct energy transfer system. Voltage (2 bytes).
     // - Direct energy transfer system. Shunt voltage (2 bytes).
     // - Direct energy transfer system. Error (1 byte).
-    static const byte EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*12;
-    static const byte SWITCHES_TELEMETRY_BUFFER_LENGTH = 1*2;
-    static const byte BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH = 2*5 + 1*2;
-    static const byte PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH = 2*2 + 1*2;
-    static const byte MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH = 1*4;
-    static const byte DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH = 2*3 + 1*1;
+    static const byte EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH =
+      2*12;
+    static const byte SWITCHES_TELEMETRY_BUFFER_LENGTH =
+      1*2;
+    static const byte BATTERY_CONTROLLER_TELEMETRY_BUFFER_LENGTH =
+      2*5 + 1*2;
+    static const byte PANEL_THERMOMETERS_TELEMETRY_BUFFER_LENGTH =
+      2*2 + 1*2;
+    static const byte MAXIMUM_POWER_POINT_TRACKING_TELEMETRY_BUFFER_LENGTH =
+      1*4;
+    static const byte DIRECT_ENERGY_TRANSFER_SYSTEM_TELEMETRY_BUFFER_LENGTH =
+      2*3 + 1*1;
     static const byte HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
       + EPS_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
@@ -201,18 +207,21 @@ class ESAT_EPSClass
     // - Battery configuration. CUV recovery delay (1 bytes).
     // - Battery configuration. Chemical ID (2 bytes).
     // - Battery configuration. Firmware version (11 bytes).
-    static const byte BM_STATUS_REGISTERS_TELEMETRY_BUFFER_LENGTH = 4*4;
-    static const byte BM_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH = 2*8 + 1*3;
-    static const byte BM_CONFIGURATION_TELEMETRY_BUFFER_LENGTH = 11*1+4*1+2*9+1*4;
-    static const byte BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH =
+    static const byte BATTERY_MODULE_STATUS_REGISTERS_TELEMETRY_BUFFER_LENGTH =
+      4*4;
+    static const byte BATTERY_MODULE_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH =
+      2*8 + 1*3;
+    static const byte BATTERY_MODULE_CONFIGURATION_TELEMETRY_BUFFER_LENGTH =
+      11*1 + 4*1 + 2*9 + 1*4;
+    static const byte BATTERY_MODULE_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
-      + BM_STATUS_REGISTERS_TELEMETRY_BUFFER_LENGTH
-      + BM_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
-      + BM_CONFIGURATION_TELEMETRY_BUFFER_LENGTH;
+      + BATTERY_MODULE_STATUS_REGISTERS_TELEMETRY_BUFFER_LENGTH
+      + BATTERY_MODULE_MEASUREMENTS_TELEMETRY_BUFFER_LENGTH
+      + BATTERY_MODULE_CONFIGURATION_TELEMETRY_BUFFER_LENGTH;
 
-    // Telemetry with the highest packet data length
-    static const byte MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH = 
-      BM_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH;
+    // Telemetry with the highest packet data length.
+    static const byte MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH =
+      BATTERY_MODULE_HOUSEKEEPING_TELEMETRY_PACKET_DATA_LENGTH;
 
     // Maximum number of available telemetry packets.
     static const word MAXIMUM_NUMBER_OF_TELEMETRY_PACKETS = 16;
@@ -234,11 +243,11 @@ class ESAT_EPSClass
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
-    // List of all the telemetry IDs that can be delivered.
-    ESAT_FlagContainer AvailableTelemetry;
+    // List of all the telemetry identifiers that can be delivered.
+    ESAT_FlagContainer availableTelemetry;
 
-    // List of the telemetry IDs that have to be delivered every cycle.
-    ESAT_FlagContainer ActiveTelemetry;
+    // List of the telemetry identifiers that have to be delivered every cycle.
+    ESAT_FlagContainer activeTelemetry;
 
     // List of telemetry identifiers that are pending to be delivered in the
     // current I2C next-packet telemetry read cycle.
@@ -282,7 +291,7 @@ class ESAT_EPSClass
 
     // Set the time of the real time clock.
     void handleSetTimeCommand(ESAT_CCSDSPacket& packet);
-    
+
     // Set the BM housekeeping telemetry as pending
     void handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
 
