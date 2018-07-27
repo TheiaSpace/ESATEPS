@@ -45,7 +45,6 @@ void ESAT_EPSClass::begin()
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
   activeTelemetry.clearAll();
   activeTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
-  activeTelemetry.set(ESAT_BatteryModuleHousekeeping.packetIdentifier());
   pendingTelemetry.clearAll();
   i2cPendingTelemetry.clearAll();
   telemetryPacketBuilder =
