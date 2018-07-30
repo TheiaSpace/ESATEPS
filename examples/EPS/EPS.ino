@@ -62,5 +62,5 @@ void loop()
   {
     ESAT_EPS.writeTelemetry(packet);
   }
-  analogWrite(LED_E,(byte)(millis()%1000*255/1000));
+  analogWrite(LED_E, byte(((millis() % 1000) * 255) / 1000));
 }
