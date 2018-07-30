@@ -25,7 +25,6 @@
 #include <ESAT_CCSDSPacketContents.h>
 #include <ESAT_KISSStream.h>
 #include <ESAT_SoftwareClock.h>
-#include <ESAT_FlagContainer.h>
 
 // Library with the functionality of the Electrical Power Subsystem
 // (EPS) board.  Use the global instance EPS.
@@ -233,29 +232,12 @@ class ESAT_EPSClass
     // Telemetry packet builder.
     ESAT_CCSDSPacketBuilder telemetryPacketBuilder;
 
-    // Number of available telemetry packets.
-    word numberOfTelemetryPackets;
-
-    // Available telemetry packets.
-    ESAT_CCSDSPacketContents* telemetryPackets[MAXIMUM_NUMBER_OF_TELEMETRY_PACKETS];
+    // Telemetry packet builder for I2C requests.
+    ESAT_CCSDSPacketBuilder i2cTelemetryPacketBuilder;
 
     // I2C packet buffers.
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
-
-    // List of all the telemetry identifiers that can be delivered.
-    ESAT_FlagContainer availableTelemetry;
-
-    // List of the telemetry identifiers that have to be delivered every cycle.
-    ESAT_FlagContainer activeTelemetry;
-
-    // List of telemetry identifiers that are pending to be delivered in the
-    // current I2C next-packet telemetry read cycle.
-    ESAT_FlagContainer i2cPendingTelemetry;
-
-    // List of the telemetry identifiers that are pending to be delivered
-    // in the current EPS cycle.
-    ESAT_FlagContainer pendingTelemetry;
 
     // Decode USB KISS frames with this stream.
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
@@ -267,11 +249,6 @@ class ESAT_EPSClass
 
     // Telemetry packet data buffer.
     byte telemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
-
-    // Fill the contents of a packet with the registered telemetry
-    // packet of given identifier.
-    // Return true on success; otherwise return false.
-    boolean fillTelemetryPacket(ESAT_CCSDSPacket& packet, byte identifier);
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
