@@ -87,13 +87,6 @@ class ESAT_EPSClass
       DEACTIVATE_TELEMETRY_DELIVERY = 0x31,
     };
 
-    // Telemetry packet identifiers.
-    enum TelemetryPacketIdentifier
-    {
-      HOUSEKEEPING = 0,
-      BM_HOUSEKEEPING = 1,
-    };
-
     // EPS subsystem identifier.
     static const word APPLICATION_PROCESS_IDENTIFIER = 1;
 
