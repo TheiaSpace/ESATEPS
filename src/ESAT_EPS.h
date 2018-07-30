@@ -284,11 +284,11 @@ class ESAT_EPSClass
     // bus.
     void respondToNextPacketTelemetryRequest();
 
+    // Rewind the telemetry queue.
+    void rewindTelemetryQueue();
+
     // Update the maximum power point tracking system.
     void updateMaximumPowerPointTracking();
-
-    // Update the pending telemetry list.
-    void updatePendingTelemetryList();
 };
 
 // Global instance of the EPS library.

@@ -61,7 +61,7 @@ void ESAT_EPSClass::begin()
   ESAT_PowerLine3V3Switch.begin();
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
   Wire1.begin();
-  ESAT_BatteryController.writeDelayBetweenCommunications((byte)2);
+  ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
   Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   USB.begin();
   ESAT_I2CSlave.begin(Wire,
@@ -300,10 +300,15 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
   }
 }
 
+void ESAT_EPSClass::rewindTelemetryQueue()
+{
+  telemetryPacketBuilder.rewindPacketContentsQueue();
+}
+
 void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
-  updatePendingTelemetryList();
+  rewindTelemetryQueue();
   respondToI2CRequest();
 }
 
@@ -311,11 +316,6 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 {
   ESAT_MaximumPowerPointTrackingDriver1.update();
   ESAT_MaximumPowerPointTrackingDriver2.update();
-}
-
-void ESAT_EPSClass::updatePendingTelemetryList()
-{
-  telemetryPacketBuilder.rewindPacketContentsQueue();
 }
 
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
