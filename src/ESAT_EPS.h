@@ -244,12 +244,6 @@ class ESAT_EPSClass
                               + MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     ESAT_KISSStream usbTelecommandDecoder;
 
-    // Telemetry buffer.
-    ESAT_CCSDSPacket telemetry;
-
-    // Telemetry packet data buffer.
-    byte telemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
-
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
 
