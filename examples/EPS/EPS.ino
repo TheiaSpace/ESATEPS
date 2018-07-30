@@ -34,6 +34,7 @@ const word PACKET_DATA_BUFFER_LENGTH = 256;
 void setup()
 {
   ESAT_EPS.begin();
+  pinMode(LED_E, OUTPUT);
 }
 
 // Body of the main loop of the program:
@@ -50,7 +51,6 @@ void setup()
 // data; if the buffer is too small, the packets will be dropped.
 void loop()
 {
-  static const byte LED = 42;
   byte buffer[PACKET_DATA_BUFFER_LENGTH];
   ESAT_CCSDSPacket packet(buffer, sizeof(buffer));
   while (ESAT_EPS.readTelecommand(packet))
@@ -62,5 +62,5 @@ void loop()
   {
     ESAT_EPS.writeTelemetry(packet);
   }
-  analogWrite(LED,(byte)(millis()%1000*255/1000));
+  analogWrite(LED_E,(byte)(millis()%1000*255/1000));
 }
