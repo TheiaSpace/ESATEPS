@@ -87,13 +87,6 @@ class ESAT_EPSClass
       DEACTIVATE_TELEMETRY_DELIVERY = 0x31,
     };
 
-    // Telemetry packet identifiers.
-    enum TelemetryPacketIdentifier
-    {
-      HOUSEKEEPING = 0,
-      BM_HOUSEKEEPING = 1,
-    };
-
     // EPS subsystem identifier.
     static const word APPLICATION_PROCESS_IDENTIFIER = 1;
 
@@ -243,12 +236,6 @@ class ESAT_EPSClass
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
                               + MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     ESAT_KISSStream usbTelecommandDecoder;
-
-    // Telemetry buffer.
-    ESAT_CCSDSPacket telemetry;
-
-    // Telemetry packet data buffer.
-    byte telemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);

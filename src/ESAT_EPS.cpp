@@ -48,8 +48,6 @@ void ESAT_EPSClass::begin()
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
   telemetryPacketBuilder.enablePacket(ESAT_EPSHousekeeping.packetIdentifier());
   telemetryPacketBuilder.disablePacket(ESAT_BatteryModuleHousekeeping.packetIdentifier());
-  telemetry = ESAT_CCSDSPacket(telemetryPacketData,
-                               MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
   usbTelecommandDecoder = ESAT_KISSStream(USB,
                                           usbTelecommandBuffer,
                                           sizeof(usbTelecommandBuffer));
