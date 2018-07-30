@@ -300,10 +300,15 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
   }
 }
 
+void ESAT_EPSClass::rewindTelemetryQueue()
+{
+  telemetryPacketBuilder.rewindPacketContentsQueue();
+}
+
 void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
-  updatePendingTelemetryList();
+  rewindTelemetryQueue();
   respondToI2CRequest();
 }
 
@@ -311,11 +316,6 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 {
   ESAT_MaximumPowerPointTrackingDriver1.update();
   ESAT_MaximumPowerPointTrackingDriver2.update();
-}
-
-void ESAT_EPSClass::updatePendingTelemetryList()
-{
-  telemetryPacketBuilder.rewindPacketContentsQueue();
 }
 
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
