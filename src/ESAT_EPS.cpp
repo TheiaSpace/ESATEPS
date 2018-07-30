@@ -61,7 +61,7 @@ void ESAT_EPSClass::begin()
   ESAT_PowerLine3V3Switch.begin();
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
   Wire1.begin();
-  ESAT_BatteryController.writeDelayBetweenCommunications((byte)2);
+  ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
   Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   USB.begin();
   ESAT_I2CSlave.begin(Wire,
