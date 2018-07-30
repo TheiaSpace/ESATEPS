@@ -34,7 +34,6 @@ const word PACKET_DATA_BUFFER_LENGTH = 256;
 void setup()
 {
   ESAT_EPS.begin();
-  pinMode(LED_E, OUTPUT);
 }
 
 // Body of the main loop of the program:
@@ -42,8 +41,9 @@ void setup()
 //   and from the USB interface).
 // - Handle the incoming telecommands.
 // - Update the telemetry measurements and do housekeeping work
-//   (update the maximum power point tracking drivers and prepare
-//   the responses to I2C telemetry requests).
+//   (update the maximum power point tracking drivers, respond to I2C
+//   telemetry requests and update the brightness of the heartbeat
+//   LED).
 // - Retrieve the telemetry packets.
 // - Write the telemetry packets through the USB interface.
 // The packet data buffer used for telecommand and telemetry
@@ -62,5 +62,4 @@ void loop()
   {
     ESAT_EPS.writeTelemetry(packet);
   }
-  analogWrite(LED_E, byte(((millis() % 1000) * 255) / 1000));
 }
