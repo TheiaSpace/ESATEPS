@@ -24,6 +24,7 @@
 #include <USBSerial.h>
 #include <Wire.h>
 #include "ESAT_BatteryModuleHousekeeping.h"
+#include "ESAT_EPSLED.h"
 #include "ESAT_EPSHousekeeping.h"
 #include "ESAT_EPSMeasurements.h"
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
@@ -62,6 +63,7 @@ void ESAT_EPSClass::begin()
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
   Wire1.begin();
   ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
+  ESAT_EPSLED.begin();
   Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   USB.begin();
   ESAT_I2CSlave.begin(Wire,
@@ -310,6 +312,14 @@ void ESAT_EPSClass::update()
   updateMaximumPowerPointTracking();
   rewindTelemetryQueue();
   respondToI2CRequest();
+  updateLEDBrightness();
+}
+
+void ESAT_EPSClass::updateLEDBrightness()
+{
+  const word milliseconds = millis() % 1000;
+  const float brightness = (milliseconds / 1000.) * 100.;
+  ESAT_EPSLED.write(brightness);
 }
 
 void ESAT_EPSClass::updateMaximumPowerPointTracking()
