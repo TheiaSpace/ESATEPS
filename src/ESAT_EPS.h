@@ -21,8 +21,9 @@
 
 #include <Arduino.h>
 #include <ESAT_CCSDSPacket.h>
-#include <ESAT_CCSDSPacketBuilder.h>
 #include <ESAT_CCSDSPacketContents.h>
+#include <ESAT_CCSDSTelemetryPacketBuilder.h>
+#include <ESAT_FlagContainer.h>
 #include <ESAT_KISSStream.h>
 #include <ESAT_SoftwareClock.h>
 
@@ -225,10 +226,21 @@ class ESAT_EPSClass
     ESAT_SoftwareClock clock;
 
     // Telemetry packet builder.
-    ESAT_CCSDSPacketBuilder telemetryPacketBuilder;
+    ESAT_CCSDSTelemetryPacketBuilder telemetryPacketBuilder;
 
-    // Telemetry packet builder for I2C requests.
-    ESAT_CCSDSPacketBuilder i2cTelemetryPacketBuilder;
+    // Enabled telemetry list.
+    ESAT_FlagContainer enabledTelemetry;
+
+    // Pending telemetry list for I2C requests (active).
+    ESAT_FlagContainer i2cPendingTelemetry;
+
+    // Pending telemetry list for I2C requests
+    // (buffer; copy this list into i2cPendingTelemetry
+    // on pending telemetry list reset request).
+    ESAT_FlagContainer i2cPendingTelemetryBuffer;
+
+    // Pending telemetry list for USB output.
+    ESAT_FlagContainer usbPendingTelemetry;
 
     // I2C packet buffers.
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
@@ -286,14 +298,14 @@ class ESAT_EPSClass
     // bus.
     void respondToNextPacketTelemetryRequest();
 
-    // Rewind the telemetry queue.
-    void rewindTelemetryQueue();
-
     // Update the brightness of the heartbeat LED.
     void updateLEDBrightness();
 
     // Update the maximum power point tracking system.
     void updateMaximumPowerPointTracking();
+
+    // Update the lists of pending telemetry.
+    void updatePendingTelemetryLists();
 };
 
 // Global instance of the EPS library.

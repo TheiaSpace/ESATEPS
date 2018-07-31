@@ -33,22 +33,25 @@
 
 void ESAT_EPSClass::addTelemetryPacket(ESAT_CCSDSPacketContents& contents)
 {
-  telemetryPacketBuilder.addPacketContents(contents);
+  telemetryPacketBuilder.add(contents);
 }
 
 void ESAT_EPSClass::begin()
 {
   telemetryPacketBuilder =
-    ESAT_CCSDSPacketBuilder(APPLICATION_PROCESS_IDENTIFIER,
-                            MAJOR_VERSION_NUMBER,
-                            MINOR_VERSION_NUMBER,
-                            PATCH_VERSION_NUMBER,
-                            clock);
-  i2cTelemetryPacketBuilder = telemetryPacketBuilder;
+    ESAT_CCSDSTelemetryPacketBuilder(APPLICATION_PROCESS_IDENTIFIER,
+                                     MAJOR_VERSION_NUMBER,
+                                     MINOR_VERSION_NUMBER,
+                                     PATCH_VERSION_NUMBER,
+                                     clock);
+  enabledTelemetry.clearAll();
+  i2cPendingTelemetry.clearAll();
+  i2cPendingTelemetryBuffer.clearAll();
+  usbPendingTelemetry.clearAll();
   addTelemetryPacket(ESAT_EPSHousekeeping);
+  enabledTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
-  telemetryPacketBuilder.enablePacket(ESAT_EPSHousekeeping.packetIdentifier());
-  telemetryPacketBuilder.disablePacket(ESAT_BatteryModuleHousekeeping.packetIdentifier());
+  enabledTelemetry.clear(ESAT_BatteryModuleHousekeeping.packetIdentifier());
   usbTelecommandDecoder = ESAT_KISSStream(USB,
                                           usbTelecommandBuffer,
                                           sizeof(usbTelecommandBuffer));
@@ -184,13 +187,13 @@ void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
 void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
   const byte identifier = packet.readByte();
-  telemetryPacketBuilder.enablePacket(identifier);
+  enabledTelemetry.set(identifier);
 }
 
 void ESAT_EPSClass::handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
 {
   const byte identifier = packet.readByte();
-  telemetryPacketBuilder.disablePacket(identifier);
+  enabledTelemetry.clear(identifier);
 }
 
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
@@ -238,7 +241,8 @@ boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
 
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
 {
-  return telemetryPacketBuilder.buildNextTelemetryPacket(packet);
+  return telemetryPacketBuilder.buildNext(packet,
+                                          usbPendingTelemetry);
 }
 
 void ESAT_EPSClass::respondToI2CRequest()
@@ -264,8 +268,14 @@ void ESAT_EPSClass::respondToNamedPacketTelemetryRequest(const byte identifier)
 {
   byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
   ESAT_CCSDSPacket packet(packetData, sizeof(packetData));
+  const boolean enabled = enabledTelemetry.read(identifier);
+  if (!enabled)
+  {
+    ESAT_I2CSlave.rejectPacket();
+    return;
+  }
   const boolean gotPacket =
-    telemetryPacketBuilder.buildNamedTelemetryPacket(packet, identifier);
+    telemetryPacketBuilder.build(packet, identifier);
   if (gotPacket)
   {
     ESAT_I2CSlave.writePacket(packet);
@@ -285,13 +295,14 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
 {
   if (ESAT_I2CSlave.telemetryQueueResetReceived())
   {
-    i2cTelemetryPacketBuilder = telemetryPacketBuilder;
-    i2cTelemetryPacketBuilder.rewindPacketContentsQueue();
+    i2cPendingTelemetry = i2cPendingTelemetryBuffer;
+    i2cPendingTelemetryBuffer.clearAll();
   }
+  i2cPendingTelemetry = i2cPendingTelemetry & enabledTelemetry;
   byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
   ESAT_CCSDSPacket packet(packetData, sizeof(packetData));
   const boolean gotPacket =
-    i2cTelemetryPacketBuilder.buildNextTelemetryPacket(packet);
+    telemetryPacketBuilder.buildNext(packet, i2cPendingTelemetry);
   if (gotPacket)
   {
     ESAT_I2CSlave.writePacket(packet);
@@ -302,15 +313,22 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
   }
 }
 
-void ESAT_EPSClass::rewindTelemetryQueue()
+void ESAT_EPSClass::updatePendingTelemetryLists()
 {
-  telemetryPacketBuilder.rewindPacketContentsQueue();
-}
+  const ESAT_FlagContainer availableTelemetry =
+    telemetryPacketBuilder.available();
+  const ESAT_FlagContainer availableAndEnabledTelemetry =
+    availableTelemetry & enabledTelemetry;
+  usbPendingTelemetry =
+    availableAndEnabledTelemetry;
+  i2cPendingTelemetryBuffer =
+    i2cPendingTelemetryBuffer | availableAndEnabledTelemetry;
+ }
 
 void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
-  rewindTelemetryQueue();
+  updatePendingTelemetryLists();
   respondToI2CRequest();
   updateLEDBrightness();
 }
