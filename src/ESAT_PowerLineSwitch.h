@@ -51,7 +51,7 @@ class ESAT_PowerLineSwitchClass
 
   private:
     // Control this line.
-    const byte line;
+    byte line;
 
     // State of the switch.
     SwitchState state;

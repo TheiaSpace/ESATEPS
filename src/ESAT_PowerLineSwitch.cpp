@@ -18,9 +18,10 @@
 
 #include "ESAT_PowerLineSwitch.h"
 
-ESAT_PowerLineSwitchClass::ESAT_PowerLineSwitchClass(const byte line):
-  line(line), state(OFF)
+ESAT_PowerLineSwitchClass::ESAT_PowerLineSwitchClass(const byte theLine)
 {
+  line = theLine;
+  state = OFF;
 }
 
 void ESAT_PowerLineSwitchClass::begin()
