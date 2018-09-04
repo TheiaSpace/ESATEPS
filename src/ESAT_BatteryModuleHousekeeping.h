@@ -27,9 +27,6 @@
 class ESAT_BatteryModuleHousekeepingClass: public ESAT_CCSDSPacketContents
 {
   public:
-    // Instantiate a battery module housekeeping library.
-    ESAT_BatteryModuleHousekeepingClass();
-
     // Return true when a new packet is available, which is once every
     // second; otherwise return false.
     boolean available();
@@ -54,7 +51,7 @@ class ESAT_BatteryModuleHousekeepingClass: public ESAT_CCSDSPacketContents
     static const unsigned long PERIOD = 1000;
 
     // System uptime at the previous packet.
-    unsigned long previousPacketTime;
+    unsigned long previousPacketTime = 0;
 };
 
 // Global instance of the ESAT_BatteryModuleHousekeeping library.

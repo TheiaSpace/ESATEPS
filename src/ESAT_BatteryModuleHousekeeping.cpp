@@ -19,11 +19,6 @@
 #include "ESAT_BatteryModuleHousekeeping.h"
 #include "ESAT_BatteryController.h"
 
-ESAT_BatteryModuleHousekeepingClass::ESAT_BatteryModuleHousekeepingClass():
-  previousPacketTime(0)
-{
-}
-
 boolean ESAT_BatteryModuleHousekeepingClass::available()
 {
   const unsigned long currentPacketTime = millis();
