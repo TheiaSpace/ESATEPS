@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2017 Theia Space, Universidad Politécnica de Madrid
+ *
  * This file is part of Theia Space's ESAT EPS library.
  *
  * Theia Space's ESAT EPS library is free software: you can
