@@ -1,16 +1,41 @@
-ESAT_BatteryController	KEYWORD1
+#######################################
+# Syntax Coloring Map For ESATEPS
+#######################################
 
-ESAT_DirectEnergyTransferSystem	KEYWORD1
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
 
-ESAT_EPS	KEYWORD1
+ESAT_BatteryControllerClass	KEYWORD1
+ESAT_BatteryModuleHousekeeping	KEYWORD1
+ESAT_DirectEnergyTransferSystemClass	KEYWORD1
+ESAT_EPSClass	KEYWORD1
+ESAT_EPSHousekeeping	KEYWORD1
+ESAT_EPSLEDClass	KEYWORD1
+ESAT_EPSMeasurementsClass	KEYWORD1
+ESAT_MaximumPowerPointTrackingDriver	KEYWORD1
+ESAT_PowerLineSwitch	KEYWORD1
+ESAT_SolarPanelThermometer	KEYWORD1
 
-ESAT_EPSMeasurements	KEYWORD1
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
 
-ESAT_MaximumPowerPointTrackingDriver1	KEYWORD1
-ESAT_MaximumPowerPointTrackingDriver2	KEYWORD1
+#######################################
+# Instances (KEYWORD2)
+#######################################
 
-ESAT_PowerLine3V3Switch	KEYWORD1
-ESAT_PowerLine5VSwitch	KEYWORD1
+ESAT_BatteryController	KEYWORD2
+ESAT_DirectEnergyTransferSystem	KEYWORD2
+ESAT_EPS	KEYWORD2
+ESAT_EPSMeasurements	KEYWORD2
+ESAT_MaximumPowerPointTrackingDriver1	KEYWORD2
+ESAT_MaximumPowerPointTrackingDriver2	KEYWORD2
+ESAT_PowerLine3V3Switch	KEYWORD2
+ESAT_PowerLine5VSwitch	KEYWORD2
+ESAT_SolarPanel1Thermometer	KEYWORD2
+ESAT_SolarPanel2Thermometer	KEYWORD2
 
-ESAT_SolarPanel1Thermometer	KEYWORD1
-ESAT_SolarPanel2Thermometer	KEYWORD1
+#######################################
+# Constants (LITERAL1)
+#######################################
