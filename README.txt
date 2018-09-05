@@ -19,7 +19,7 @@ along with Theia Space's ESAT EPS library.  If not, see
 
 Electrical Power Subsystem (EPS) for ESAT.
 
-See the example EPS program.
+See the example EPS program (examples/EPS/EPS.ino).
 
 
 # ESAT_EPS
