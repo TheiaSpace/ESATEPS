@@ -32,6 +32,11 @@ This is the main library that provides the general EPS functionality.
 Battery voltage, current, temperature and state of charge readings.
 
 
+# ESAT_BatteryModuleHousekeeping
+
+Battery module housekeeping telemetry packet contents.
+
+
 # ESAT_DirectEnergyTransferSystem
 
 Readings on the direct energy transfer system.  The direct energy
