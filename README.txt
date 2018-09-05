@@ -49,6 +49,11 @@ panels.
 General EPS housekeeping telemetry packet contents.
 
 
+# ESAT_EPSLED
+
+Control of the on-board heartbeat LED.
+
+
 # ESAT_EPSMeasurements
 
 On-board voltage and current measurements.
