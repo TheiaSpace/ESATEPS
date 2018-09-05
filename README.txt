@@ -19,7 +19,11 @@ along with Theia Space's ESAT EPS library.  If not, see
 
 Electrical Power Subsystem (EPS) for ESAT.
 
-See the example EPS program (examples/EPS/EPS.ino).
+See the example EPS program (examples/EPS/EPS.ino).  This program
+uses the modules of the EPS library.
+
+The src/ directory contains the EPS library, which consists of the
+following modules:
 
 
 # ESAT_EPS
