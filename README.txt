@@ -17,6 +17,8 @@ along with Theia Space's ESAT EPS library.  If not, see
 <http://www.gnu.org/licenses/>.
 
 
+ESAT EPS library version 2.1.0.
+
 Electrical Power Subsystem (EPS) for ESAT.
 
 This software runs in the ESAT EPS board.  Use it with Arduino 1.8.0
