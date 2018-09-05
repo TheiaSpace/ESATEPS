@@ -19,6 +19,12 @@ along with Theia Space's ESAT EPS library.  If not, see
 
 Electrical Power Subsystem (EPS) for ESAT.
 
+This software runs in the ESAT EPS board.  Use it with Arduino 1.8.0
+or newer together with the Arduino core for MSP430-based ESAT boards
+(Theia Space's ESAT Boards (MSP430)) 2.2.0 or a newer 2.x.y version
+and the ESAT utility library (ESATUtil) version 2.1.0 or a newer 2.x.y
+version.  Use ESAT-EPS as the target board.
+
 See the example EPS program (examples/EPS/EPS.ino).  This program
 uses the modules of the EPS library.
 
