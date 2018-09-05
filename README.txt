@@ -44,6 +44,11 @@ transfer system can be used to dissipate excess power from the solar
 panels.
 
 
+# ESAT_EPSHousekeeping
+
+General EPS housekeeping telemetry packet contents.
+
+
 # ESAT_EPSMeasurements
 
 On-board voltage and current measurements.
