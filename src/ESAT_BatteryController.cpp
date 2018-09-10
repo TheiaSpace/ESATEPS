@@ -59,7 +59,8 @@ ESAT_BatteryControllerClass::ESAT_BatteryControllerClass()
   serialNumber = 0;
   totalBatteryVoltage = 0;
   previousError = false;
-  previousReadingTime = 0;
+  previousBatteryModuleHousekeepingReadingTime = 0;
+  previousEPSHousekeepingReadingTime = 0;
 }
 
 boolean ESAT_BatteryControllerClass::read(const word registerAddress,
@@ -91,29 +92,19 @@ boolean ESAT_BatteryControllerClass::read(const word registerAddress,
   return false;
 }
 
-void ESAT_BatteryControllerClass::readAll()
+void ESAT_BatteryControllerClass::readBatteryModuleHousekeeping()
 {
   const unsigned long readingTime = millis();
-  if ((readingTime - previousReadingTime) <= PERIOD)
+  if ((readingTime - previousBatteryModuleHousekeepingReadingTime) <= PERIOD)
   {
     error = previousError;
   }
   else
   {
-    previousReadingTime               = readingTime;
+    previousBatteryModuleHousekeepingReadingTime = readingTime;
     balancingConfiguration            = readByte(BALANCING_CONFIGURATION_REGISTER,
                                                  MANUFACTURER_PROTOCOL);
-    battery1Voltage                   = readWord(BATTERY_1_VOLTAGE_REGISTER,
-                                                 WORD_PROTOCOL);
-    battery2Voltage                   = readWord(BATTERY_2_VOLTAGE_REGISTER,
-                                                 WORD_PROTOCOL);
     batteryAbsoluteStateOfCharge      = readByte(ABSOLUTE_STATE_OF_CHARGE_REGISTER,
-                                                 WORD_PROTOCOL);
-    batteryCurrent                    = readWord(BATTERY_CURRENT_REGISTER,
-                                                 WORD_PROTOCOL);
-    batteryRelativeStateOfCharge      = readByte(RELATIVE_STATE_OF_CHARGE_REGISTER,
-                                                 WORD_PROTOCOL);
-    batteryTemperature                = readWord(BATTERY_TEMPERATURE_REGISTER,
                                                  WORD_PROTOCOL);
     cellOvervoltageRecoveryDelay      = readByte(CELL_OVERVOLTAGE_RECOVERY_DELAY_REGISTER,
                                                  MANUFACTURER_PROTOCOL);
@@ -159,51 +150,49 @@ void ESAT_BatteryControllerClass::readAll()
                                                          BLOCK_PROTOCOL);
     serialNumber                      = readWord(SERIAL_NUMBER_REGISTER,
                                                  WORD_PROTOCOL);
-    totalBatteryVoltage               = readWord(TOTAL_BATTERY_VOLTAGE_REGISTER,
-                                                 WORD_PROTOCOL);
     previousError                     = error;
   }
 }
 
 byte ESAT_BatteryControllerClass::readBalancingConfiguration()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return balancingConfiguration;
 }
 
 word ESAT_BatteryControllerClass::readBattery1Voltage()
 {
-  readAll();
+  readEPSHousekeeping();
   return battery1Voltage;
 }
 
 word ESAT_BatteryControllerClass::readBattery2Voltage()
 {
-  readAll();
+  readEPSHousekeeping();
   return battery2Voltage;
 }
 
 byte ESAT_BatteryControllerClass::readBatteryAbsoluteStateOfCharge()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return batteryAbsoluteStateOfCharge;
 }
 
 word ESAT_BatteryControllerClass::readBatteryCurrent()
 {
-  readAll();
+  readEPSHousekeeping();
   return batteryCurrent;
 }
 
 word ESAT_BatteryControllerClass::readBatteryTemperature()
 {
-  readAll();
+  readEPSHousekeeping();
   return batteryTemperature;
 }
 
 byte ESAT_BatteryControllerClass::readBatteryRelativeStateOfCharge()
 {
-  readAll();
+  readEPSHousekeeping();
   return batteryRelativeStateOfCharge;
 }
 
@@ -217,43 +206,43 @@ byte ESAT_BatteryControllerClass::readByte(const word registerAddress,
 
 byte ESAT_BatteryControllerClass::readCellOvervoltageRecoveryDelay()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return cellOvervoltageRecoveryDelay;
 }
 
 word ESAT_BatteryControllerClass::readCellOvervoltageRecoveryThreshold()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return cellOvervoltageRecoveryThreshold;
 }
 
 word ESAT_BatteryControllerClass::readCellOvervoltageThreshold()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return cellOvervoltageThreshold;
 }
 
 byte ESAT_BatteryControllerClass::readCellUndervoltageRecoveryDelay()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return cellUndervoltageRecoveryDelay;
 }
 
 word ESAT_BatteryControllerClass::readCellUndervoltageRecoveryThreshold()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return cellUndervoltageRecoveryThreshold;
 }
 
 word ESAT_BatteryControllerClass::readCellUndervoltageThreshold()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return cellUndervoltageThreshold;
 }
 
 unsigned long ESAT_BatteryControllerClass::readChargingStatus()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return chargingStatus;
 }
 
@@ -264,55 +253,81 @@ word ESAT_BatteryControllerClass::readChemicalID()
 
 word ESAT_BatteryControllerClass::readChemicalIdentifier()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return chemicalIdentifier;
 }
 
 word ESAT_BatteryControllerClass::readCycleCount()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return cycleCount;
 }
 
 word ESAT_BatteryControllerClass::readDesignCapacity()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return designCapacity;
 }
 
 word ESAT_BatteryControllerClass::readDesignVoltage()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return designVoltage;
 }
 
 word ESAT_BatteryControllerClass::readDesiredChargingCurrent()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return desiredChargingCurrent;
 }
 
 word ESAT_BatteryControllerClass::readDesiredChargingVoltage()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return desiredChargingVoltage;
 }
 
 byte ESAT_BatteryControllerClass::readDeviceConfiguration()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return deviceConfiguration;
 }
 
 unsigned long ESAT_BatteryControllerClass::readEnabledProtections()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return enabledProtections;
+}
+
+void ESAT_BatteryControllerClass::readEPSHousekeeping()
+{
+  const unsigned long readingTime = millis();
+  if ((readingTime - previousEPSHousekeepingReadingTime) <= PERIOD)
+  {
+    error = previousError;
+  }
+  else
+  {
+    previousEPSHousekeepingReadingTime = readingTime;
+    batteryCurrent                     = readWord(BATTERY_CURRENT_REGISTER,
+                                                  WORD_PROTOCOL);
+    batteryRelativeStateOfCharge       = readByte(RELATIVE_STATE_OF_CHARGE_REGISTER,
+                                                  WORD_PROTOCOL);
+    batteryTemperature                 = readWord(BATTERY_TEMPERATURE_REGISTER,
+                                                  WORD_PROTOCOL);
+    battery1Voltage                    = readWord(BATTERY_1_VOLTAGE_REGISTER,
+                                                  WORD_PROTOCOL);
+    battery2Voltage                    = readWord(BATTERY_2_VOLTAGE_REGISTER,
+                                                  WORD_PROTOCOL);
+    totalBatteryVoltage                = readWord(TOTAL_BATTERY_VOLTAGE_REGISTER,
+                                                  WORD_PROTOCOL);
+    previousError                      = error;
+  }
 }
 
 void ESAT_BatteryControllerClass::readFirmwareVersion(byte firmwareValue[])
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   for (byte index = 0; index < BM_FIRMWARE_VERSION_LENGTH; index++)
   {
     firmwareValue[index] = firmwareVersion[index];
@@ -322,37 +337,37 @@ void ESAT_BatteryControllerClass::readFirmwareVersion(byte firmwareValue[])
 
 unsigned long ESAT_BatteryControllerClass::readManufacturingStatus()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return manufacturingStatus;
 }
 
 word ESAT_BatteryControllerClass::readMicrocontrollerTemperature()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return microcontrollerTemperature;
 }
 
 unsigned long ESAT_BatteryControllerClass::readOperationStatus()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return operationStatus;
 }
 
 unsigned long ESAT_BatteryControllerClass::readSafetyStatus()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return safetyStatus;
 }
 
 word ESAT_BatteryControllerClass::readSerialNumber()
 {
-  readAll();
+  readBatteryModuleHousekeeping();
   return serialNumber;
 }
 
 word ESAT_BatteryControllerClass::readTotalBatteryVoltage()
 {
-  readAll();
+  readEPSHousekeeping();
   return totalBatteryVoltage;
 }
 
