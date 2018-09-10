@@ -20,6 +20,7 @@
 
 #include "ESAT_BatteryController.h"
 #include <ESAT_Buffer.h>
+#include <ESAT_CRC8.h>
 #include <ESAT_Util.h>
 #include <Wire.h>
 
@@ -59,7 +60,6 @@ ESAT_BatteryControllerClass::ESAT_BatteryControllerClass()
   totalBatteryVoltage = 0;
   previousError = false;
   previousReadingTime = 0;
-  CRC.begin(CRC_POLYNOMIAL);
 }
 
 boolean ESAT_BatteryControllerClass::read(const word registerAddress,
@@ -668,13 +668,13 @@ boolean ESAT_BatteryControllerClass::writeFrame(const byte frame[],
   }
   if (command == APPEND_CRC_BYTE)
   {
-    byte CRCValue;
-    const byte message[] = { ADDRESS << 1 };
+    ESAT_CRC8 crc(CRC_POLYNOMIAL);
     // We have to include the I2C address with the read/write bit to
     // calculate the CRC.
-    CRCValue = CRC.read(message,1);
-    CRCValue = CRC.add(CRCValue,frame,frameLength);
-    Wire1.write(CRCValue);
+    crc.write(ADDRESS << 1);
+    crc.write(frame, frameLength);
+    const byte remainder = byte(crc.read());
+    Wire1.write(remainder);
   }
   const byte transmissionStatus = Wire1.endTransmission();
   delay(delayMilliseconds);
