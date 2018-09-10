@@ -338,8 +338,13 @@ class ESAT_BatteryControllerClass
     // operation; false otherwise.
     boolean previousError;
 
-    // System uptime at the previous readings.
-    unsigned long previousReadingTime;
+    // System uptime at the previous readings (with the exception of
+    // EPS housekeeping values).
+    unsigned long previousBatteryModuleHousekeepingReadingTime;
+
+    // System uptime at the previous readings (EPS housekeeping
+    // values).
+    unsigned long previousEPSHousekeepingReadingTime;
 
     // Telecommand packet definition:
     // 1. Telecommand header:
@@ -386,15 +391,22 @@ class ESAT_BatteryControllerClass
       - TELEMETRY_FOOTER_LENGTH;
 
     // If more than PERIOD milliseconds have ellapsed since
-    // previousReadingTime, update all readings, set the error flag on
-    // error and update previousError; otherwise don't update the
-    // readings, but set error to previousError.
-    void readAll();
+    // previousReadingTime, update all readings with the exception of
+    // EPS housekeeping, set the error flag on error and update
+    // previousError; otherwise don't update the readings, but set
+    // error to previousError.
+    void readBatteryModuleHousekeeping();
 
     // Read a byte from the given register using the given protocol.
     // Set the error flag on error.
     byte readByte(word registerAddress,
                   Protocol theProtocol);
+
+    // If more than PERIOD milliseconds have ellapsed since
+    // previousReadingTime, update all EPS housekeeping readings, set
+    // the error flag on error and update previousError; otherwise
+    // don't update the readings, but set error to previousError.
+    void readEPSHousekeeping();
 
     // Read a 16-bit integer from the given register using the given protocol.
     // Set the error flag on error.
