@@ -22,7 +22,6 @@
 #define ESAT_BatteryController_h
 
 #include <Arduino.h>
-#include <ESAT_CRC8.h>
 #include <Wire.h>
 
 // An interface with the battery controller.
@@ -239,9 +238,6 @@ class ESAT_BatteryControllerClass
 
     // SM Bus CRC polynomial (x8+x2+x+1)
     static const byte CRC_POLYNOMIAL = 0b00000111;
-
-    // CRC used in the writeFrame method to append a CRC byte to the I2C frame.
-    ESAT_CRC8 CRC;
 
     // SBS command used to access to the MCU data flash.
     static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER = 0x44;
