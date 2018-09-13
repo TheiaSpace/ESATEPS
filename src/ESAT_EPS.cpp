@@ -243,8 +243,16 @@ boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
 
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
 {
-  return telemetryPacketBuilder.buildNext(packet,
-                                          usbPendingTelemetry);
+  if (usbPendingTelemetry.available() > 0)
+  {
+    const byte identifier = byte(usbPendingTelemetry.readNext());
+    usbPendingTelemetry.clear(identifier);
+    return telemetryPacketBuilder.build(packet, identifier);
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void ESAT_EPSClass::respondToI2CRequest()
@@ -301,13 +309,10 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
     i2cPendingTelemetryBuffer.clearAll();
   }
   i2cPendingTelemetry = i2cPendingTelemetry & enabledTelemetry;
-  byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
-  ESAT_CCSDSPacket packet(packetData, sizeof(packetData));
-  const boolean gotPacket =
-    telemetryPacketBuilder.buildNext(packet, i2cPendingTelemetry);
-  if (gotPacket)
+  if (i2cPendingTelemetry.available() > 0)
   {
-    ESAT_I2CSlave.writePacket(packet);
+    const byte identifier = byte(i2cPendingTelemetry.readNext());
+    respondToNamedPacketTelemetryRequest(identifier);
   }
   else
   {
