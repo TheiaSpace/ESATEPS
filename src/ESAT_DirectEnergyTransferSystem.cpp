@@ -37,22 +37,22 @@ word ESAT_DirectEnergyTransferSystemClass::read(const word channelConfigurationB
 
 word ESAT_DirectEnergyTransferSystemClass::readConvertedValue()
 {
-  Wire1.beginTransmission(ADDRESS);
-  Wire1.write(CONVERSION_REGISTER);
-  const byte writeStatus = Wire1.endTransmission();
+  WireEPS.beginTransmission(ADDRESS);
+  WireEPS.write(CONVERSION_REGISTER);
+  const byte writeStatus = WireEPS.endTransmission();
   if (writeStatus != 0)
   {
     error = true;
     return 0;
   }
-  const byte bytesRead = Wire1.requestFrom(int(ADDRESS), 2);
+  const byte bytesRead = WireEPS.requestFrom(int(ADDRESS), 2);
   if (bytesRead != 2)
   {
     error = true;
     return 0;
   }
-  const byte highByte = Wire1.read();
-  const byte lowByte = Wire1.read();
+  const byte highByte = WireEPS.read();
+  const byte lowByte = WireEPS.read();
   return word(highByte, lowByte);
 }
 
@@ -79,11 +79,11 @@ boolean ESAT_DirectEnergyTransferSystemClass::startConversion(const word channel
     DATA_RATE_CONFIGURATION_BITS |
     FULL_SCALE_RANGE_CONFIGURATION_BITS |
     channelConfigurationBits;
-  Wire1.beginTransmission(ADDRESS);
-  Wire1.write(CONFIGURATION_REGISTER);
-  Wire1.write(highByte(configurationBits));
-  Wire1.write(lowByte(configurationBits));
-  const byte status = Wire1.endTransmission();
+  WireEPS.beginTransmission(ADDRESS);
+  WireEPS.write(CONFIGURATION_REGISTER);
+  WireEPS.write(highByte(configurationBits));
+  WireEPS.write(lowByte(configurationBits));
+  const byte status = WireEPS.endTransmission();
   if (status == 0)
   {
     return true;

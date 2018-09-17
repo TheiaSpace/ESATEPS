@@ -65,12 +65,12 @@ void ESAT_EPSClass::begin()
   ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.ON);
   ESAT_PowerLine3V3Switch.begin();
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
-  Wire1.begin();
+  WireEPS.begin();
   ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
   ESAT_EPSLED.begin();
-  Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
+  WireOBC.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   Serial.begin();
-  ESAT_I2CSlave.begin(Wire,
+  ESAT_I2CSlave.begin(WireOBC,
                       i2cTelecommandPacketData,
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                       i2cTelemetryPacketData,
