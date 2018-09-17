@@ -68,9 +68,9 @@ void ESAT_EPSClass::begin()
   WireEPS.begin();
   ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
   ESAT_EPSLED.begin();
-  Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
+  WireOBC.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   Serial.begin();
-  ESAT_I2CSlave.begin(Wire,
+  ESAT_I2CSlave.begin(WireOBC,
                       i2cTelecommandPacketData,
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                       i2cTelemetryPacketData,
