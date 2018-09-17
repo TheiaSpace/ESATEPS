@@ -23,7 +23,6 @@
 #include <ESAT_I2CSlave.h>
 #include <ESAT_KISSStream.h>
 #include <ESAT_Timestamp.h>
-#include <USBSerial.h>
 #include <Wire.h>
 #include "ESAT_BatteryModuleHousekeeping.h"
 #include "ESAT_EPSLED.h"
@@ -54,7 +53,7 @@ void ESAT_EPSClass::begin()
   enabledTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
   enabledTelemetry.clear(ESAT_BatteryModuleHousekeeping.packetIdentifier());
-  usbTelecommandDecoder = ESAT_KISSStream(USB,
+  usbTelecommandDecoder = ESAT_KISSStream(Serial,
                                           usbTelecommandBuffer,
                                           sizeof(usbTelecommandBuffer));
   ESAT_EPSMeasurements.begin();
@@ -70,7 +69,7 @@ void ESAT_EPSClass::begin()
   ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
   ESAT_EPSLED.begin();
   Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
-  USB.begin();
+  Serial.begin();
   ESAT_I2CSlave.begin(Wire,
                       i2cTelecommandPacketData,
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
@@ -356,7 +355,7 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
 {
   packet.rewind();
-  ESAT_KISSStream encoder(USB);
+  ESAT_KISSStream encoder(Serial);
   (void) encoder.beginFrame();
   (void) packet.writeTo(encoder);
   (void) encoder.endFrame();
