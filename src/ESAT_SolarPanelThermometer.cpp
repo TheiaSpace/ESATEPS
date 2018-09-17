@@ -84,23 +84,23 @@ word ESAT_SolarPanelThermometerClass::read()
 word ESAT_SolarPanelThermometerClass::tryRead(const byte address,
                                               const byte registerNumber)
 {
-  Wire1.beginTransmission(address);
-  Wire1.write(registerNumber);
-  const byte writeStatus = Wire1.endTransmission();
+  WireEPS.beginTransmission(address);
+  WireEPS.write(registerNumber);
+  const byte writeStatus = WireEPS.endTransmission();
   if (writeStatus != 0)
   {
     successfulRead = false;
     return 0;
   }
-  const byte bytesRead = Wire1.requestFrom(int(address), 2);
+  const byte bytesRead = WireEPS.requestFrom(int(address), 2);
   if (bytesRead != 2)
   {
     successfulRead = false;
     return 0;
   }
   successfulRead = true;
-  const byte highByte = Wire1.read();
-  const byte lowByte = Wire1.read();
+  const byte highByte = WireEPS.read();
+  const byte lowByte = WireEPS.read();
   return word(highByte, lowByte);
 }
 
