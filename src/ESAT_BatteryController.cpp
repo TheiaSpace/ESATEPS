@@ -386,9 +386,9 @@ boolean ESAT_BatteryControllerClass::readWithBlockProtocol(const word registerAd
                                                            byte byteArray[],
                                                            const byte byteArraySize)
 {
-  Wire1.beginTransmission(ADDRESS);
-  Wire1.write(byte(registerAddress));
-  const byte transmissionStatus = Wire1.endTransmission();
+  WireEPS.beginTransmission(ADDRESS);
+  WireEPS.write(byte(registerAddress));
+  const byte transmissionStatus = WireEPS.endTransmission();
   delay(delayMilliseconds);
   if (transmissionStatus != 0)
   {
@@ -397,7 +397,7 @@ boolean ESAT_BatteryControllerClass::readWithBlockProtocol(const word registerAd
   }
   // In the block protocol, the first sent byte is the parameter size.
   const byte bytesRead =
-    Wire1.requestFrom(byte(ADDRESS), byte(1 + byteArraySize));
+    WireEPS.requestFrom(byte(ADDRESS), byte(1 + byteArraySize));
   delay(delayMilliseconds);
   if (bytesRead != 1 + byteArraySize)
   {
@@ -405,10 +405,10 @@ boolean ESAT_BatteryControllerClass::readWithBlockProtocol(const word registerAd
     return true;
   }
   // We read the parameter size.
-  (void) Wire1.read();
+  (void) WireEPS.read();
   for (byte index = 0; index < byteArraySize; index++)
   {
-    byteArray[index] = Wire1.read();
+    byteArray[index] = WireEPS.read();
   }
   return false;
 }
@@ -463,25 +463,25 @@ boolean ESAT_BatteryControllerClass::readWithManufacturerProtocol(const word reg
     }
     // Request the data memory.
     const byte numberOfBytesReceived =
-      Wire1.requestFrom(ADDRESS, numberOfBytesToRequest);
+      WireEPS.requestFrom(ADDRESS, numberOfBytesToRequest);
     delay(delayMilliseconds);
     if (numberOfBytesReceived != numberOfBytesToRequest)
     {
       error = true;
       return true;
     }
-    const byte receivedPacketDataLength = Wire1.read();
-    const byte receivedRegisterAddressLow = Wire1.read();
-    const byte receivedRegisterAddressHigh = Wire1.read();
+    const byte receivedPacketDataLength = WireEPS.read();
+    const byte receivedRegisterAddressLow = WireEPS.read();
+    const byte receivedRegisterAddressHigh = WireEPS.read();
     for (byte index = 0; index < userDataLength; index++)
     {
       const word position =
         (TELEMETRY_USER_DATA_MAXIMUM_LENGTH * frame) + index;
-      byteArray[position] = Wire1.read();
+      byteArray[position] = WireEPS.read();
     }
     // We do noting with the last byte.  We do not know if it is a CRC byte or
     // part of the user data.
-    (void) Wire1.read();
+    (void) WireEPS.read();
     if (receivedPacketDataLength < (userDataLength +
                                     TELEMETRY_MEMORY_ADDRESS_FIELD_LENGTH))
     {
@@ -502,16 +502,16 @@ boolean ESAT_BatteryControllerClass::readWithWordProtocol(const word registerAdd
                                                           byte byteArray[],
                                                           const byte byteArraySize)
 {
-  Wire1.beginTransmission(ADDRESS);
-  Wire1.write(byte(registerAddress));
-  const byte transmissionStatus = Wire1.endTransmission();
+  WireEPS.beginTransmission(ADDRESS);
+  WireEPS.write(byte(registerAddress));
+  const byte transmissionStatus = WireEPS.endTransmission();
   delay(delayMilliseconds);
   if (transmissionStatus != 0)
   {
     error = true;
     return true;
   }
-  const byte bytesRead = Wire1.requestFrom(byte(ADDRESS), byteArraySize);
+  const byte bytesRead = WireEPS.requestFrom(byte(ADDRESS), byteArraySize);
   delay(delayMilliseconds);
   if (bytesRead != byteArraySize)
   {
@@ -520,7 +520,7 @@ boolean ESAT_BatteryControllerClass::readWithWordProtocol(const word registerAdd
   }
   for (byte index = 0; index < byteArraySize; index++)
   {
-    byteArray[index] = Wire1.read();
+    byteArray[index] = WireEPS.read();
   }
   return false;
 }
@@ -676,10 +676,10 @@ boolean ESAT_BatteryControllerClass::writeFrame(const byte frame[],
                                                 const byte frameLength,
                                                 const CRCCommand command)
 {
-  Wire1.beginTransmission(ADDRESS);
+  WireEPS.beginTransmission(ADDRESS);
   for (byte index = 0; index < frameLength; index++)
   {
-    Wire1.write(frame[index]);
+    WireEPS.write(frame[index]);
   }
   if (command == APPEND_CRC_BYTE)
   {
@@ -689,9 +689,9 @@ boolean ESAT_BatteryControllerClass::writeFrame(const byte frame[],
     crc.write(ADDRESS << 1);
     crc.write(frame, frameLength);
     const byte remainder = byte(crc.read());
-    Wire1.write(remainder);
+    WireEPS.write(remainder);
   }
-  const byte transmissionStatus = Wire1.endTransmission();
+  const byte transmissionStatus = WireEPS.endTransmission();
   delay(delayMilliseconds);
   if (transmissionStatus != 0)
   {
