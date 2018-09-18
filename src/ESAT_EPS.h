@@ -117,6 +117,13 @@ class ESAT_EPSClass
       ESAT_CCSDSSecondaryHeader::LENGTH
       + MAXIMUM_COMMAND_PARAMETER_LENGTH;
 
+    // Total length of telecommand packets:
+    // - Primary header.
+    // - Maximum telecommand packet data length.
+    static const unsigned long MAXIMUM_TELECOMMAND_PACKET_LENGTH =
+      ESAT_CCSDSPrimaryHeader::LENGTH
+      + MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH;
+
     // Size of the "housekeeping" telemetry buffer:
     // - Secondary header.              (ESAT_CCSDSSecondaryHeader::LENGTH).
     // - EPS measurements.              3.3 V line current (2 bytes).
