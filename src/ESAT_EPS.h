@@ -108,12 +108,12 @@ class ESAT_EPSClass
     // - Hours (1 byte).
     // - Minutes (1 byte).
     // - Seconds (1 byte).
-    static const byte MAXIMUM_COMMAND_PARAMETER_LENGTH = 7;
+    static const unsigned long MAXIMUM_COMMAND_PARAMETER_LENGTH = 7;
 
     // Packet data length of telecommand packets.
     // - Secondary header.
     // - Longest command parameter.
-    static const byte MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
+    static const unsigned long MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
       + MAXIMUM_COMMAND_PARAMETER_LENGTH;
 
