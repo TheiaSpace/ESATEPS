@@ -302,6 +302,7 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
   if (i2cPendingTelemetry.available() > 0)
   {
     const byte identifier = byte(i2cPendingTelemetry.readNext());
+    i2cPendingTelemetry.clear(identifier);
     respondToNamedPacketTelemetryRequest(identifier);
   }
   else
