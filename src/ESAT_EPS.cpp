@@ -53,9 +53,10 @@ void ESAT_EPSClass::begin()
   enabledTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
   enabledTelemetry.clear(ESAT_BatteryModuleHousekeeping.packetIdentifier());
-  usbTelecommandDecoder = ESAT_KISSStream(Serial,
-                                          usbTelecommandBuffer,
-                                          sizeof(usbTelecommandBuffer));
+  usb = ESAT_CCSDSKISSBridge(Serial);
+  usb.enableReading(usbTelecommandBuffer,
+                    sizeof(usbTelecommandBuffer));
+  usb.enableWriting();
   ESAT_EPSMeasurements.begin();
   ESAT_MaximumPowerPointTrackingDriver1.begin();
   ESAT_MaximumPowerPointTrackingDriver2.begin();
@@ -207,7 +208,7 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
   boolean pendingTelecommand = ESAT_I2CSlave.readPacket(packet);
   if (!pendingTelecommand)
   {
-    pendingTelecommand = readTelecommandFromUSB(packet);
+    pendingTelecommand = usb.read(packet);
   }
   if (!pendingTelecommand)
   {
@@ -228,16 +229,6 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
     return false;
   }
   return true;
-}
-
-boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
-{
-  const boolean gotFrame = usbTelecommandDecoder.receiveFrame();
-  if (!gotFrame)
-  {
-    return false;
-  }
-  return packet.readFrom(usbTelecommandDecoder);
 }
 
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
@@ -354,11 +345,7 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
 {
-  packet.rewind();
-  ESAT_KISSStream encoder(Serial);
-  (void) encoder.beginFrame();
-  (void) packet.writeTo(encoder);
-  (void) encoder.endFrame();
+  usb.write(packet);
 }
 
 ESAT_EPSClass ESAT_EPS;

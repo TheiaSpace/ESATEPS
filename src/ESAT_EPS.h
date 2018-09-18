@@ -22,6 +22,7 @@
 #define ESAT_EPS_h
 
 #include <Arduino.h>
+#include <ESAT_CCSDSKISSBridge.h>
 #include <ESAT_CCSDSPacket.h>
 #include <ESAT_CCSDSPacketContents.h>
 #include <ESAT_CCSDSTelemetryPacketBuilder.h>
@@ -248,10 +249,12 @@ class ESAT_EPSClass
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
-    // Decode USB KISS frames with this stream.
+    // Use this to move CCSDS packets in KISS frames through the USB interface.
+    ESAT_CCSDSKISSBridge usb;
+
+    // Use this buffer to accumulate incoming telecommands.
     byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
                               + MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
-    ESAT_KISSStream usbTelecommandDecoder;
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
@@ -280,10 +283,6 @@ class ESAT_EPSClass
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
-
-    // Read a telecommand from USB and write it into the given packet.
-    // Return true on success; otherwise return false.
-    boolean readTelecommandFromUSB(ESAT_CCSDSPacket& packet);
 
     // Respond to telemetry and telecommand requests coming from the I2C bus.
     void respondToI2CRequest();
