@@ -108,14 +108,25 @@ class ESAT_EPSClass
     // - Hours (1 byte).
     // - Minutes (1 byte).
     // - Seconds (1 byte).
-    static const byte MAXIMUM_COMMAND_PARAMETER_LENGTH = 7;
+    static const unsigned long MAXIMUM_COMMAND_PARAMETER_LENGTH = 7;
 
     // Packet data length of telecommand packets.
     // - Secondary header.
     // - Longest command parameter.
-    static const byte MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
+    static const unsigned long MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH =
       ESAT_CCSDSSecondaryHeader::LENGTH
       + MAXIMUM_COMMAND_PARAMETER_LENGTH;
+
+    // Total length of telecommand packets:
+    // - Primary header.
+    // - Maximum telecommand packet data length.
+    static const unsigned long MAXIMUM_TELECOMMAND_PACKET_LENGTH =
+      ESAT_CCSDSPrimaryHeader::LENGTH
+      + MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH;
+
+    // Maximum length of telecommand frames.
+    static const unsigned long MAXIMUM_TELECOMMAND_FRAME_LENGTH =
+      ESAT_KISSStream::frameLength(MAXIMUM_TELECOMMAND_PACKET_LENGTH);
 
     // Size of the "housekeeping" telemetry buffer:
     // - Secondary header.              (ESAT_CCSDSSecondaryHeader::LENGTH).
@@ -253,8 +264,7 @@ class ESAT_EPSClass
     ESAT_CCSDSKISSBridge usb;
 
     // Use this buffer to accumulate incoming telecommands.
-    byte usbTelecommandBuffer[ESAT_CCSDSPrimaryHeader::LENGTH
-                              + MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
+    byte usbTelecommandBuffer[MAXIMUM_TELECOMMAND_FRAME_LENGTH];
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
