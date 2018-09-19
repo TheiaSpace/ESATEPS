@@ -22,7 +22,8 @@
 #define ESAT_EPS_h
 
 #include <Arduino.h>
-#include <ESAT_CCSDSKISSBridge.h>
+#include <ESAT_CCSDSPacketFromKISSFrameReader.h>
+#include <ESAT_CCSDSPacketToKISSFrameWriter.h>
 #include <ESAT_CCSDSPacket.h>
 #include <ESAT_CCSDSPacketContents.h>
 #include <ESAT_CCSDSTelemetryPacketBuilder.h>
@@ -260,8 +261,11 @@ class ESAT_EPSClass
     byte i2cTelecommandPacketData[MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH];
     byte i2cTelemetryPacketData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
 
-    // Use this to move CCSDS packets in KISS frames through the USB interface.
-    ESAT_CCSDSKISSBridge usb;
+    // Use this read CCSDS packets from KISS frames coming from USB interface.
+    ESAT_CCSDSPacketFromKISSFrameReader usbReader;
+
+    // Use this write CCSDS packets in KISS frames to the USB interface.
+    ESAT_CCSDSPacketToKISSFrameWriter usbWriter;
 
     // Use this buffer to accumulate incoming telecommands.
     byte usbTelecommandBuffer[MAXIMUM_TELECOMMAND_FRAME_LENGTH];

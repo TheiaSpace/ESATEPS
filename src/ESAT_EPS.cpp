@@ -21,7 +21,6 @@
 #include "ESAT_EPS.h"
 #include <ESAT_CCSDSPrimaryHeader.h>
 #include <ESAT_I2CSlave.h>
-#include <ESAT_KISSStream.h>
 #include <ESAT_Timestamp.h>
 #include <Wire.h>
 #include "ESAT_BatteryModuleHousekeeping.h"
@@ -53,10 +52,10 @@ void ESAT_EPSClass::begin()
   enabledTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
   addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
   enabledTelemetry.clear(ESAT_BatteryModuleHousekeeping.packetIdentifier());
-  usb = ESAT_CCSDSKISSBridge(Serial);
-  usb.enableReading(usbTelecommandBuffer,
-                    sizeof(usbTelecommandBuffer));
-  usb.enableWriting();
+  usbReader = ESAT_CCSDSPacketFromKISSFrameReader(Serial,
+                                                  usbTelecommandBuffer,
+                                                  sizeof(usbTelecommandBuffer));
+  usbWriter = ESAT_CCSDSPacketToKISSFrameWriter(Serial);
   ESAT_EPSMeasurements.begin();
   ESAT_MaximumPowerPointTrackingDriver1.begin();
   ESAT_MaximumPowerPointTrackingDriver2.begin();
@@ -208,7 +207,7 @@ boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
   boolean pendingTelecommand = ESAT_I2CSlave.readPacket(packet);
   if (!pendingTelecommand)
   {
-    pendingTelecommand = usb.read(packet);
+    pendingTelecommand = usbReader.read(packet);
   }
   if (!pendingTelecommand)
   {
@@ -346,7 +345,7 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
 
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
 {
-  usb.write(packet);
+  (void) usbWriter.unbufferedWrite(packet);
 }
 
 ESAT_EPSClass ESAT_EPS;
