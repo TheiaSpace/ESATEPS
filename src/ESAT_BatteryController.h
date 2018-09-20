@@ -33,18 +33,6 @@
 class ESAT_BatteryControllerClass
 {
   public:
-    // Protocol to use when communicating with the battery controller.
-    // There are 3 protocols:
-    // - the block protocol;
-    // - the manufacturer protocol;
-    // - the word protocol.
-    enum Protocol
-    {
-      BLOCK_PROTOCOL,
-      MANUFACTURER_PROTOCOL,
-      WORD_PROTOCOL,
-    };
-
     // True after a read error.  Must be reset manually.
     boolean error;
 
@@ -217,6 +205,18 @@ class ESAT_BatteryControllerClass
     void writeDelayBetweenCommunications(byte delayInMilliseconds);
 
   private:
+    // Protocol to use when communicating with the battery controller.
+    // There are 3 protocols:
+    // - the block protocol;
+    // - the manufacturer protocol;
+    // - the word protocol.
+    enum Protocol
+    {
+      BLOCK_PROTOCOL,
+      MANUFACTURER_PROTOCOL,
+      WORD_PROTOCOL,
+    };
+
     // I2C address of the battery controller.
     static const byte ADDRESS = 0x0B;
 
