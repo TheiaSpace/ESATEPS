@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_EPSHousekeeping.h"
+#include "ESAT_EPSHousekeepingTelemetry.h"
 #include "ESAT_BatteryController.h"
 #include "ESAT_DirectEnergyTransferSystem.h"
 #include "ESAT_EPSMeasurements.h"
@@ -26,17 +26,17 @@
 #include "ESAT_PowerLineSwitch.h"
 #include "ESAT_SolarPanelThermometer.h"
 
-boolean ESAT_EPSHousekeepingClass::available()
+boolean ESAT_EPSHousekeepingTelemetryClass::available()
 {
   return true;
 }
 
-byte ESAT_EPSHousekeepingClass::packetIdentifier()
+byte ESAT_EPSHousekeepingTelemetryClass::packetIdentifier()
 {
   return PACKET_IDENTIFIER;
 }
 
-boolean ESAT_EPSHousekeepingClass::fillUserData(ESAT_CCSDSPacket& packet)
+boolean ESAT_EPSHousekeepingTelemetryClass::fillUserData(ESAT_CCSDSPacket& packet)
 {
   packet.writeWord(ESAT_EPSMeasurements.read3V3LineCurrent());
   packet.writeWord(ESAT_EPSMeasurements.read3V3LineVoltage());
@@ -78,4 +78,4 @@ boolean ESAT_EPSHousekeepingClass::fillUserData(ESAT_CCSDSPacket& packet)
   return true;
 }
 
-ESAT_EPSHousekeepingClass ESAT_EPSHousekeeping;
+ESAT_EPSHousekeepingTelemetryClass ESAT_EPSHousekeepingTelemetry;

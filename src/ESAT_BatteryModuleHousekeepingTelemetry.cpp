@@ -18,10 +18,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_BatteryModuleHousekeeping.h"
+#include "ESAT_BatteryModuleHousekeepingTelemetry.h"
 #include "ESAT_BatteryController.h"
 
-boolean ESAT_BatteryModuleHousekeepingClass::available()
+boolean ESAT_BatteryModuleHousekeepingTelemetryClass::available()
 {
   const unsigned long currentPacketTime = millis();
   if (currentPacketTime >= (previousPacketTime + PERIOD))
@@ -35,12 +35,12 @@ boolean ESAT_BatteryModuleHousekeepingClass::available()
   }
 }
 
-byte ESAT_BatteryModuleHousekeepingClass::packetIdentifier()
+byte ESAT_BatteryModuleHousekeepingTelemetryClass::packetIdentifier()
 {
   return PACKET_IDENTIFIER;
 }
 
-boolean ESAT_BatteryModuleHousekeepingClass::fillUserData(ESAT_CCSDSPacket& packet)
+boolean ESAT_BatteryModuleHousekeepingTelemetryClass::fillUserData(ESAT_CCSDSPacket& packet)
 {
   packet.writeUnsignedLong(ESAT_BatteryController.readOperationStatus());
   packet.writeUnsignedLong(ESAT_BatteryController.readChargingStatus());
@@ -82,4 +82,4 @@ boolean ESAT_BatteryModuleHousekeepingClass::fillUserData(ESAT_CCSDSPacket& pack
   return true;
 }
 
-ESAT_BatteryModuleHousekeepingClass ESAT_BatteryModuleHousekeeping;
+ESAT_BatteryModuleHousekeepingTelemetryClass ESAT_BatteryModuleHousekeepingTelemetry;

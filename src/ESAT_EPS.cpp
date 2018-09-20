@@ -23,9 +23,9 @@
 #include <ESAT_I2CSlave.h>
 #include <ESAT_Timestamp.h>
 #include <Wire.h>
-#include "ESAT_BatteryModuleHousekeeping.h"
+#include "ESAT_BatteryModuleHousekeepingTelemetry.h"
 #include "ESAT_EPSLED.h"
-#include "ESAT_EPSHousekeeping.h"
+#include "ESAT_EPSHousekeepingTelemetry.h"
 #include "ESAT_EPSMeasurements.h"
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
 #include "ESAT_PowerLineSwitch.h"
@@ -48,10 +48,10 @@ void ESAT_EPSClass::begin()
   i2cPendingTelemetry.clearAll();
   i2cPendingTelemetryBuffer.clearAll();
   usbPendingTelemetry.clearAll();
-  addTelemetryPacket(ESAT_EPSHousekeeping);
-  enabledTelemetry.set(ESAT_EPSHousekeeping.packetIdentifier());
-  addTelemetryPacket(ESAT_BatteryModuleHousekeeping);
-  enabledTelemetry.clear(ESAT_BatteryModuleHousekeeping.packetIdentifier());
+  addTelemetryPacket(ESAT_EPSHousekeepingTelemetry);
+  enabledTelemetry.set(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
+  addTelemetryPacket(ESAT_BatteryModuleHousekeepingTelemetry);
+  enabledTelemetry.clear(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
   usbReader = ESAT_CCSDSPacketFromKISSFrameReader(Serial,
                                                   usbTelecommandBuffer,
                                                   sizeof(usbTelecommandBuffer));

@@ -18,15 +18,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_BatteryModuleHousekeeping_h
-#define ESAT_BatteryModuleHousekeeping_h
+#ifndef ESAT_BatteryModuleHousekeepingTelemetry_h
+#define ESAT_BatteryModuleHousekeepingTelemetry_h
 
 #include <Arduino.h>
 #include <ESAT_CCSDSPacketContents.h>
 
-// Battery module housekeeping packet contents.
-// Use the global instance ESAT_BatteryModuleHousekeeping.
-class ESAT_BatteryModuleHousekeepingClass: public ESAT_CCSDSPacketContents
+// Battery module housekeeping telemetry packet contents.
+// Use the global instance ESAT_BatteryModuleHousekeepingTelemetry.
+class ESAT_BatteryModuleHousekeepingTelemetryClass: public ESAT_CCSDSPacketContents
 {
   public:
     // Return true when a new packet is available, which is once every
@@ -38,7 +38,7 @@ class ESAT_BatteryModuleHousekeepingClass: public ESAT_CCSDSPacketContents
     byte packetIdentifier();
 
     // Fill the user data section of the provided packet
-    // with battery module housekeeping.
+    // with battery module housekeeping telemetry.
     // Return true on success; otherwise return false.
     boolean fillUserData(ESAT_CCSDSPacket& packet);
 
@@ -56,7 +56,7 @@ class ESAT_BatteryModuleHousekeepingClass: public ESAT_CCSDSPacketContents
     unsigned long previousPacketTime = 0;
 };
 
-// Global instance of the ESAT_BatteryModuleHousekeeping library.
-extern ESAT_BatteryModuleHousekeepingClass ESAT_BatteryModuleHousekeeping;
+// Global instance of the ESAT_BatteryModuleHousekeepingTelemetry library.
+extern ESAT_BatteryModuleHousekeepingTelemetryClass ESAT_BatteryModuleHousekeepingTelemetry;
 
-#endif /* ESAT_BatteryModuleHousekeeping */
+#endif /* ESAT_BatteryModuleHousekeepingTelemetry */
