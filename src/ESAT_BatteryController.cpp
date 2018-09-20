@@ -246,11 +246,6 @@ unsigned long ESAT_BatteryControllerClass::readChargingStatus()
   return chargingStatus;
 }
 
-word ESAT_BatteryControllerClass::readChemicalID()
-{
-  return readChemicalIdentifier();
-}
-
 word ESAT_BatteryControllerClass::readChemicalIdentifier()
 {
   readBatteryModuleHousekeeping();

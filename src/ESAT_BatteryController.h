@@ -74,10 +74,6 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     unsigned long readChargingStatus();
 
-    // Same functionality as readChemicalIdentifier().
-    // Use readChemicalIdentifier() instead of this function.
-    word readChemicalID() __attribute__((deprecated));
-
     // Read the battery chemical identifier.
     // Set the error flag on error.
     word readChemicalIdentifier();
