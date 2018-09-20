@@ -120,7 +120,7 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readDesiredChargingVoltage();
 
-    // Read the device configuration. Corresponds to "DA Configuration".
+    // Read the device configuration.  Corresponds to "DA Configuration".
     // Set the error flag on error.
     byte readDeviceConfiguration();
 
