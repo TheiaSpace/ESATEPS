@@ -18,25 +18,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_EPSHousekeeping_h
-#define ESAT_EPSHousekeeping_h
+#ifndef ESAT_EPSHousekeepingTelemetry_h
+#define ESAT_EPSHousekeepingTelemetry_h
 
 #include <Arduino.h>
 #include <ESAT_CCSDSPacketContents.h>
 
-// EPS housekeeping packet contents.
-// Use the global instance ESAT_EPSHousekeeping.
-class ESAT_EPSHousekeepingClass: public ESAT_CCSDSPacketContents
+// EPS housekeeping telemetry packet contents.
+// Use the global instance ESAT_EPSHousekeepingTelemetry.
+class ESAT_EPSHousekeepingTelemetryClass: public ESAT_CCSDSPacketContents
 {
   public:
-    // Return true (EPS housekeeping packets are always available).
+    // Return true (EPS housekeeping telemetry packets are always available).
     boolean available();
 
     // Return the packet identifier of EPS housekeeping telemetry.
     byte packetIdentifier();
 
     // Fill the user data section of the provided packet
-    // with EPS housekeeping.
+    // with EPS housekeeping telemetry.
     // Return true on success; otherwise return false.
     boolean fillUserData(ESAT_CCSDSPacket& packet);
 
@@ -45,7 +45,7 @@ class ESAT_EPSHousekeepingClass: public ESAT_CCSDSPacketContents
     static const byte PACKET_IDENTIFIER = 0;
 };
 
-// Global instance of the ESAT_EPSHousekeeping library.
-extern ESAT_EPSHousekeepingClass ESAT_EPSHousekeeping;
+// Global instance of the ESAT_EPSHousekeepingTelemetry library.
+extern ESAT_EPSHousekeepingTelemetryClass ESAT_EPSHousekeepingTelemetry;
 
-#endif /* ESAT_EPSHousekeeping */
+#endif /* ESAT_EPSHousekeepingTelemetry */
