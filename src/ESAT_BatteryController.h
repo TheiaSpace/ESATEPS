@@ -167,24 +167,6 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readTotalBatteryVoltage();
 
-    // Write the dataMemory array in the MCU data flash starting in the
-    // given dataMemoryAddress.  It uses the "alternate manufacturer access"
-    // and the CRC checksum.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed, otherwise
-    // return true.
-    boolean write(word dataMemoryAddress,
-                  const byte dataMemory[],
-                  byte dataMemoryLength);
-
-    // Write the data memory address using the "alternate manufacturer access"
-    // and the CRC checksum. It is used when the data memory address is
-    // actually a command.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed, otherwise
-    // return true.
-    boolean write(word dataMemoryAddress);
-
     // Update the time delay between I2C communications,
     // expressed in milliseconds.
     void writeDelayBetweenCommunications(byte delayInMilliseconds);
@@ -447,6 +429,24 @@ class ESAT_BatteryControllerClass
     // Return false when the MCU is successfully sealed, otherwise
     // return true.
     boolean unseal();
+
+    // Write the data memory address using the "alternate manufacturer access"
+    // and the CRC checksum. It is used when the data memory address is
+    // actually a command.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed, otherwise
+    // return true.
+    boolean write(word dataMemoryAddress);
+
+    // Write the dataMemory array in the MCU data flash starting in the
+    // given dataMemoryAddress.  It uses the "alternate manufacturer access"
+    // and the CRC checksum.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed, otherwise
+    // return true.
+    boolean write(word dataMemoryAddress,
+                  const byte dataMemory[],
+                  byte dataMemoryLength);
 
     // Receive the frame to send (without the CRC byte).
     // Compute the CRC and append it to the frame when requested
