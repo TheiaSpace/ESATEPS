@@ -22,6 +22,7 @@
 #define ESAT_BatteryController_h
 
 #include <Arduino.h>
+#include "ESAT_BatteryControllerFirmwareVersion.h"
 #include <Wire.h>
 
 // An interface with the battery controller.
@@ -130,11 +131,9 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     unsigned long readEnabledProtections();
 
-    // Read the firmware version and return it in firmwareVersion.
-    // The size of firmwareVersion has to be at least
-    // BM_FIRMWARE_VERSION_LENGTH.
+    // Return the firmware version.
     // Set the error flag on error.
-    void readFirmwareVersion(byte firmwareVersion[]);
+    ESAT_BatteryControllerFirmwareVersion readFirmwareVersion();
 
     // Read the manufacturing status.
     // Set the error flag on error.
@@ -277,7 +276,7 @@ class ESAT_BatteryControllerClass
     word desiredChargingVoltage;
     byte deviceConfiguration;
     unsigned long enabledProtections;
-    byte firmwareVersion[BM_FIRMWARE_VERSION_LENGTH];
+    ESAT_BatteryControllerFirmwareVersion firmwareVersion;
     unsigned long manufacturingStatus;
     word microcontrollerTemperature;
     unsigned long operationStatus;
