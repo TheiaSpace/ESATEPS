@@ -57,18 +57,6 @@ class ESAT_BatteryControllerClass
     // Instantiate a battery controller library.
     ESAT_BatteryControllerClass();
 
-    // Read from "registerAddress" "contentSize" bytes
-    // and store it in "content".
-    // The protocol has to be selected among: BLOCK_PROTOCOL,
-    // MANUFACTURER_PROTOCOL and WORD_PROTOCOL.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed (see seal()),
-    // otherwise return true.
-    boolean read(word registerAddress,
-                 byte content[],
-                 byte contentSize,
-                 Protocol theProtocol);
-
     // Read the battery balancing configuration.
     // Set the error flag on error.
     byte readBalancingConfiguration();
@@ -389,6 +377,18 @@ class ESAT_BatteryControllerClass
       - TELEMETRY_HEADER_LENGTH
       - TELEMETRY_MEMORY_ADDRESS_FIELD_LENGTH
       - TELEMETRY_FOOTER_LENGTH;
+
+    // Read from "registerAddress" "contentSize" bytes
+    // and store it in "content".
+    // The protocol has to be selected among: BLOCK_PROTOCOL,
+    // MANUFACTURER_PROTOCOL and WORD_PROTOCOL.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed (see seal()),
+    // otherwise return true.
+    boolean read(word registerAddress,
+                 byte content[],
+                 byte contentSize,
+                 Protocol theProtocol);
 
     // If more than PERIOD milliseconds have ellapsed since
     // previousReadingTime, update all readings with the exception of
