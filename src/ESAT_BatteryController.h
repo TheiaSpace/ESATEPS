@@ -39,9 +39,6 @@ class ESAT_BatteryControllerClass
     // Number of bytes used by the BM MCU Firmware version.
     static const byte BM_FIRMWARE_VERSION_LENGTH = 11;
 
-    // Length (number of octecs) of the memory address field.
-    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
-
     // Instantiate a battery controller library.
     ESAT_BatteryControllerClass();
 
@@ -200,6 +197,9 @@ class ESAT_BatteryControllerClass
 
     // SM Bus CRC polynomial (x8+x2+x+1)
     static const byte CRC_POLYNOMIAL = 0b00000111;
+
+    // Length (number of octecs) of the memory address field.
+    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
 
     // SBS command used to access to the MCU data flash.
     static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER = 0x44;
