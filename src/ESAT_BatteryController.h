@@ -64,6 +64,13 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     byte readBatteryRelativeStateOfCharge();
 
+    // Deprecated method; use
+    // ESAT_BatteryController.readBatteryRelativeStateOfCharge()
+    // intead.
+    // Read the relative state of charge.
+    // Set the error flag on error.
+    byte readBatteryStateOfCharge() __attribute__((deprecated("Use ESAT_BatteryController.readBatteryRelativeStateOfCharge instead.")));
+
     // Read the temperature of the batteries.
     // Set the error flag on error.
     word readBatteryTemperature();

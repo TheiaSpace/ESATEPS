@@ -192,6 +192,11 @@ byte ESAT_BatteryControllerClass::readBatteryRelativeStateOfCharge()
   return batteryRelativeStateOfCharge;
 }
 
+byte ESAT_BatteryControllerClass::readBatteryStateOfCharge()
+{
+  return readBatteryRelativeStateOfCharge();
+}
+
 byte ESAT_BatteryControllerClass::readByte(const word registerAddress,
                                            const Protocol theProtocol)
 {
