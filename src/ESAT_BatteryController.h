@@ -167,14 +167,6 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readTotalBatteryVoltage();
 
-    // This method must be called before reading or writing
-    // with the manufacturer access.
-    // It unseals the MCU.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed, otherwise
-    // return true.
-    boolean unseal();
-
     // Write the dataMemory array in the MCU data flash starting in the
     // given dataMemoryAddress.  It uses the "alternate manufacturer access"
     // and the CRC checksum.
@@ -447,6 +439,14 @@ class ESAT_BatteryControllerClass
     // Return false when the MCU is successfully sealed, otherwise
     // return true.
     boolean seal();
+
+    // This method must be called before reading or writing
+    // with the manufacturer access.
+    // It unseals the MCU.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed, otherwise
+    // return true.
+    boolean unseal();
 
     // Receive the frame to send (without the CRC byte).
     // Compute the CRC and append it to the frame when requested
