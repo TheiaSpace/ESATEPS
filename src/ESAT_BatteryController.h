@@ -191,6 +191,9 @@ class ESAT_BatteryControllerClass
     // I2C address of the battery controller.
     static const byte ADDRESS = 0x0B;
 
+    // SBS command used to access to the MCU data flash.
+    static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER = 0x44;
+
     // Length of the buffer used to comunicate with the BM.
     // Taken from Wire.h.
     static const byte BM_COMMUNICATION_BUFFER_LENGTH = BUFFER_LENGTH;
@@ -200,9 +203,6 @@ class ESAT_BatteryControllerClass
 
     // Length (number of octecs) of the memory address field.
     static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
-
-    // SBS command used to access to the MCU data flash.
-    static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER = 0x44;
 
     // The operation status register is used to read the current security mode.
     static const unsigned long OPERATION_STATUS_SECURITY_MODE_MASK =
