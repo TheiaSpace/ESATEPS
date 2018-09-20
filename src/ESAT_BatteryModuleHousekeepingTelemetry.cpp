@@ -71,14 +71,9 @@ boolean ESAT_BatteryModuleHousekeepingTelemetryClass::fillUserData(ESAT_CCSDSPac
   packet.writeByte(ESAT_BatteryController.readCellOvervoltageRecoveryDelay());
   packet.writeWord(ESAT_BatteryController.readCellOvervoltageRecoveryThreshold());
   packet.writeWord(ESAT_BatteryController.readChemicalIdentifier());
-  byte BMFirmwareVersion[ESAT_BatteryController.BM_FIRMWARE_VERSION_LENGTH];
-  ESAT_BatteryController.readFirmwareVersion(BMFirmwareVersion);
-  for (byte index = 0;
-       index < ESAT_BatteryController.BM_FIRMWARE_VERSION_LENGTH;
-       index++)
-  {
-    packet.writeByte(BMFirmwareVersion[index]);
-  }
+  const ESAT_BatteryControllerFirmwareVersion firmwareVersion =
+    ESAT_BatteryController.readFirmwareVersion();
+  (void) firmwareVersion.writeTo(packet);
   return true;
 }
 

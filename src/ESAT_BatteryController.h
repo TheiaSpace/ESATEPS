@@ -22,6 +22,7 @@
 #define ESAT_BatteryController_h
 
 #include <Arduino.h>
+#include "ESAT_BatteryControllerFirmwareVersion.h"
 #include <Wire.h>
 
 // An interface with the battery controller.
@@ -33,41 +34,11 @@
 class ESAT_BatteryControllerClass
 {
   public:
-    // Protocol to use when communicating with the battery controller.
-    // There are 3 protocols:
-    // - the block protocol;
-    // - the manufacturer protocol;
-    // - the word protocol.
-    enum Protocol
-    {
-      BLOCK_PROTOCOL,
-      MANUFACTURER_PROTOCOL,
-      WORD_PROTOCOL,
-    };
-
     // True after a read error.  Must be reset manually.
     boolean error;
 
-    // Number of bytes used by the BM MCU Firmware version.
-    static const byte BM_FIRMWARE_VERSION_LENGTH = 11;
-
-    // Length (number of octecs) of the memory address field.
-    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
-
     // Instantiate a battery controller library.
     ESAT_BatteryControllerClass();
-
-    // Read from "registerAddress" "contentSize" bytes
-    // and store it in "content".
-    // The protocol has to be selected among: BLOCK_PROTOCOL,
-    // MANUFACTURER_PROTOCOL and WORD_PROTOCOL.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed (see seal()),
-    // otherwise return true.
-    boolean read(word registerAddress,
-                 byte content[],
-                 byte contentSize,
-                 Protocol theProtocol);
 
     // Read the battery balancing configuration.
     // Set the error flag on error.
@@ -93,6 +64,13 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     byte readBatteryRelativeStateOfCharge();
 
+    // Deprecated method; use
+    // ESAT_BatteryController.readBatteryRelativeStateOfCharge()
+    // intead.
+    // Read the relative state of charge.
+    // Set the error flag on error.
+    byte readBatteryStateOfCharge() __attribute__((deprecated("Use ESAT_BatteryController.readBatteryRelativeStateOfCharge instead.")));
+
     // Read the temperature of the batteries.
     // Set the error flag on error.
     word readBatteryTemperature();
@@ -100,10 +78,6 @@ class ESAT_BatteryControllerClass
     // Read the battery charging status.
     // Set the error flag on error.
     unsigned long readChargingStatus();
-
-    // Same functionality as readChemicalIdentifier().
-    // Use readChemicalIdentifier() instead of this function.
-    word readChemicalID() __attribute__((deprecated));
 
     // Read the battery chemical identifier.
     // Set the error flag on error.
@@ -153,7 +127,7 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readDesiredChargingVoltage();
 
-    // Read the device configuration. Corresponds to "DA Configuration".
+    // Read the device configuration.  Corresponds to "DA Configuration".
     // Set the error flag on error.
     byte readDeviceConfiguration();
 
@@ -161,11 +135,9 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     unsigned long readEnabledProtections();
 
-    // Read the firmware version and return it in firmwareVersion.
-    // The size of firmwareVersion has to be at least
-    // BM_FIRMWARE_VERSION_LENGTH.
+    // Return the firmware version.
     // Set the error flag on error.
-    void readFirmwareVersion(byte firmwareVersion[]);
+    ESAT_BatteryControllerFirmwareVersion readFirmwareVersion();
 
     // Read the manufacturing status.
     // Set the error flag on error.
@@ -191,46 +163,35 @@ class ESAT_BatteryControllerClass
     // Set the error flag on error.
     word readTotalBatteryVoltage();
 
-    // This method must be called after finishing the write operations.
-    // It seals the MCU.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed, otherwise
-    // return true.
-    boolean seal();
-
-    // This method must be called before reading or writing
-    // with the manufacturer access.
-    // It unseals the MCU.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed, otherwise
-    // return true.
-    boolean unseal();
-
-    // Write the dataMemory array in the MCU data flash starting in the
-    // given dataMemoryAddress.  It uses the "alternate manufacturer access"
-    // and the CRC checksum.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed, otherwise
-    // return true.
-    boolean write(word dataMemoryAddress,
-                  const byte dataMemory[],
-                  byte dataMemoryLength);
-
-    // Write the data memory address using the "alternate manufacturer access"
-    // and the CRC checksum. It is used when the data memory address is
-    // actually a command.
-    // Set the error flag on error.
-    // Return false when the MCU is successfully sealed, otherwise
-    // return true.
-    boolean write(word dataMemoryAddress);
-
     // Update the time delay between I2C communications,
     // expressed in milliseconds.
     void writeDelayBetweenCommunications(byte delayInMilliseconds);
 
   private:
+    // Mode of operation of writeFrame: append or don't append the CRC byte.
+    enum CRCCommand
+    {
+      APPEND_CRC_BYTE,
+      DO_NOT_APPEND_CRC_BYTE
+    };
+
+    // Protocol to use when communicating with the battery controller.
+    // There are 3 protocols:
+    // - the block protocol;
+    // - the manufacturer protocol;
+    // - the word protocol.
+    enum Protocol
+    {
+      BLOCK_PROTOCOL,
+      MANUFACTURER_PROTOCOL,
+      WORD_PROTOCOL,
+    };
+
     // I2C address of the battery controller.
     static const byte ADDRESS = 0x0B;
+
+    // SBS command used to access to the MCU data flash.
+    static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER = 0x44;
 
     // Length of the buffer used to comunicate with the BM.
     // Taken from Wire.h.
@@ -239,8 +200,8 @@ class ESAT_BatteryControllerClass
     // SM Bus CRC polynomial (x8+x2+x+1)
     static const byte CRC_POLYNOMIAL = 0b00000111;
 
-    // SBS command used to access to the MCU data flash.
-    static const byte ALTERNATE_MANUFACTURER_ACCESS_COMMAND_IDENTIFIER = 0x44;
+    // Length (number of octecs) of the memory address field.
+    static const byte MEMORY_ADDRESS_FIELD_LENGTH = 2;
 
     // The operation status register is used to read the current security mode.
     static const unsigned long OPERATION_STATUS_SECURITY_MODE_MASK =
@@ -251,13 +212,6 @@ class ESAT_BatteryControllerClass
       ((unsigned long) 0B10) << 8;
     static const unsigned long OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS =
       ((unsigned long) 0B01) << 8;
-
-    // Mode of operation of writeFrame: append or don't append the CRC byte.
-    enum CRCCommand
-    {
-      APPEND_CRC_BYTE,
-      DO_NOT_APPEND_CRC_BYTE
-    };
 
     // Registers.
     static const word ABSOLUTE_STATE_OF_CHARGE_REGISTER = 0x0E;
@@ -326,7 +280,7 @@ class ESAT_BatteryControllerClass
     word desiredChargingVoltage;
     byte deviceConfiguration;
     unsigned long enabledProtections;
-    byte firmwareVersion[BM_FIRMWARE_VERSION_LENGTH];
+    ESAT_BatteryControllerFirmwareVersion firmwareVersion;
     unsigned long manufacturingStatus;
     word microcontrollerTemperature;
     unsigned long operationStatus;
@@ -390,6 +344,18 @@ class ESAT_BatteryControllerClass
       - TELEMETRY_MEMORY_ADDRESS_FIELD_LENGTH
       - TELEMETRY_FOOTER_LENGTH;
 
+    // Read from "registerAddress" "contentSize" bytes
+    // and store it in "content".
+    // The protocol has to be selected among: BLOCK_PROTOCOL,
+    // MANUFACTURER_PROTOCOL and WORD_PROTOCOL.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed (see seal()),
+    // otherwise return true.
+    boolean read(word registerAddress,
+                 byte content[],
+                 byte contentSize,
+                 Protocol theProtocol);
+
     // If more than PERIOD milliseconds have ellapsed since
     // previousReadingTime, update all readings with the exception of
     // EPS housekeeping, set the error flag on error and update
@@ -447,6 +413,39 @@ class ESAT_BatteryControllerClass
     boolean readWithWordProtocol(word registerAddress,
                                  byte byteArray[],
                                  byte byteArraySize);
+
+    // This method must be called after finishing the write operations.
+    // It seals the MCU.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed, otherwise
+    // return true.
+    boolean seal();
+
+    // This method must be called before reading or writing
+    // with the manufacturer access.
+    // It unseals the MCU.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed, otherwise
+    // return true.
+    boolean unseal();
+
+    // Write the data memory address using the "alternate manufacturer access"
+    // and the CRC checksum. It is used when the data memory address is
+    // actually a command.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed, otherwise
+    // return true.
+    boolean write(word dataMemoryAddress);
+
+    // Write the dataMemory array in the MCU data flash starting in the
+    // given dataMemoryAddress.  It uses the "alternate manufacturer access"
+    // and the CRC checksum.
+    // Set the error flag on error.
+    // Return false when the MCU is successfully sealed, otherwise
+    // return true.
+    boolean write(word dataMemoryAddress,
+                  const byte dataMemory[],
+                  byte dataMemoryLength);
 
     // Receive the frame to send (without the CRC byte).
     // Compute the CRC and append it to the frame when requested

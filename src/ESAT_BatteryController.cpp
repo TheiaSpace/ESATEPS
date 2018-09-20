@@ -48,10 +48,6 @@ ESAT_BatteryControllerClass::ESAT_BatteryControllerClass()
   desiredChargingVoltage = 0;
   deviceConfiguration = 0;
   enabledProtections = 0;
-  for (byte index = 0; index < BM_FIRMWARE_VERSION_LENGTH; index++)
-  {
-    firmwareVersion[index] = 0;
-  }
   manufacturingStatus = 0;
   microcontrollerTemperature = 0;
   operationStatus = 0;
@@ -137,8 +133,8 @@ void ESAT_BatteryControllerClass::readBatteryModuleHousekeeping()
     enabledProtections                = readUnsignedLong(ENABLED_PROTECTIONS_REGISTER,
                                                          MANUFACTURER_PROTOCOL);
     read(FIRMWARE_VERSION_REGISTER,
-         firmwareVersion,
-         BM_FIRMWARE_VERSION_LENGTH,
+         firmwareVersion.version,
+         firmwareVersion.LENGTH,
          MANUFACTURER_PROTOCOL);
     manufacturingStatus               = readUnsignedLong(MANUFACTURING_STATUS_REGISTER,
                                                          BLOCK_PROTOCOL);
@@ -196,6 +192,11 @@ byte ESAT_BatteryControllerClass::readBatteryRelativeStateOfCharge()
   return batteryRelativeStateOfCharge;
 }
 
+byte ESAT_BatteryControllerClass::readBatteryStateOfCharge()
+{
+  return readBatteryRelativeStateOfCharge();
+}
+
 byte ESAT_BatteryControllerClass::readByte(const word registerAddress,
                                            const Protocol theProtocol)
 {
@@ -244,11 +245,6 @@ unsigned long ESAT_BatteryControllerClass::readChargingStatus()
 {
   readBatteryModuleHousekeeping();
   return chargingStatus;
-}
-
-word ESAT_BatteryControllerClass::readChemicalID()
-{
-  return readChemicalIdentifier();
 }
 
 word ESAT_BatteryControllerClass::readChemicalIdentifier()
@@ -325,14 +321,10 @@ void ESAT_BatteryControllerClass::readEPSHousekeeping()
   }
 }
 
-void ESAT_BatteryControllerClass::readFirmwareVersion(byte firmwareValue[])
+ESAT_BatteryControllerFirmwareVersion ESAT_BatteryControllerClass::readFirmwareVersion()
 {
   readBatteryModuleHousekeeping();
-  for (byte index = 0; index < BM_FIRMWARE_VERSION_LENGTH; index++)
-  {
-    firmwareValue[index] = firmwareVersion[index];
-  }
-  return;
+  return firmwareVersion;
 }
 
 unsigned long ESAT_BatteryControllerClass::readManufacturingStatus()
