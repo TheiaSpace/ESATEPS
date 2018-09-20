@@ -205,6 +205,13 @@ class ESAT_BatteryControllerClass
     void writeDelayBetweenCommunications(byte delayInMilliseconds);
 
   private:
+    // Mode of operation of writeFrame: append or don't append the CRC byte.
+    enum CRCCommand
+    {
+      APPEND_CRC_BYTE,
+      DO_NOT_APPEND_CRC_BYTE
+    };
+
     // Protocol to use when communicating with the battery controller.
     // There are 3 protocols:
     // - the block protocol;
@@ -239,13 +246,6 @@ class ESAT_BatteryControllerClass
       ((unsigned long) 0B10) << 8;
     static const unsigned long OPERATION_STATUS_SECURITY_MODE_FULL_ACCESS =
       ((unsigned long) 0B01) << 8;
-
-    // Mode of operation of writeFrame: append or don't append the CRC byte.
-    enum CRCCommand
-    {
-      APPEND_CRC_BYTE,
-      DO_NOT_APPEND_CRC_BYTE
-    };
 
     // Registers.
     static const word ABSOLUTE_STATE_OF_CHARGE_REGISTER = 0x0E;
