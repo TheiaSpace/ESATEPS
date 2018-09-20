@@ -33,11 +33,11 @@
 class ESAT_BatteryControllerClass
 {
   public:
-    // True after a read error.  Must be reset manually.
-    boolean error;
-
     // Number of bytes used by the BM MCU Firmware version.
     static const byte BM_FIRMWARE_VERSION_LENGTH = 11;
+
+    // True after a read error.  Must be reset manually.
+    boolean error;
 
     // Instantiate a battery controller library.
     ESAT_BatteryControllerClass();
