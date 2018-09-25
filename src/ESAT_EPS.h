@@ -268,7 +268,7 @@ class ESAT_EPSClass
     ESAT_CCSDSPacketToKISSFrameWriter usbWriter;
 
     // Use this buffer to accumulate incoming telecommands.
-    byte usbTelecommandBuffer[MAXIMUM_TELECOMMAND_FRAME_LENGTH];
+    byte usbTelecommandBuffer[MAXIMUM_TELECOMMAND_PACKET_LENGTH];
 
     // Set the maximum power point tracking drivers in fixed mode.
     void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
