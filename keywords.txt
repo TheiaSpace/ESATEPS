@@ -28,7 +28,6 @@
 ESAT_BatteryControllerClass	KEYWORD1
 ESAT_DirectEnergyTransferSystemClass	KEYWORD1
 ESAT_EPSClass	KEYWORD1
-ESAT_EPSHousekeeping	KEYWORD1
 ESAT_EPSLEDClass	KEYWORD1
 ESAT_EPSMeasurementsClass	KEYWORD1
 ESAT_MaximumPowerPointTrackingDriver	KEYWORD1
