@@ -26,6 +26,7 @@
 #######################################
 
 ESAT_BatteryControllerClass	KEYWORD1
+ESAT_BatteryModuleHousekeepingTelemetryClass	KEYWORD1
 ESAT_DirectEnergyTransferSystemClass	KEYWORD1
 ESAT_EPSClass	KEYWORD1
 ESAT_EPSLEDClass	KEYWORD1
@@ -43,6 +44,7 @@ ESAT_SolarPanelThermometer	KEYWORD1
 #######################################
 
 ESAT_BatteryController	KEYWORD2
+ESAT_BatteryModuleHousekeepingTelemetry	KEYWORD2
 ESAT_DirectEnergyTransferSystem	KEYWORD2
 ESAT_EPS	KEYWORD2
 ESAT_EPSMeasurements	KEYWORD2
