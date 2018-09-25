@@ -26,6 +26,7 @@
 #######################################
 
 ESAT_BatteryControllerClass	KEYWORD1
+ESAT_BatteryControllerFirmwareVersion	KEYWORD1
 ESAT_BatteryModuleHousekeepingTelemetryClass	KEYWORD1
 ESAT_DirectEnergyTransferSystemClass	KEYWORD1
 ESAT_EPSClass	KEYWORD1
