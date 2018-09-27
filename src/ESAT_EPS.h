@@ -55,6 +55,14 @@ class ESAT_EPSClass
     // Set up the EPS board.
     void begin();
 
+    // Disable the generation of the telemetry packet with the given
+    // identifier.
+    void disableTelemetry(byte identifier);
+
+    // Enable the generation of the telemetry packet with the given
+    // identifier.
+    void enableTelemetry(byte identifier);
+
     // Handle a telecommand.
     void handleTelecommand(ESAT_CCSDSPacket& packet);
 

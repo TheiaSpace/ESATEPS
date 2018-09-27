@@ -49,9 +49,9 @@ void ESAT_EPSClass::begin()
   i2cPendingTelemetryBuffer.clearAll();
   usbPendingTelemetry.clearAll();
   addTelemetryPacket(ESAT_EPSHousekeepingTelemetry);
-  enabledTelemetry.set(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
+  enableTelemetry(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
   addTelemetryPacket(ESAT_BatteryModuleHousekeepingTelemetry);
-  enabledTelemetry.clear(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
+  disableTelemetry(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
   usbReader = ESAT_CCSDSPacketFromKISSFrameReader(Serial,
                                                   usbTelecommandBuffer,
                                                   sizeof(usbTelecommandBuffer));
@@ -75,6 +75,16 @@ void ESAT_EPSClass::begin()
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                       i2cTelemetryPacketData,
                       MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
+}
+
+void ESAT_EPSClass::disableTelemetry(const byte identifier)
+{
+  enabledTelemetry.set(identifier);
+}
+
+void ESAT_EPSClass::enableTelemetry(const byte identifier)
+{
+  enabledTelemetry.clear(identifier);
 }
 
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
