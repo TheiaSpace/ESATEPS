@@ -70,6 +70,9 @@ class ESAT_EPSClass
     // This sets newTelemetryPacket to false.
     boolean readTelemetry(ESAT_CCSDSPacket& packet);
 
+    // Set the time of the real-time clock.
+    void setTime(ESAT_Timestamp timestamp);
+
     // Update the EPS:
     // - Update the maximum point tracking system.
     // - Update the telemetry vector.

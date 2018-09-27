@@ -310,6 +310,11 @@ void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
   }
 }
 
+void ESAT_EPSClass::setTime(const ESAT_Timestamp timestamp)
+{
+  clock.write(timestamp);
+}
+
 void ESAT_EPSClass::updatePendingTelemetryLists()
 {
   const ESAT_FlagContainer availableTelemetry =
