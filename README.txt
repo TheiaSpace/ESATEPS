@@ -44,21 +44,11 @@ This is the main library that provides the general EPS functionality.
 Battery voltage, current, temperature and state of charge readings.
 
 
-# ESAT_BatteryModuleHousekeeping
-
-Battery module housekeeping telemetry packet contents.
-
-
 # ESAT_DirectEnergyTransferSystem
 
 Readings on the direct energy transfer system.  The direct energy
 transfer system can be used to dissipate excess power from the solar
 panels.
-
-
-# ESAT_EPSHousekeeping
-
-General EPS housekeeping telemetry packet contents.
 
 
 # ESAT_EPSLED
@@ -91,3 +81,8 @@ Temperature measurements on the solar panels.
 # ESAT_EPS-telecommands directory
 
 Telecommand handlers.
+
+
+# ESAT_EPS-telemetry directory
+
+Telemetry packets.
