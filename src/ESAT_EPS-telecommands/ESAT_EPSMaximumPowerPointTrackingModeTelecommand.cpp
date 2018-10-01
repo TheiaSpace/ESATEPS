@@ -19,7 +19,7 @@
  */
 
 #include "ESAT_EPS-telecommands/ESAT_EPSMaximumPowerPointTrackingModeTelecommand.h"
-#include "ESAT_MaximumPowerPointTrackingDriver.h"
+#include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
 
 const ESAT_SemanticVersionNumber ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass::INTERFACE_VERSION_NUMBER(2, 0, 0);
 

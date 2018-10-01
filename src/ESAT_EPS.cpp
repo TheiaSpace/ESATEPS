@@ -23,8 +23,11 @@
 #include <ESAT_I2CSlave.h>
 #include <ESAT_Timestamp.h>
 #include <Wire.h>
-#include "ESAT_EPSLED.h"
-#include "ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-peripherals/ESAT_BatteryController.h"
+#include "ESAT_EPS-peripherals/ESAT_EPSLED.h"
+#include "ESAT_EPS-peripherals/ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
+#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSDisableTelemetryTelecommand.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSEnableTelemetryTelecommand.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSFixedModeTelecommand.h"
@@ -35,9 +38,6 @@
 #include "ESAT_EPS-telecommands/ESAT_EPSSwitch5VLineTelecommand.h"
 #include "ESAT_EPS-telemetry/ESAT_BatteryModuleHousekeepingTelemetry.h"
 #include "ESAT_EPS-telemetry/ESAT_EPSHousekeepingTelemetry.h"
-#include "ESAT_MaximumPowerPointTrackingDriver.h"
-#include "ESAT_PowerLineSwitch.h"
-#include "ESAT_BatteryController.h"
 
 void ESAT_EPSClass::addTelecommand(ESAT_CCSDSPacketConsumer& telecommand)
 {

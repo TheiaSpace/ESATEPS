@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_EPSLED.h"
+#include "ESAT_EPS-peripherals/ESAT_EPSLED.h"
 
 void ESAT_EPSLEDClass::begin()
 {

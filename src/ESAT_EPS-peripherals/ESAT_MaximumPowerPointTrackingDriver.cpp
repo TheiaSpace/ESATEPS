@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_MaximumPowerPointTrackingDriver.h"
+#include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
 
 ESAT_MaximumPowerPointTrackingDriverClass::ESAT_MaximumPowerPointTrackingDriverClass(const int theSensorPin,
                                                                                      const int theOutputPin)

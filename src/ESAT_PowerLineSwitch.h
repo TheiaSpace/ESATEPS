@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
+ * Copyright (C) 2018 Theia Space, Universidad Politécnica de Madrid
  *
  * This file is part of Theia Space's ESAT EPS library.
  *
@@ -19,50 +19,5 @@
  */
 
 #ifndef ESAT_PowerLineSwitch_h
-#define ESAT_PowerLineSwitch_h
-
-#include <Arduino.h>
-
-// Power line switch controller.
-// Use the global instances ESAT_PowerLine3V3Switch (for the 3.3 V line)
-// and ESAT_PowerLine5VSwitch (for the 5 V line).
-class ESAT_PowerLineSwitchClass
-{
-  public:
-    // State of the switch.
-    enum SwitchState
-    {
-      OFF = 0,
-      ON = 1,
-    };
-
-    // Instantiate a new power line switch on a given line.
-    ESAT_PowerLineSwitchClass(byte line);
-
-    // Set up the power line controller.
-    void begin();
-
-    // Return the state of the line.
-    SwitchState read();
-
-    // Toggle the state of the line.
-    void toggle();
-
-    // Switch the line.
-    void write(SwitchState newState);
-
-  private:
-    // Control this line.
-    byte line;
-
-    // State of the switch.
-    SwitchState state;
-};
-
-// Global instance of the 3.3 V power line switch library.
-extern ESAT_PowerLineSwitchClass ESAT_PowerLine3V3Switch;
-
-// Global instance of the 5 V power line switch library.
-extern ESAT_PowerLineSwitchClass ESAT_PowerLine5VSwitch;
-
+#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
 #endif /* ESAT_PowerLineSwitch_h */
