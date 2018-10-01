@@ -30,8 +30,8 @@ version.  Use ESAT-EPS as the target board.
 See the example EPS program (examples/EPS/EPS.ino).  This program
 uses the modules of the EPS library.
 
-The src/ directory contains the EPS library, which consists of the
-following modules:
+The src/ directory contains the EPS library (ESAT_EPS) as well as
+several subdirectories:
 
 
 # ESAT_EPS
