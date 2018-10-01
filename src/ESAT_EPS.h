@@ -25,7 +25,9 @@
 #include <ESAT_CCSDSPacketFromKISSFrameReader.h>
 #include <ESAT_CCSDSPacketToKISSFrameWriter.h>
 #include <ESAT_CCSDSPacket.h>
+#include <ESAT_CCSDSPacketConsumer.h>
 #include <ESAT_CCSDSPacketContents.h>
+#include <ESAT_CCSDSTelecommandPacketHandler.h>
 #include <ESAT_CCSDSTelemetryPacketBuilder.h>
 #include <ESAT_FlagContainer.h>
 #include <ESAT_KISSStream.h>
@@ -49,6 +51,9 @@
 class ESAT_EPSClass
 {
   public:
+    // Register a telecommand handler.
+    void addTelecommand(ESAT_CCSDSPacketConsumer& telecommand);
+
     // Add a telemetry packet to the list of available telemetry packets.
     void addTelemetryPacket(ESAT_CCSDSPacketContents& packet);
 
@@ -246,6 +251,10 @@ class ESAT_EPSClass
     // Real time clock.
     // Useful for generating timestamps for telemetry packets.
     ESAT_SoftwareClock clock;
+
+    // Telecommand packet handler.
+    ESAT_CCSDSTelecommandPacketHandler telecommandPacketHandler =
+      ESAT_CCSDSTelecommandPacketHandler(APPLICATION_PROCESS_IDENTIFIER);
 
     // Telemetry packet builder.
     ESAT_CCSDSTelemetryPacketBuilder telemetryPacketBuilder;

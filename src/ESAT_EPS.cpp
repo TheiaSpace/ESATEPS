@@ -31,6 +31,11 @@
 #include "ESAT_PowerLineSwitch.h"
 #include "ESAT_BatteryController.h"
 
+void ESAT_EPSClass::addTelecommand(ESAT_CCSDSPacketConsumer& telecommand)
+{
+  telecommandPacketHandler.add(telecommand);
+}
+
 void ESAT_EPSClass::addTelemetryPacket(ESAT_CCSDSPacketContents& contents)
 {
   telemetryPacketBuilder.add(contents);
