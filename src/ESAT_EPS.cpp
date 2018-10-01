@@ -25,7 +25,6 @@
 #include <Wire.h>
 #include "ESAT_BatteryModuleHousekeepingTelemetry.h"
 #include "ESAT_EPSLED.h"
-#include "ESAT_EPSHousekeepingTelemetry.h"
 #include "ESAT_EPSMeasurements.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSDisableTelemetryTelecommand.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSEnableTelemetryTelecommand.h"
@@ -35,6 +34,7 @@
 #include "ESAT_EPS-telecommands/ESAT_EPSSweepModeTelecommand.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSSwitch3V3LineTelecommand.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSSwitch5VLineTelecommand.h"
+#include "ESAT_EPS-telemetry/ESAT_EPSHousekeepingTelemetry.h"
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
 #include "ESAT_PowerLineSwitch.h"
 #include "ESAT_BatteryController.h"
