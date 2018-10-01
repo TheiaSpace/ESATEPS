@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_DirectEnergyTransferSystem.h"
+#include "ESAT_EPS-peripherals/ESAT_DirectEnergyTransferSystem.h"
 #include <Wire.h>
 
 word ESAT_DirectEnergyTransferSystemClass::read(const word channelConfigurationBits)
