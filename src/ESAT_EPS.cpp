@@ -100,12 +100,12 @@ void ESAT_EPSClass::begin()
 
 void ESAT_EPSClass::disableTelemetry(const byte identifier)
 {
-  enabledTelemetry.set(identifier);
+  enabledTelemetry.clear(identifier);
 }
 
 void ESAT_EPSClass::enableTelemetry(const byte identifier)
 {
-  enabledTelemetry.clear(identifier);
+  enabledTelemetry.set(identifier);
 }
 
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
