@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Theia Space, Universidad Politécnica de Madrid
+ * Copyright (C) 2018 Theia Space, Universidad Politécnica de Madrid
  *
  * This file is part of Theia Space's ESAT EPS library.
  *
@@ -19,56 +19,5 @@
  */
 
 #ifndef ESAT_EPSMeasurements_h
-#define ESAT_EPSMeasurements_h
-
-#include <Arduino.h>
-
-// EPS current and voltage measurements.
-// Use the global instance ESAT_EPSMeasurements.
-class ESAT_EPSMeasurementsClass
-{
-  public:
-    // Return the current of the 3.3 V line.
-    word read3V3LineCurrent();
-
-    // Configure the measurement lines.
-    void begin();
-
-    // Return the voltage of the 3.3 V line.
-    word read3V3LineVoltage();
-
-    // Return the current of the 5 V line.
-    word read5VLineCurrent();
-
-    // Return the voltage of the 5 V line.
-    word read5VLineVoltage();
-
-    // Return the current of the input line.
-    word readInputLineCurrent();
-
-    // Return the voltage of the input line.
-    word readInputLineVoltage();
-
-    // Return the input current of solar panel 1.
-    word readSolarPanel1InputCurrent();
-
-    // Return the output current of solar panel 1.
-    word readSolarPanel1OutputCurrent();
-
-    // Return the voltage of solar panel 1.
-    word readSolarPanel1Voltage();
-
-    // Return the input current of solar panel 2.
-    word readSolarPanel2InputCurrent();
-
-    // Return the output current of solar panel 2.
-    word readSolarPanel2OutputCurrent();
-
-    // Return the voltage of solar panel 2.
-    word readSolarPanel2Voltage();
-};
-
-// Global instance of the EPS measurements library.
-extern ESAT_EPSMeasurementsClass ESAT_EPSMeasurements;
-
+#include "ESAT_EPS-peripherals/ESAT_EPSMeasurements.h"
 #endif /* ESAT_EPSMeasurements_h */
