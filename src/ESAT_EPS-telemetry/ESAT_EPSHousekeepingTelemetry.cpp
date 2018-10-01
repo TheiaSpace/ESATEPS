@@ -23,7 +23,7 @@
 #include "ESAT_EPS-peripherals/ESAT_DirectEnergyTransferSystem.h"
 #include "ESAT_EPS-peripherals/ESAT_EPSMeasurements.h"
 #include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
-#include "ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
 #include "ESAT_SolarPanelThermometer.h"
 
 boolean ESAT_EPSHousekeepingTelemetryClass::available()

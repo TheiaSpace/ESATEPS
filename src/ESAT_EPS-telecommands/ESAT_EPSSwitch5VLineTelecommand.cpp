@@ -19,7 +19,7 @@
  */
 
 #include "ESAT_EPS-telecommands/ESAT_EPSSwitch5VLineTelecommand.h"
-#include "ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
 
 const ESAT_SemanticVersionNumber ESAT_EPSSwitch5VLineTelecommandClass::INTERFACE_VERSION_NUMBER(2, 0, 0);
 
