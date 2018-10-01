@@ -86,3 +86,8 @@ Control of the power line switches.
 # ESAT_SolarPanelThermometer
 
 Temperature measurements on the solar panels.
+
+
+# ESAT_EPS-telecommands directory
+
+Telecommand handlers.

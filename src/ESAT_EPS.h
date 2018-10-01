@@ -25,7 +25,9 @@
 #include <ESAT_CCSDSPacketFromKISSFrameReader.h>
 #include <ESAT_CCSDSPacketToKISSFrameWriter.h>
 #include <ESAT_CCSDSPacket.h>
+#include <ESAT_CCSDSPacketConsumer.h>
 #include <ESAT_CCSDSPacketContents.h>
+#include <ESAT_CCSDSTelecommandPacketHandler.h>
 #include <ESAT_CCSDSTelemetryPacketBuilder.h>
 #include <ESAT_FlagContainer.h>
 #include <ESAT_KISSStream.h>
@@ -49,11 +51,22 @@
 class ESAT_EPSClass
 {
   public:
+    // Register a telecommand handler.
+    void addTelecommand(ESAT_CCSDSPacketConsumer& telecommand);
+
     // Add a telemetry packet to the list of available telemetry packets.
     void addTelemetryPacket(ESAT_CCSDSPacketContents& packet);
 
     // Set up the EPS board.
     void begin();
+
+    // Disable the generation of the telemetry packet with the given
+    // identifier.
+    void disableTelemetry(byte identifier);
+
+    // Enable the generation of the telemetry packet with the given
+    // identifier.
+    void enableTelemetry(byte identifier);
 
     // Handle a telecommand.
     void handleTelecommand(ESAT_CCSDSPacket& packet);
@@ -70,6 +83,9 @@ class ESAT_EPSClass
     // This sets newTelemetryPacket to false.
     boolean readTelemetry(ESAT_CCSDSPacket& packet);
 
+    // Set the time of the real-time clock.
+    void setTime(ESAT_Timestamp timestamp);
+
     // Update the EPS:
     // - Update the maximum point tracking system.
     // - Update the telemetry vector.
@@ -81,19 +97,6 @@ class ESAT_EPSClass
     void writeTelemetry(ESAT_CCSDSPacket& packet);
 
   private:
-    // Command codes.
-    enum CommandCode
-    {
-      SET_TIME = 0x00,
-      SWITCH_3V3_LINE = 0x10,
-      SWITCH_5V_LINE = 0x11,
-      MAXIMUM_POWER_POINT_TRACKING_MODE = 0x20,
-      SWEEP_MODE = 0x21,
-      FIXED_MODE = 0x22,
-      ACTIVATE_TELEMETRY_DELIVERY = 0x30,
-      DEACTIVATE_TELEMETRY_DELIVERY = 0x31,
-    };
-
     // EPS subsystem identifier.
     static const word APPLICATION_PROCESS_IDENTIFIER = 1;
 
@@ -236,6 +239,10 @@ class ESAT_EPSClass
     // Useful for generating timestamps for telemetry packets.
     ESAT_SoftwareClock clock;
 
+    // Telecommand packet handler.
+    ESAT_CCSDSTelecommandPacketHandler telecommandPacketHandler =
+      ESAT_CCSDSTelecommandPacketHandler(APPLICATION_PROCESS_IDENTIFIER);
+
     // Telemetry packet builder.
     ESAT_CCSDSTelemetryPacketBuilder telemetryPacketBuilder;
 
@@ -265,31 +272,6 @@ class ESAT_EPSClass
 
     // Use this buffer to accumulate incoming telecommands.
     byte usbTelecommandBuffer[MAXIMUM_TELECOMMAND_PACKET_LENGTH];
-
-    // Set the maximum power point tracking drivers in fixed mode.
-    void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the maximum power point tracking drivers in maximum power
-    // point tracking mode.
-    void handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the maximum power point tracking drivers in sweep mode.
-    void handleSweepModeCommand(ESAT_CCSDSPacket& packet);
-
-    // Switch the 3V3 line.
-    void handleSwitch3V3LineCommand(ESAT_CCSDSPacket& packet);
-
-    // Switch the 5V line.
-    void handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the time of the real time clock.
-    void handleSetTimeCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the BM housekeeping telemetry as pending
-    void handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
-
-    // Set the BM housekeeping telemetry as pending
-    void handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
