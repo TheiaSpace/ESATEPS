@@ -27,6 +27,14 @@
 #include "ESAT_EPSLED.h"
 #include "ESAT_EPSHousekeepingTelemetry.h"
 #include "ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSDisableTelemetryTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSEnableTelemetryTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSFixedModeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSMaximumPowerPointTrackingModeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSetTimeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSweepModeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSwitch3V3LineTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSwitch5VLineTelecommand.h"
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
 #include "ESAT_PowerLineSwitch.h"
 #include "ESAT_BatteryController.h"
@@ -57,6 +65,14 @@ void ESAT_EPSClass::begin()
   enableTelemetry(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
   addTelemetryPacket(ESAT_BatteryModuleHousekeepingTelemetry);
   disableTelemetry(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
+  addTelecommand(ESAT_EPSSetTimeTelecommand);
+  addTelecommand(ESAT_EPSSwitch3V3LineTelecommand);
+  addTelecommand(ESAT_EPSSwitch5VLineTelecommand);
+  addTelecommand(ESAT_EPSMaximumPowerPointTrackingModeTelecommand);
+  addTelecommand(ESAT_EPSSweepModeTelecommand);
+  addTelecommand(ESAT_EPSFixedModeTelecommand);
+  addTelecommand(ESAT_EPSEnableTelemetryTelecommand);
+  addTelecommand(ESAT_EPSDisableTelemetryTelecommand);
   usbReader = ESAT_CCSDSPacketFromKISSFrameReader(Serial,
                                                   usbTelecommandBuffer,
                                                   sizeof(usbTelecommandBuffer));
@@ -95,121 +111,7 @@ void ESAT_EPSClass::enableTelemetry(const byte identifier)
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.rewind();
-  const ESAT_CCSDSPrimaryHeader primaryHeader = packet.readPrimaryHeader();
-  if (primaryHeader.applicationProcessIdentifier
-      != APPLICATION_PROCESS_IDENTIFIER)
-  {
-    return;
-  }
-  if (primaryHeader.packetType != primaryHeader.TELECOMMAND)
-  {
-    return;
-  }
-  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
-  {
-    return;
-  }
-  const ESAT_CCSDSSecondaryHeader secondaryHeader =
-    packet.readSecondaryHeader();
-  if (secondaryHeader.majorVersionNumber < MAJOR_VERSION_NUMBER)
-  {
-    return;
-  }
-  switch (secondaryHeader.packetIdentifier)
-  {
-    case SWITCH_5V_LINE:
-      handleSwitch5VLineCommand(packet);
-      break;
-    case SWITCH_3V3_LINE:
-      handleSwitch3V3LineCommand(packet);
-      break;
-    case MAXIMUM_POWER_POINT_TRACKING_MODE:
-      handleMaximumPowerPointTrackingModeCommand(packet);
-      break;
-    case SWEEP_MODE:
-      handleSweepModeCommand(packet);
-      break;
-    case FIXED_MODE:
-      handleFixedModeCommand(packet);
-      break;
-    case SET_TIME:
-      handleSetTimeCommand(packet);
-      break;
-    case ACTIVATE_TELEMETRY_DELIVERY:
-      handleActivateTelemetryDelivery(packet);
-      break;
-    case DEACTIVATE_TELEMETRY_DELIVERY:
-      handleDeactivateTelemetryDelivery(packet);
-      break;
-    default:
-      break;
-  }
-}
-
-void ESAT_EPSClass::handleFixedModeCommand(ESAT_CCSDSPacket& packet)
-{
-  const byte commandParameter = packet.readByte();
-  const byte dutyCycle = constrain(commandParameter, 0, 255);
-  ESAT_MaximumPowerPointTrackingDriver1.setFixedMode(dutyCycle);
-  ESAT_MaximumPowerPointTrackingDriver2.setFixedMode(dutyCycle);
-}
-
-void ESAT_EPSClass::handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet)
-{
-  (void) packet;
-  ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
-  ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
-}
-
-void ESAT_EPSClass::handleSweepModeCommand(ESAT_CCSDSPacket& packet)
-{
-  (void) packet;
-  ESAT_MaximumPowerPointTrackingDriver1.setSweepMode();
-  ESAT_MaximumPowerPointTrackingDriver2.setSweepMode();
-}
-
-void ESAT_EPSClass::handleSwitch3V3LineCommand(ESAT_CCSDSPacket& packet)
-{
-  const byte commandParameter = packet.readByte();
-  if (commandParameter > 0)
-  {
-    ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
-  }
-  else
-  {
-    ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.OFF);
-  }
-}
-
-void ESAT_EPSClass::handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet)
-{
-  const byte commandParameter = packet.readByte();
-  if (commandParameter > 0)
-  {
-    ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.ON);
-  }
-  else
-  {
-    ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.OFF);
-  }
-}
-
-void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
-{
-  const ESAT_Timestamp timestamp = packet.readTimestamp();
-  clock.write(timestamp);
-}
-
-void ESAT_EPSClass::handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
-{
-  const byte identifier = packet.readByte();
-  enabledTelemetry.set(identifier);
-}
-
-void ESAT_EPSClass::handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet)
-{
-  const byte identifier = packet.readByte();
-  enabledTelemetry.clear(identifier);
+  (void) telecommandPacketHandler.handle(packet);
 }
 
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)

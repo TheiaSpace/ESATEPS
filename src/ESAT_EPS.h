@@ -97,19 +97,6 @@ class ESAT_EPSClass
     void writeTelemetry(ESAT_CCSDSPacket& packet);
 
   private:
-    // Command codes.
-    enum CommandCode
-    {
-      SET_TIME = 0x00,
-      SWITCH_3V3_LINE = 0x10,
-      SWITCH_5V_LINE = 0x11,
-      MAXIMUM_POWER_POINT_TRACKING_MODE = 0x20,
-      SWEEP_MODE = 0x21,
-      FIXED_MODE = 0x22,
-      ACTIVATE_TELEMETRY_DELIVERY = 0x30,
-      DEACTIVATE_TELEMETRY_DELIVERY = 0x31,
-    };
-
     // EPS subsystem identifier.
     static const word APPLICATION_PROCESS_IDENTIFIER = 1;
 
@@ -285,31 +272,6 @@ class ESAT_EPSClass
 
     // Use this buffer to accumulate incoming telecommands.
     byte usbTelecommandBuffer[MAXIMUM_TELECOMMAND_PACKET_LENGTH];
-
-    // Set the maximum power point tracking drivers in fixed mode.
-    void handleFixedModeCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the maximum power point tracking drivers in maximum power
-    // point tracking mode.
-    void handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the maximum power point tracking drivers in sweep mode.
-    void handleSweepModeCommand(ESAT_CCSDSPacket& packet);
-
-    // Switch the 3V3 line.
-    void handleSwitch3V3LineCommand(ESAT_CCSDSPacket& packet);
-
-    // Switch the 5V line.
-    void handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the time of the real time clock.
-    void handleSetTimeCommand(ESAT_CCSDSPacket& packet);
-
-    // Set the BM housekeeping telemetry as pending
-    void handleActivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
-
-    // Set the BM housekeeping telemetry as pending
-    void handleDeactivateTelemetryDelivery(ESAT_CCSDSPacket& packet);
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
