@@ -23,8 +23,8 @@
 #include <ESAT_I2CSlave.h>
 #include <ESAT_Timestamp.h>
 #include <Wire.h>
-#include "ESAT_EPSLED.h"
 #include "ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-peripherals/ESAT_EPSLED.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSDisableTelemetryTelecommand.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSEnableTelemetryTelecommand.h"
 #include "ESAT_EPS-telecommands/ESAT_EPSFixedModeTelecommand.h"
