@@ -19,7 +19,7 @@
  */
 
 #include "ESAT_EPS-telemetry/ESAT_BatteryModuleHousekeepingTelemetry.h"
-#include "ESAT_BatteryController.h"
+#include "ESAT_EPS-peripherals/ESAT_BatteryController.h"
 
 boolean ESAT_BatteryModuleHousekeepingTelemetryClass::available()
 {

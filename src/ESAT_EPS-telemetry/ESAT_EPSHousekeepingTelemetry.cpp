@@ -19,7 +19,7 @@
  */
 
 #include "ESAT_EPS-telemetry/ESAT_EPSHousekeepingTelemetry.h"
-#include "ESAT_BatteryController.h"
+#include "ESAT_EPS-peripherals/ESAT_BatteryController.h"
 #include "ESAT_DirectEnergyTransferSystem.h"
 #include "ESAT_EPSMeasurements.h"
 #include "ESAT_MaximumPowerPointTrackingDriver.h"
