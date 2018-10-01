@@ -54,8 +54,8 @@ class ESAT_EPSClass
     // Register a telecommand handler.
     void addTelecommand(ESAT_CCSDSPacketConsumer& telecommand);
 
-    // Add a telemetry packet to the list of available telemetry packets.
-    void addTelemetryPacket(ESAT_CCSDSPacketContents& packet);
+    // Register a telemetry packet.
+    void addTelemetry(ESAT_CCSDSPacketContents& telemetry);
 
     // Set up the EPS board.
     void begin();

@@ -44,9 +44,9 @@ void ESAT_EPSClass::addTelecommand(ESAT_CCSDSPacketConsumer& telecommand)
   telecommandPacketHandler.add(telecommand);
 }
 
-void ESAT_EPSClass::addTelemetryPacket(ESAT_CCSDSPacketContents& contents)
+void ESAT_EPSClass::addTelemetry(ESAT_CCSDSPacketContents& telemetry)
 {
-  telemetryPacketBuilder.add(contents);
+  telemetryPacketBuilder.add(telemetry);
 }
 
 void ESAT_EPSClass::begin()
@@ -61,9 +61,9 @@ void ESAT_EPSClass::begin()
   i2cPendingTelemetry.clearAll();
   i2cPendingTelemetryBuffer.clearAll();
   usbPendingTelemetry.clearAll();
-  addTelemetryPacket(ESAT_EPSHousekeepingTelemetry);
+  addTelemetry(ESAT_EPSHousekeepingTelemetry);
   enableTelemetry(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
-  addTelemetryPacket(ESAT_BatteryModuleHousekeepingTelemetry);
+  addTelemetry(ESAT_BatteryModuleHousekeepingTelemetry);
   disableTelemetry(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
   addTelecommand(ESAT_EPSSetTimeTelecommand);
   addTelecommand(ESAT_EPSSwitch3V3LineTelecommand);
