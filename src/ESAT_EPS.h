@@ -55,6 +55,8 @@ class ESAT_EPSClass
     void addTelecommand(ESAT_CCSDSPacketConsumer& telecommand);
 
     // Register a telemetry packet.
+    // The telemetry packet will be disabled by default;
+    // enable it with enableTelemetry.
     void addTelemetry(ESAT_CCSDSPacketContents& telemetry);
 
     // Set up the EPS board.

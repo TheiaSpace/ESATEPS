@@ -47,6 +47,7 @@ void ESAT_EPSClass::addTelecommand(ESAT_CCSDSPacketConsumer& telecommand)
 void ESAT_EPSClass::addTelemetry(ESAT_CCSDSPacketContents& telemetry)
 {
   telemetryPacketBuilder.add(telemetry);
+  disableTelemetry(telemetry.packetIdentifier());
 }
 
 void ESAT_EPSClass::begin()
