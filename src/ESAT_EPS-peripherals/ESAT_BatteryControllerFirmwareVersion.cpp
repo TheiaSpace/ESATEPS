@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_BatteryControllerFirmwareVersion.h"
+#include "ESAT_EPS-peripherals/ESAT_BatteryControllerFirmwareVersion.h"
 
 boolean ESAT_BatteryControllerFirmwareVersion::writeTo(Stream& stream) const
 {
