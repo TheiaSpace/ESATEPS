@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_BatteryModuleHousekeepingTelemetry.h"
+#include "ESAT_EPS-telemetry/ESAT_BatteryModuleHousekeepingTelemetry.h"
 #include "ESAT_BatteryController.h"
 
 boolean ESAT_BatteryModuleHousekeepingTelemetryClass::available()
