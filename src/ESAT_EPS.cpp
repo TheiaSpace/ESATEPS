@@ -118,34 +118,16 @@ void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.flush();
-  if (packet.capacity() < ESAT_CCSDSSecondaryHeader::LENGTH)
+  const boolean gotI2CPacket = ESAT_I2CSlave.readPacket(packet);
+  if (gotI2CPacket)
   {
-    return false;
+    return true;
   }
-  boolean pendingTelecommand = ESAT_I2CSlave.readPacket(packet);
-  if (!pendingTelecommand)
+  else
   {
-    pendingTelecommand = usbReader.read(packet);
+    const boolean gotUSBPacket = usbReader.read(packet);
+    return gotUSBPacket;
   }
-  if (!pendingTelecommand)
-  {
-    return false;
-  }
-  const ESAT_CCSDSPrimaryHeader primaryHeader = packet.readPrimaryHeader();
-  if (primaryHeader.packetType != primaryHeader.TELECOMMAND)
-  {
-    return false;
-  }
-  if (primaryHeader.applicationProcessIdentifier
-      != APPLICATION_PROCESS_IDENTIFIER)
-  {
-    return false;
-  }
-  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
-  {
-    return false;
-  }
-  return true;
 }
 
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
