@@ -22,11 +22,11 @@
 #define ESAT_EPSHousekeepingTelemetry_h
 
 #include <Arduino.h>
-#include <ESAT_CCSDSPacketContents.h>
+#include <ESAT_CCSDSTelemetryPacketContents.h>
 
 // EPS housekeeping telemetry packet contents.
 // Use the global instance ESAT_EPSHousekeepingTelemetry.
-class ESAT_EPSHousekeepingTelemetryClass: public ESAT_CCSDSPacketContents
+class ESAT_EPSHousekeepingTelemetryClass: public ESAT_CCSDSTelemetryPacketContents
 {
   public:
     // Return true (EPS housekeeping telemetry packets are always available).

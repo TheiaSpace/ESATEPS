@@ -25,10 +25,10 @@
 #include <ESAT_CCSDSPacketFromKISSFrameReader.h>
 #include <ESAT_CCSDSPacketToKISSFrameWriter.h>
 #include <ESAT_CCSDSPacket.h>
-#include <ESAT_CCSDSPacketContents.h>
 #include <ESAT_CCSDSTelecommandPacketDispatcher.h>
 #include <ESAT_CCSDSTelecommandPacketHandler.h>
 #include <ESAT_CCSDSTelemetryPacketBuilder.h>
+#include <ESAT_CCSDSTelemetryPacketContents.h>
 #include <ESAT_FlagContainer.h>
 #include <ESAT_KISSStream.h>
 #include <ESAT_SoftwareClock.h>
@@ -57,7 +57,7 @@ class ESAT_EPSClass
     // Register a telemetry packet.
     // The telemetry packet will be disabled by default;
     // enable it with enableTelemetry.
-    void addTelemetry(ESAT_CCSDSPacketContents& telemetry);
+    void addTelemetry(ESAT_CCSDSTelemetryPacketContents& telemetry);
 
     // Set up the EPS board.
     void begin();
