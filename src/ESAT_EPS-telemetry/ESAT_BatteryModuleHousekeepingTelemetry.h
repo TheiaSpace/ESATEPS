@@ -35,7 +35,10 @@ class ESAT_BatteryModuleHousekeepingTelemetryClass: public ESAT_CCSDSTelemetryPa
 
     // Return the packet identifier of battery module housekeeping
     // telemetry.
-    byte packetIdentifier();
+    byte packetIdentifier()
+    {
+      return 0x01;
+    }
 
     // Fill the user data section of the provided packet
     // with battery module housekeeping telemetry.
@@ -43,9 +46,6 @@ class ESAT_BatteryModuleHousekeepingTelemetryClass: public ESAT_CCSDSTelemetryPa
     boolean fillUserData(ESAT_CCSDSPacket& packet);
 
   private:
-    // Packet identifier of battery module housekeeping telemetry.
-    static const byte PACKET_IDENTIFIER = 1;
-
     // Generate packets up to once every PERIOD milliseconds.
     // The EPS cycle isn't fast enough to capture fast transients, and
     // the quasi-steady dynamics are slow, so measuring more often

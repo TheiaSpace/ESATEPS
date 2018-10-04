@@ -31,11 +31,6 @@ boolean ESAT_EPSHousekeepingTelemetryClass::available()
   return true;
 }
 
-byte ESAT_EPSHousekeepingTelemetryClass::packetIdentifier()
-{
-  return PACKET_IDENTIFIER;
-}
-
 boolean ESAT_EPSHousekeepingTelemetryClass::fillUserData(ESAT_CCSDSPacket& packet)
 {
   packet.writeWord(ESAT_EPSMeasurements.read3V3LineCurrent());

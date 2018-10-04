@@ -33,16 +33,15 @@ class ESAT_EPSHousekeepingTelemetryClass: public ESAT_CCSDSTelemetryPacketConten
     boolean available();
 
     // Return the packet identifier of EPS housekeeping telemetry.
-    byte packetIdentifier();
+    byte packetIdentifier()
+    {
+      return 0x00;
+    }
 
     // Fill the user data section of the provided packet
     // with EPS housekeeping telemetry.
     // Return true on success; otherwise return false.
     boolean fillUserData(ESAT_CCSDSPacket& packet);
-
-  private:
-    // Packet identifier of EPS housekeeping telemetry.
-    static const byte PACKET_IDENTIFIER = 0;
 };
 
 // Global instance of the ESAT_EPSHousekeepingTelemetry library.
