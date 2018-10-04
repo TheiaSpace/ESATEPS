@@ -39,9 +39,9 @@
 #include "ESAT_EPS-telemetry/ESAT_BatteryModuleHousekeepingTelemetry.h"
 #include "ESAT_EPS-telemetry/ESAT_EPSHousekeepingTelemetry.h"
 
-void ESAT_EPSClass::addTelecommand(ESAT_CCSDSPacketConsumer& telecommand)
+void ESAT_EPSClass::addTelecommand(ESAT_CCSDSTelecommandPacketHandler& telecommand)
 {
-  telecommandPacketHandler.add(telecommand);
+  telecommandPacketDispatcher.add(telecommand);
 }
 
 void ESAT_EPSClass::addTelemetry(ESAT_CCSDSPacketContents& telemetry)
@@ -112,7 +112,7 @@ void ESAT_EPSClass::enableTelemetry(const byte identifier)
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
 {
   packet.rewind();
-  (void) telecommandPacketHandler.handle(packet);
+  (void) telecommandPacketDispatcher.dispatch(packet);
 }
 
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)

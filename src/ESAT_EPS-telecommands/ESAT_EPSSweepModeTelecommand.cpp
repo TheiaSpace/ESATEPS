@@ -21,38 +21,7 @@
 #include "ESAT_EPS-telecommands/ESAT_EPSSweepModeTelecommand.h"
 #include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
 
-const ESAT_SemanticVersionNumber ESAT_EPSSweepModeTelecommandClass::INTERFACE_VERSION_NUMBER(2, 0, 0);
-
-boolean ESAT_EPSSweepModeTelecommandClass::accept(const ESAT_CCSDSSecondaryHeader secondaryHeader) const
-{
-  if (!INTERFACE_VERSION_NUMBER.isForwardCompatibleWith(secondaryHeader.majorVersionNumber,
-                                                        secondaryHeader.minorVersionNumber,
-                                                        secondaryHeader.patchVersionNumber))
-  {
-    return false;
-  }
-  if (secondaryHeader.packetIdentifier != EPS_SWEEP_MODE)
-  {
-    return false;
-  }
-  return true;
-}
-
-boolean ESAT_EPSSweepModeTelecommandClass::consume(ESAT_CCSDSPacket packet)
-{
-  const ESAT_CCSDSSecondaryHeader secondaryHeader =
-    packet.readSecondaryHeader();
-  if (accept(secondaryHeader))
-  {
-    return handle(packet);
-  }
-  else
-  {
-    return false;
-  }
-}
-
-boolean ESAT_EPSSweepModeTelecommandClass::handle(ESAT_CCSDSPacket packet) const
+boolean ESAT_EPSSweepModeTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {
   (void) packet; // Ignored.
   ESAT_MaximumPowerPointTrackingDriver1.setSweepMode();

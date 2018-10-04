@@ -21,38 +21,7 @@
 #include "ESAT_EPS-telecommands/ESAT_EPSMaximumPowerPointTrackingModeTelecommand.h"
 #include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
 
-const ESAT_SemanticVersionNumber ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass::INTERFACE_VERSION_NUMBER(2, 0, 0);
-
-boolean ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass::accept(const ESAT_CCSDSSecondaryHeader secondaryHeader) const
-{
-  if (!INTERFACE_VERSION_NUMBER.isForwardCompatibleWith(secondaryHeader.majorVersionNumber,
-                                                        secondaryHeader.minorVersionNumber,
-                                                        secondaryHeader.patchVersionNumber))
-  {
-    return false;
-  }
-  if (secondaryHeader.packetIdentifier != EPS_MAXIMUM_POWER_POINT_TRACKING_MODE)
-  {
-    return false;
-  }
-  return true;
-}
-
-boolean ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass::consume(ESAT_CCSDSPacket packet)
-{
-  const ESAT_CCSDSSecondaryHeader secondaryHeader =
-    packet.readSecondaryHeader();
-  if (accept(secondaryHeader))
-  {
-    return handle(packet);
-  }
-  else
-  {
-    return false;
-  }
-}
-
-boolean ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass::handle(ESAT_CCSDSPacket packet) const
+boolean ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {
   (void) packet; // Ignored.
   ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
