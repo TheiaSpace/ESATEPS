@@ -22,11 +22,11 @@
 #define ESAT_BatteryModuleHousekeepingTelemetry_h
 
 #include <Arduino.h>
-#include <ESAT_CCSDSPacketContents.h>
+#include <ESAT_CCSDSTelemetryPacketContents.h>
 
 // Battery module housekeeping telemetry packet contents.
 // Use the global instance ESAT_BatteryModuleHousekeepingTelemetry.
-class ESAT_BatteryModuleHousekeepingTelemetryClass: public ESAT_CCSDSPacketContents
+class ESAT_BatteryModuleHousekeepingTelemetryClass: public ESAT_CCSDSTelemetryPacketContents
 {
   public:
     // Return true when a new packet is available, which is once every
