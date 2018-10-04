@@ -29,8 +29,8 @@
 class ESAT_BatteryModuleHousekeepingTelemetryClass: public ESAT_CCSDSTelemetryPacketContents
 {
   public:
-    // Return true when a new packet is available, which is once every
-    // second; otherwise return false.
+    // Return true when a new telemetry packet is available; otherwise
+    // return false;
     boolean available();
 
     // Return the packet identifier of battery module housekeeping

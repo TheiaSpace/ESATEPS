@@ -29,7 +29,8 @@
 class ESAT_EPSHousekeepingTelemetryClass: public ESAT_CCSDSTelemetryPacketContents
 {
   public:
-    // Return true (EPS housekeeping telemetry packets are always available).
+    // Return true when a new telemetry packet is available;
+    // otherwise return false.
     boolean available();
 
     // Return the packet identifier of EPS housekeeping telemetry.
