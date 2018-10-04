@@ -19,5 +19,5 @@
  */
 
 #ifndef ESAT_BatteryController_h
-#include "ESAT_EPS-peripherals/ESAT_BatteryController.h"
+#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
 #endif /* ESAT_BatteryController_h */

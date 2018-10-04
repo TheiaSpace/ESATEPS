@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_EPS-peripherals/ESAT_SolarPanelThermometer.h"
+#include "ESAT_EPS-hardware/ESAT_SolarPanelThermometer.h"
 #include <Wire.h>
 
 // Address/register pairs.

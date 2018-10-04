@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_EPS-peripherals/ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-hardware/ESAT_EPSMeasurements.h"
 
 // Number of samples for current measurements.
 static const byte currentSamples = 5;

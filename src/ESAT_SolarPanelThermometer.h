@@ -19,5 +19,5 @@
  */
 
 #ifndef ESAT_SolarPanelThermometer_h
-#include "ESAT_EPS-peripherals/ESAT_SolarPanelThermometer.h"
+#include "ESAT_EPS-hardware/ESAT_SolarPanelThermometer.h"
 #endif /* ESAT_SolarPanelThermometer_h */

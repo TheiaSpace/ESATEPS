@@ -29,29 +29,29 @@ This is the main library that provides the general EPS functionality.
 
 # ESAT_BatteryController.h
 
-This includes ESAT_EPS-peripherals/ESAT_BatteryController.h
+This includes ESAT_EPS-hardware/ESAT_BatteryController.h
 
 
 # ESAT_DirectEnergyTransferSystem.h
 
-This includes ESAT_EPS-peripherals/ESAT_DirectEnergyTransferSystem.h
+This includes ESAT_EPS-hardware/ESAT_DirectEnergyTransferSystem.h
 
 
 # ESAT_EPSMeasurements.h
 
-This includes ESAT_EPS-peripherals/ESAT_EPSMeasurements.h
+This includes ESAT_EPS-hardware/ESAT_EPSMeasurements.h
 
 
 # ESAT_MaximumPowerPointTrackingDriver.h
 
-This includes ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h
+This includes ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h
 
 
 # ESAT_PowerLineSwitch.h
 
-This includes ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h
+This includes ESAT_EPS-hardware/ESAT_PowerLineSwitch.h
 
 
 # ESAT_SolarPanelThermometer.h
 
-This includes ESAT_EPS-peripherals/ESAT_SolarPanelThermometer.h
+This includes ESAT_EPS-hardware/ESAT_SolarPanelThermometer.h

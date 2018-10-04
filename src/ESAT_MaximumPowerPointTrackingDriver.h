@@ -19,5 +19,5 @@
  */
 
 #ifndef ESAT_MaximumPowerPointTrackingDriver_h
-#include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
+#include "ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h"
 #endif /* ESAT_MaximumPowerPointTrackingDriver_h */

@@ -19,7 +19,7 @@
  */
 
 #include "ESAT_EPS-telecommands/ESAT_EPSFixedModeTelecommand.h"
-#include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
+#include "ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h"
 
 boolean ESAT_EPSFixedModeTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {

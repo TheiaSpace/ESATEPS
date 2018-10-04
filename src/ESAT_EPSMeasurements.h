@@ -19,5 +19,5 @@
  */
 
 #ifndef ESAT_EPSMeasurements_h
-#include "ESAT_EPS-peripherals/ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-hardware/ESAT_EPSMeasurements.h"
 #endif /* ESAT_EPSMeasurements_h */
