@@ -35,11 +35,6 @@ boolean ESAT_BatteryModuleHousekeepingTelemetryClass::available()
   }
 }
 
-byte ESAT_BatteryModuleHousekeepingTelemetryClass::packetIdentifier()
-{
-  return PACKET_IDENTIFIER;
-}
-
 boolean ESAT_BatteryModuleHousekeepingTelemetryClass::fillUserData(ESAT_CCSDSPacket& packet)
 {
   packet.writeUnsignedLong(ESAT_BatteryController.readOperationStatus());
