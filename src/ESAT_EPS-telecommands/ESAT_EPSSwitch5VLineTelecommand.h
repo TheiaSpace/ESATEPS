@@ -22,35 +22,37 @@
 #define ESAT_EPSSwitch5VLineTelecommand_h
 
 #include <Arduino.h>
-#include <ESAT_CCSDSPacketConsumer.h>
+#include <ESAT_CCSDSTelecommandPacketHandler.h>
 #include <ESAT_SemanticVersionNumber.h>
 
 // Telecommand handler for EPS_SWITCH_5V_LINE.
 // Used by ESAT_EPS.
-class ESAT_EPSSwitch5VLineTelecommandClass: public ESAT_CCSDSPacketConsumer
+class ESAT_EPSSwitch5VLineTelecommandClass: public ESAT_CCSDSTelecommandPacketHandler
 {
   public:
     // Handle a telecommand packet.
+    // The read/write pointer of the packet is at the start of the
+    // user data field.
     // Return true on success; otherwise return false.
-    boolean consume(ESAT_CCSDSPacket packet);
+    boolean handleUserData(ESAT_CCSDSPacket packet);
 
-  private:
-    // Identifier of the EPS_SWITCH_5V_LINE telecommand.
-    static const byte EPS_SWITCH_5V_LINE = 0x11;
+    // Return the packet identifier of this telecommand handler.
+    // ESAT_CCSDSTelecommandPacketDispatcher objects pass telecommand
+    // packets to a handler object only when the packet identifiers
+    // match.
+    byte packetIdentifier()
+    {
+      return 0x11;
+    }
 
-    // with a version number that is backwards-compatible with
-    // this version number.
-    static const ESAT_SemanticVersionNumber INTERFACE_VERSION_NUMBER;
-
-    // Return true if this telecommand handler accepts the
-    // packet with the given secondary header; otherwise
-    // return false.
-    boolean accept(ESAT_CCSDSSecondaryHeader secondaryHeader) const;
-
-    // Handle the telecommand packet (given with the read/write pointer
-    // at the start of the user data field).
-    // Return true on success; otherwise return false.
-    boolean handle(ESAT_CCSDSPacket packet) const;
+    // Return the version number of this telecommand handler.
+    // ESAT_CCSDSTelecommandPacketDispatcher objects pass telecommand
+    // packets to a handler object only when the packet version number
+    // is backward-compatible with the handler version number.
+    ESAT_SemanticVersionNumber versionNumber()
+    {
+      return ESAT_SemanticVersionNumber(2, 0, 0);
+    }
 };
 
 // Global instance of ESAT_EPSSwitch5VLineTelecommandClass.

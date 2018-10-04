@@ -21,38 +21,7 @@
 #include "ESAT_EPS-telecommands/ESAT_EPSSetTimeTelecommand.h"
 #include "ESAT_EPS.h"
 
-const ESAT_SemanticVersionNumber ESAT_EPSSetTimeTelecommandClass::INTERFACE_VERSION_NUMBER(2, 0, 0);
-
-boolean ESAT_EPSSetTimeTelecommandClass::accept(const ESAT_CCSDSSecondaryHeader secondaryHeader) const
-{
-  if (!INTERFACE_VERSION_NUMBER.isForwardCompatibleWith(secondaryHeader.majorVersionNumber,
-                                                        secondaryHeader.minorVersionNumber,
-                                                        secondaryHeader.patchVersionNumber))
-  {
-    return false;
-  }
-  if (secondaryHeader.packetIdentifier != EPS_SET_TIME)
-  {
-    return false;
-  }
-  return true;
-}
-
-boolean ESAT_EPSSetTimeTelecommandClass::consume(ESAT_CCSDSPacket packet)
-{
-  const ESAT_CCSDSSecondaryHeader secondaryHeader =
-    packet.readSecondaryHeader();
-  if (accept(secondaryHeader))
-  {
-    return handle(packet);
-  }
-  else
-  {
-    return false;
-  }
-}
-
-boolean ESAT_EPSSetTimeTelecommandClass::handle(ESAT_CCSDSPacket packet) const
+boolean ESAT_EPSSetTimeTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {
   const ESAT_Timestamp timestamp = packet.readTimestamp();
   if (packet.triedToReadBeyondLength())

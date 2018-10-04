@@ -21,38 +21,7 @@
 #include "ESAT_EPS-telecommands/ESAT_EPSEnableTelemetryTelecommand.h"
 #include "ESAT_EPS.h"
 
-const ESAT_SemanticVersionNumber ESAT_EPSEnableTelemetryTelecommandClass::INTERFACE_VERSION_NUMBER(2, 1, 0);
-
-boolean ESAT_EPSEnableTelemetryTelecommandClass::accept(const ESAT_CCSDSSecondaryHeader secondaryHeader) const
-{
-  if (!INTERFACE_VERSION_NUMBER.isForwardCompatibleWith(secondaryHeader.majorVersionNumber,
-                                                        secondaryHeader.minorVersionNumber,
-                                                        secondaryHeader.patchVersionNumber))
-  {
-    return false;
-  }
-  if (secondaryHeader.packetIdentifier != EPS_ENABLE_TELEMETRY)
-  {
-    return false;
-  }
-  return true;
-}
-
-boolean ESAT_EPSEnableTelemetryTelecommandClass::consume(ESAT_CCSDSPacket packet)
-{
-  const ESAT_CCSDSSecondaryHeader secondaryHeader =
-    packet.readSecondaryHeader();
-  if (accept(secondaryHeader))
-  {
-    return handle(packet);
-  }
-  else
-  {
-    return false;
-  }
-}
-
-boolean ESAT_EPSEnableTelemetryTelecommandClass::handle(ESAT_CCSDSPacket packet) const
+boolean ESAT_EPSEnableTelemetryTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {
   const byte identifier = packet.readByte();
   if (packet.triedToReadBeyondLength())

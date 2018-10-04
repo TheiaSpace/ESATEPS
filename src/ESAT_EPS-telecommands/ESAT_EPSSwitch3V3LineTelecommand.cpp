@@ -21,38 +21,7 @@
 #include "ESAT_EPS-telecommands/ESAT_EPSSwitch3V3LineTelecommand.h"
 #include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
 
-const ESAT_SemanticVersionNumber ESAT_EPSSwitch3V3LineTelecommandClass::INTERFACE_VERSION_NUMBER(2, 0, 0);
-
-boolean ESAT_EPSSwitch3V3LineTelecommandClass::accept(const ESAT_CCSDSSecondaryHeader secondaryHeader) const
-{
-  if (!INTERFACE_VERSION_NUMBER.isForwardCompatibleWith(secondaryHeader.majorVersionNumber,
-                                                        secondaryHeader.minorVersionNumber,
-                                                        secondaryHeader.patchVersionNumber))
-  {
-    return false;
-  }
-  if (secondaryHeader.packetIdentifier != EPS_SWITCH_3V3_LINE)
-  {
-    return false;
-  }
-  return true;
-}
-
-boolean ESAT_EPSSwitch3V3LineTelecommandClass::consume(ESAT_CCSDSPacket packet)
-{
-  const ESAT_CCSDSSecondaryHeader secondaryHeader =
-    packet.readSecondaryHeader();
-  if (accept(secondaryHeader))
-  {
-    return handle(packet);
-  }
-  else
-  {
-    return false;
-  }
-}
-
-boolean ESAT_EPSSwitch3V3LineTelecommandClass::handle(ESAT_CCSDSPacket packet) const
+boolean ESAT_EPSSwitch3V3LineTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {
   const byte commandParameter = packet.readByte();
   if (packet.triedToReadBeyondLength())
