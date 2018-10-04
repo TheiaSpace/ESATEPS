@@ -19,12 +19,12 @@
  */
 
 #include "ESAT_EPS-telemetry/ESAT_EPSHousekeepingTelemetry.h"
-#include "ESAT_EPS-peripherals/ESAT_BatteryController.h"
-#include "ESAT_EPS-peripherals/ESAT_DirectEnergyTransferSystem.h"
-#include "ESAT_EPS-peripherals/ESAT_EPSMeasurements.h"
-#include "ESAT_EPS-peripherals/ESAT_MaximumPowerPointTrackingDriver.h"
-#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
-#include "ESAT_EPS-peripherals/ESAT_SolarPanelThermometer.h"
+#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
+#include "ESAT_EPS-hardware/ESAT_DirectEnergyTransferSystem.h"
+#include "ESAT_EPS-hardware/ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h"
+#include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-hardware/ESAT_SolarPanelThermometer.h"
 
 boolean ESAT_EPSHousekeepingTelemetryClass::available()
 {

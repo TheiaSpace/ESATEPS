@@ -19,5 +19,5 @@
  */
 
 #ifndef ESAT_PowerLineSwitch_h
-#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
 #endif /* ESAT_PowerLineSwitch_h */

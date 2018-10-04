@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_EPS-peripherals/ESAT_BatteryController.h"
+#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
 #include <ESAT_Buffer.h>
 #include <ESAT_CRC8.h>
 #include <ESAT_Util.h>

@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
 
 ESAT_PowerLineSwitchClass::ESAT_PowerLineSwitchClass(const byte theLine)
 {

@@ -39,7 +39,7 @@ several subdirectories:
 This is the main library that provides the general EPS functionality.
 
 
-# ESAT_EPS-peripherals directory
+# ESAT_EPS-hardware directory
 
 This directory contains drivers for the peripherals of the ESAT EPS
 board used by ESAT_EPS.

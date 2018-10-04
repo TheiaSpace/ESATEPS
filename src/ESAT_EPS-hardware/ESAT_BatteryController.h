@@ -22,7 +22,7 @@
 #define ESAT_BatteryController_h
 
 #include <Arduino.h>
-#include "ESAT_EPS-peripherals/ESAT_BatteryControllerFirmwareVersion.h"
+#include "ESAT_EPS-hardware/ESAT_BatteryControllerFirmwareVersion.h"
 #include <Wire.h>
 
 // An interface with the battery controller.

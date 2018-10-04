@@ -19,7 +19,7 @@
  */
 
 #include "ESAT_EPS-telecommands/ESAT_EPSSwitch5VLineTelecommand.h"
-#include "ESAT_EPS-peripherals/ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
 
 boolean ESAT_EPSSwitch5VLineTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {

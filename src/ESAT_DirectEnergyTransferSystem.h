@@ -19,5 +19,5 @@
  */
 
 #ifndef ESAT_DirectEnergyTransferSystem_h
-#include "ESAT_EPS-peripherals/ESAT_DirectEnergyTransferSystem.h"
+#include "ESAT_EPS-hardware/ESAT_DirectEnergyTransferSystem.h"
 #endif /* ESAT_DirectEnergyTransferSystem_h */
