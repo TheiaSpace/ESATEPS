@@ -289,9 +289,6 @@ class ESAT_EPSClass
     // Configure the telemetry packets.
     void beginTelemetry();
 
-    // Queue incoming USB commands.
-    void queueIncomingUSBCommands();
-
     // Respond to telemetry and telecommand requests coming from the I2C bus.
     void respondToI2CRequest();
 
