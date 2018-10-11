@@ -23,6 +23,7 @@
 
 boolean ESAT_BatteryModuleHousekeepingTelemetryClass::available()
 {
+  // This telemetry packet is available once every second.
   const unsigned long currentPacketTime = millis();
   if (currentPacketTime >= (previousPacketTime + PERIOD))
   {
