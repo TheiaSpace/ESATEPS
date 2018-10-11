@@ -52,28 +52,13 @@ void ESAT_EPSClass::addTelemetry(ESAT_CCSDSTelemetryPacketContents& telemetry)
 
 void ESAT_EPSClass::begin()
 {
-  telemetryPacketBuilder =
-    ESAT_CCSDSTelemetryPacketBuilder(APPLICATION_PROCESS_IDENTIFIER,
-                                     MAJOR_VERSION_NUMBER,
-                                     MINOR_VERSION_NUMBER,
-                                     PATCH_VERSION_NUMBER,
-                                     clock);
-  enabledTelemetry.clearAll();
-  i2cPendingTelemetry.clearAll();
-  i2cPendingTelemetryBuffer.clearAll();
-  usbPendingTelemetry.clearAll();
-  addTelemetry(ESAT_EPSHousekeepingTelemetry);
-  enableTelemetry(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
-  addTelemetry(ESAT_BatteryModuleHousekeepingTelemetry);
-  disableTelemetry(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
-  addTelecommand(ESAT_EPSSetTimeTelecommand);
-  addTelecommand(ESAT_EPSSwitch3V3LineTelecommand);
-  addTelecommand(ESAT_EPSSwitch5VLineTelecommand);
-  addTelecommand(ESAT_EPSMaximumPowerPointTrackingModeTelecommand);
-  addTelecommand(ESAT_EPSSweepModeTelecommand);
-  addTelecommand(ESAT_EPSFixedModeTelecommand);
-  addTelecommand(ESAT_EPSEnableTelemetryTelecommand);
-  addTelecommand(ESAT_EPSDisableTelemetryTelecommand);
+  beginTelemetry();
+  beginTelecommands();
+  beginHardware();
+}
+
+void ESAT_EPSClass::beginHardware()
+{
   usbReader = ESAT_CCSDSPacketFromKISSFrameReader(Serial,
                                                   usbTelecommandBuffer,
                                                   sizeof(usbTelecommandBuffer));
@@ -97,6 +82,26 @@ void ESAT_EPSClass::begin()
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                       i2cTelemetryPacketData,
                       MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
+}
+
+void ESAT_EPSClass::beginTelecommands()
+{
+  addTelecommand(ESAT_EPSSetTimeTelecommand);
+  addTelecommand(ESAT_EPSSwitch3V3LineTelecommand);
+  addTelecommand(ESAT_EPSSwitch5VLineTelecommand);
+  addTelecommand(ESAT_EPSMaximumPowerPointTrackingModeTelecommand);
+  addTelecommand(ESAT_EPSSweepModeTelecommand);
+  addTelecommand(ESAT_EPSFixedModeTelecommand);
+  addTelecommand(ESAT_EPSEnableTelemetryTelecommand);
+  addTelecommand(ESAT_EPSDisableTelemetryTelecommand);
+}
+
+void ESAT_EPSClass::beginTelemetry()
+{
+  addTelemetry(ESAT_EPSHousekeepingTelemetry);
+  enableTelemetry(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
+  addTelemetry(ESAT_BatteryModuleHousekeepingTelemetry);
+  disableTelemetry(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
 }
 
 void ESAT_EPSClass::disableTelemetry(const byte identifier)
