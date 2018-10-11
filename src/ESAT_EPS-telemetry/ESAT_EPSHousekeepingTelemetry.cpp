@@ -28,11 +28,13 @@
 
 boolean ESAT_EPSHousekeepingTelemetryClass::available()
 {
+  // This telemetry packet is always available.
   return true;
 }
 
 boolean ESAT_EPSHousekeepingTelemetryClass::fillUserData(ESAT_CCSDSPacket& packet)
 {
+  // We read some error flags and we must reset them after use.
   packet.writeWord(ESAT_EPSMeasurements.read3V3LineCurrent());
   packet.writeWord(ESAT_EPSMeasurements.read3V3LineVoltage());
   packet.writeWord(ESAT_EPSMeasurements.read5VLineCurrent());
