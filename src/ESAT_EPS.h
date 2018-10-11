@@ -246,7 +246,12 @@ class ESAT_EPSClass
       ESAT_CCSDSTelecommandPacketDispatcher(APPLICATION_PROCESS_IDENTIFIER);
 
     // Telemetry packet builder.
-    ESAT_CCSDSTelemetryPacketBuilder telemetryPacketBuilder;
+    ESAT_CCSDSTelemetryPacketBuilder telemetryPacketBuilder =
+      ESAT_CCSDSTelemetryPacketBuilder(APPLICATION_PROCESS_IDENTIFIER,
+                                       MAJOR_VERSION_NUMBER,
+                                       MINOR_VERSION_NUMBER,
+                                       PATCH_VERSION_NUMBER,
+                                       clock);
 
     // Enabled telemetry list.
     ESAT_FlagContainer enabledTelemetry;
@@ -274,6 +279,15 @@ class ESAT_EPSClass
 
     // Use this buffer to accumulate incoming telecommands.
     byte usbTelecommandBuffer[MAXIMUM_TELECOMMAND_PACKET_LENGTH];
+
+    // Configure the hardware.
+    void beginHardware();
+
+    // Configure the telecommand handlers.
+    void beginTelecommands();
+
+    // Configure the telemetry packets.
+    void beginTelemetry();
 
     // Queue incoming USB commands.
     void queueIncomingUSBCommands();
