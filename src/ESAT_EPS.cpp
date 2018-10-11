@@ -59,6 +59,7 @@ void ESAT_EPSClass::begin()
 
 void ESAT_EPSClass::beginHardware()
 {
+  // We pass packets around the USB interface in KISS frames.
   usbReader = ESAT_CCSDSPacketFromKISSFrameReader(Serial,
                                                   usbTelecommandBuffer,
                                                   sizeof(usbTelecommandBuffer));
@@ -75,8 +76,9 @@ void ESAT_EPSClass::beginHardware()
   WireEPS.begin();
   ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
   ESAT_EPSLED.begin();
-  WireOBC.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   Serial.begin();
+  // We are a slave node at the OBC I2C interface.
+  WireOBC.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
   ESAT_I2CSlave.begin(WireOBC,
                       i2cTelecommandPacketData,
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
@@ -116,22 +118,49 @@ void ESAT_EPSClass::enableTelemetry(const byte identifier)
 
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
 {
-  packet.rewind();
+  // We leave the complexity of handling telecommands to the
+  // telecommand packet dispatcher.
   (void) telecommandPacketDispatcher.dispatch(packet);
 }
 
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
-  packet.flush();
-  const boolean gotI2CPacket = ESAT_I2CSlave.readPacket(packet);
-  if (gotI2CPacket)
+  // There are two sources of telecommands:
+  // - the I2C interface;
+  // - the USB interface.
+  if (readTelecommandFromI2C(packet))
   {
     return true;
   }
   else
   {
-    const boolean gotUSBPacket = usbReader.read(packet);
-    return gotUSBPacket;
+    return readTelecommandFromUSB(packet);
+  }
+}
+
+boolean ESAT_EPSClass::readTelecommandFromI2C(ESAT_CCSDSPacket& packet)
+{
+  const boolean gotPacket = ESAT_I2CSlave.readPacket(packet);
+  if (gotPacket && packet.isTelecommand())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
+{
+  const boolean gotPacket = usbReader.read(packet);
+  if (gotPacket && packet.isTelecommand())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
   }
 }
 
@@ -170,6 +199,9 @@ void ESAT_EPSClass::respondToI2CRequest()
 
 void ESAT_EPSClass::respondToNamedPacketTelemetryRequest(const byte identifier)
 {
+  // We try to satisfy named-packet telemetry requests, but only for
+  // enabled telemetry packets.  If the requested packet isn't enabled
+  // or we don't recognise it, we reject the request.
   byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
   ESAT_CCSDSPacket packet(packetData, sizeof(packetData));
   const boolean enabled = enabledTelemetry.read(identifier);
@@ -192,17 +224,25 @@ void ESAT_EPSClass::respondToNamedPacketTelemetryRequest(const byte identifier)
 
 void ESAT_EPSClass::respondToNextPacketTelecommandRequest()
 {
+  // We don't generate telecommands.
   ESAT_I2CSlave.rejectPacket();
 }
 
 void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
 {
+  // We only update the list of pending I2C telemetry packets
+  // with the contents of the buffered list when we receive
+  // a command to reset the telemetry queue.
   if (ESAT_I2CSlave.telemetryQueueResetReceived())
   {
     i2cPendingTelemetry = i2cPendingTelemetryBuffer;
     i2cPendingTelemetryBuffer.clearAll();
   }
+  // Some pending I2C telemetry packet might have been disabled
+  // since the last I2C request.
   i2cPendingTelemetry = i2cPendingTelemetry & enabledTelemetry;
+  // We try to satisfy requests until we run out of packets.
+  // Then, we just reject the request.
   if (i2cPendingTelemetry.available() > 0)
   {
     const byte identifier = byte(i2cPendingTelemetry.readNext());
@@ -222,6 +262,16 @@ void ESAT_EPSClass::setTime(const ESAT_Timestamp timestamp)
 
 void ESAT_EPSClass::updatePendingTelemetryLists()
 {
+  // We have two pending telemetry lists to update:
+  // - The USB pending telemetry list, which is consumed
+  //   by readTelemetry().  This list contains the telemetry
+  //   packets that are currently available and enabled.
+  // - The I2C penging telemetry list buffer, which isn't
+  //   consumed by I2C requests directly, but goes to the
+  //   list of pending I2C telemetry when we receive a
+  //   telemetry queue reset command.  This list accumulates
+  //   the telemetry packets that are available and enabled
+  //   on each cycle.
   const ESAT_FlagContainer availableTelemetry =
     telemetryPacketBuilder.available();
   const ESAT_FlagContainer availableAndEnabledTelemetry =

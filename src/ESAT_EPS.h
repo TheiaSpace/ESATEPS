@@ -289,6 +289,14 @@ class ESAT_EPSClass
     // Configure the telemetry packets.
     void beginTelemetry();
 
+    // Read a telecommand packet from the I2C interface.  Return true
+    // on success; otherwise return false.
+    boolean readTelecommandFromI2C(ESAT_CCSDSPacket& packet);
+
+    // Read a telecommand packet from the USB interface.  Return true
+    // on success; otherwise return false.
+    boolean readTelecommandFromUSB(ESAT_CCSDSPacket& packet);
+
     // Respond to telemetry and telecommand requests coming from the I2C bus.
     void respondToI2CRequest();
 
