@@ -49,6 +49,8 @@ ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte theP
 
 word ESAT_SolarPanelThermometerClass::read()
 {
+  // We support two different thermometer hardware implementations.
+  // We try one first and, if we fail, we try the second one.
   unsigned long currentReadingTime = millis();
   if ((currentReadingTime - previousReadingTime) < PERIOD)
   {
