@@ -91,7 +91,7 @@ class ESAT_EPSClass
     // Update the EPS:
     // - Update the maximum point tracking system.
     // - Update the telemetry vector.
-    // - Respond to I2C reques
+    // - Respond to I2C requests.
     // - Update the brightness of the heartbeat LED.
     void update();
 

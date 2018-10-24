@@ -1,0 +1,77 @@
+ESATEPS NEWS -- history of changes.
+
+Copyright (C) 2018 Theia Space, Universidad Politécnica de Madrid
+
+This file is part of Theia Space's ESAT EPS library.
+
+Theia Space's ESAT EPS library is free software: you can
+redistribute it and/or modify it under the terms of the GNU General
+Public License as published by the Free Software Foundation, either
+version 3 of the License, or (at your option) any later version.
+
+Theia Space's ESAT EPS library is distributed in the hope that it
+will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Theia Space's ESAT EPS library.  If not, see
+<http://www.gnu.org/licenses/>.
+
+
+* Changes in ESATEPS 2.1.0, 2018-10-24
+
+** The EPS supports multiple telemetry packets.
+
+** There is a new battery module housekeeping telemetry packet.
+
+** The EPS accepts pluggable telemetry and telecommand packets.
+
+** The battery controller driver can read more parameters and
+variables.
+
+** There is a driver for the on-board LED of the new EPS boards.
+
+** All computer code files have copyright notices.
+
+** The main program shows the program name and version in the header.
+
+** The complexity of pasing around CCSDS Space Packets in KISS frames
+has been reduced with the help of new modules form ESATUtil.
+
+** The minimum required version of the Arduino core (Theia Space's
+ESAT Boards (MSP430)) is 3.0.0.
+
+** The minimum required version of ESATUtil is 2.1.0.
+
+
+* Changes in ESATEPS 2.0.1, 2017-11-30
+
+** The error flags of the battery controller and the solar panel
+thermometer work as expected now.
+
+** This release fixes code formatting and other style issues.
+
+
+* Changes in ESATEPS 2.0.0, 2017-11-08
+
+** Telemetry and telecommand packets are CCSDS Space Packets.
+
+** Packets passed around through the USB interface go in KISS frames.
+
+** There is a new protocol for passing packets through the I2C interface.
+
+** The library has been splitted into different modules.
+
+** The main loop is way faster now.
+
+** The minimum required version of the Arduino core (Theia Space's
+ESAT Boards) is 2.0.0.
+
+** The minimum required version of ESATUtil is 2.0.0.
+
+
+* Changes in ESATEPS 1.1.0, 2017-02-10
+
+** Both the old and the new solar panel thermometers are supported
+now.
