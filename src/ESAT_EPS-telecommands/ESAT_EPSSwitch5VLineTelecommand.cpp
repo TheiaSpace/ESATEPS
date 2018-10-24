@@ -18,6 +18,28 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_BatteryController_h
-#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
-#endif /* ESAT_BatteryController_h */
+#include "ESAT_EPS-telecommands/ESAT_EPSSwitch5VLineTelecommand.h"
+#include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
+
+boolean ESAT_EPSSwitch5VLineTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
+{
+  const byte commandParameter = packet.readByte();
+  if (packet.triedToReadBeyondLength())
+  {
+    return false;
+  }
+  else
+  {
+    if (commandParameter > 0)
+    {
+      ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.ON);
+    }
+    else
+    {
+      ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.OFF);
+    }
+    return true;
+  }
+}
+
+ESAT_EPSSwitch5VLineTelecommandClass ESAT_EPSSwitch5VLineTelecommand;

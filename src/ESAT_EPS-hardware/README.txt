@@ -17,41 +17,44 @@ along with Theia Space's ESAT EPS library.  If not, see
 <http://www.gnu.org/licenses/>.
 
 
-This directory contains the ESAT_EPS module as well as simple headers
-that include files from the subdirectories and are preserved for
-backward-compatibility.
+Drivers for peripherals of the ESAT EPS board.  They are used by
+ESAT_EPS.
 
 
-# ESAT_EPS
+# ESAT_BatteryController
 
-This is the main library that provides the general EPS functionality.
-
-
-# ESAT_BatteryController.h
-
-This includes ESAT_EPS-hardware/ESAT_BatteryController.h
+Battery voltage, current, temperature and state of charge readings.
 
 
-# ESAT_DirectEnergyTransferSystem.h
+# ESAT_DirectEnergyTransferSystem
 
-This includes ESAT_EPS-hardware/ESAT_DirectEnergyTransferSystem.h
-
-
-# ESAT_EPSMeasurements.h
-
-This includes ESAT_EPS-hardware/ESAT_EPSMeasurements.h
+Readings on the direct energy transfer system.  The direct energy
+transfer system can be used to dissipate excess power from the solar
+panels.
 
 
-# ESAT_MaximumPowerPointTrackingDriver.h
+# ESAT_EPSLED
 
-This includes ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h
-
-
-# ESAT_PowerLineSwitch.h
-
-This includes ESAT_EPS-hardware/ESAT_PowerLineSwitch.h
+Control of the on-board heartbeat LED.
 
 
-# ESAT_SolarPanelThermometer.h
+# ESAT_EPSMeasurements
 
-This includes ESAT_EPS-hardware/ESAT_SolarPanelThermometer.h
+On-board voltage and current measurements.
+
+
+# ESAT_MaximumPowerPointTrackingDriver
+
+Readings on the maximum power point tracking drivers.  The maximum
+power point tracking system can be used to extract the maximum power
+possible from the solar panels.
+
+
+# ESAT_PowerLineSwitch
+
+Control of the power line switches.
+
+
+# ESAT_SolarPanelThermometer
+
+Temperature measurements on the solar panels.

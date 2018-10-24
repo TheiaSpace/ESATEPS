@@ -18,6 +18,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_BatteryController_h
-#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
-#endif /* ESAT_BatteryController_h */
+#include "ESAT_EPS-telecommands/ESAT_EPSEnableTelemetryTelecommand.h"
+#include "ESAT_EPS.h"
+
+boolean ESAT_EPSEnableTelemetryTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
+{
+  const byte identifier = packet.readByte();
+  if (packet.triedToReadBeyondLength())
+  {
+    (void) identifier; // Unused.
+    return false;
+  }
+  else
+  {
+    ESAT_EPS.enableTelemetry(identifier);
+    return true;
+  }
+}
+
+ESAT_EPSEnableTelemetryTelecommandClass ESAT_EPSEnableTelemetryTelecommand;

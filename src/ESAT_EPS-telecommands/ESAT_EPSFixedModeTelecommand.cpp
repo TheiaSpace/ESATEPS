@@ -18,6 +18,24 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_BatteryController_h
-#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
-#endif /* ESAT_BatteryController_h */
+#include "ESAT_EPS-telecommands/ESAT_EPSFixedModeTelecommand.h"
+#include "ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h"
+
+boolean ESAT_EPSFixedModeTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
+{
+  const byte parameter = packet.readByte();
+  if (packet.triedToReadBeyondLength())
+  {
+    (void) parameter; // Ignored.
+    return false;
+  }
+  else
+  {
+    const byte dutyCycle = constrain(parameter, 0, 255);
+    ESAT_MaximumPowerPointTrackingDriver1.setFixedMode(dutyCycle);
+    ESAT_MaximumPowerPointTrackingDriver2.setFixedMode(dutyCycle);
+    return true;
+  }
+}
+
+ESAT_EPSFixedModeTelecommandClass ESAT_EPSFixedModeTelecommand;

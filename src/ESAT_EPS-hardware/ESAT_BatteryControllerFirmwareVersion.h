@@ -18,6 +18,24 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_BatteryController_h
-#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
-#endif /* ESAT_BatteryController_h */
+#ifndef ESAT_BatteryControllerFirmwareVersion_h
+#define ESAT_BatteryControllerFirmwareVersion_h
+
+#include <Arduino.h>
+
+// Firmware version of the battery controller.
+class ESAT_BatteryControllerFirmwareVersion
+{
+  public:
+    // Number of bytes used by the firmware version.
+    static const byte LENGTH = 11;
+
+    // Firmware version.
+    byte version[LENGTH];
+
+    // Write the firmware version to a stream.
+    // Return true on success; otherwise return false.
+    boolean writeTo(Stream& stream) const;
+};
+
+#endif /* ESAT_BatteryControllerFirmwareVersion_h */

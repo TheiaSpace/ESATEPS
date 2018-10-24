@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Theia Space, Universidad Politécnica de Madrid
+ * Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
  *
  * This file is part of Theia Space's ESAT EPS library.
  *
@@ -18,6 +18,49 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_PowerLineSwitch_h
 #include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
-#endif /* ESAT_PowerLineSwitch_h */
+
+ESAT_PowerLineSwitchClass::ESAT_PowerLineSwitchClass(const byte theLine)
+{
+  line = theLine;
+  state = OFF;
+}
+
+void ESAT_PowerLineSwitchClass::begin()
+{
+  pinMode(line, OUTPUT);
+  write(state);
+}
+
+ESAT_PowerLineSwitchClass::SwitchState ESAT_PowerLineSwitchClass::read()
+{
+  return state;
+}
+
+void ESAT_PowerLineSwitchClass::toggle()
+{
+  if (state == ON)
+  {
+    write(OFF);
+  }
+  else
+  {
+    write(ON);
+  }
+}
+
+void ESAT_PowerLineSwitchClass::write(const ESAT_PowerLineSwitchClass::SwitchState newState)
+{
+  state = newState;
+  if (state == ON)
+  {
+    digitalWrite(line, HIGH);
+  }
+  else
+  {
+    digitalWrite(line, LOW);
+  }
+}
+
+ESAT_PowerLineSwitchClass ESAT_PowerLine3V3Switch(EN3V3);
+ESAT_PowerLineSwitchClass ESAT_PowerLine5VSwitch(EN5V);

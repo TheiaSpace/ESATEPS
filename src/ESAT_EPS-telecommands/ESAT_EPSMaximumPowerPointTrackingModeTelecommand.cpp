@@ -18,6 +18,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_BatteryController_h
-#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
-#endif /* ESAT_BatteryController_h */
+#include "ESAT_EPS-telecommands/ESAT_EPSMaximumPowerPointTrackingModeTelecommand.h"
+#include "ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h"
+
+boolean ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
+{
+  (void) packet; // Ignored.
+  ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
+  ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
+  return true;
+}
+
+ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass ESAT_EPSMaximumPowerPointTrackingModeTelecommand;

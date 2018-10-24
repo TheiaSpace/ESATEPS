@@ -18,6 +18,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ESAT_BatteryController_h
-#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
-#endif /* ESAT_BatteryController_h */
+#include "ESAT_EPS-telecommands/ESAT_EPSSetTimeTelecommand.h"
+#include "ESAT_EPS.h"
+
+boolean ESAT_EPSSetTimeTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
+{
+  const ESAT_Timestamp timestamp = packet.readTimestamp();
+  if (packet.triedToReadBeyondLength())
+  {
+    (void) timestamp; // Ignored.
+    return false;
+  }
+  else
+  {
+    ESAT_EPS.setTime(timestamp);
+    return true;
+  }
+}
+
+ESAT_EPSSetTimeTelecommandClass ESAT_EPSSetTimeTelecommand;

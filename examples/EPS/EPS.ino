@@ -1,4 +1,7 @@
 /*
+ * ESAT EPS Main Program version 2.1.0
+ * Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
+ *
  * This file is part of Theia Space's ESAT EPS library.
  *
  * Theia Space's ESAT EPS library is free software: you can
@@ -41,8 +44,9 @@ void setup()
 //   and from the USB interface).
 // - Handle the incoming telecommands.
 // - Update the telemetry measurements and do housekeeping work
-//   (update the maximum power point tracking drivers and prepare
-//   the responses to I2C telemetry requests).
+//   (update the maximum power point tracking drivers, respond to I2C
+//   telemetry requests and update the brightness of the heartbeat
+//   LED).
 // - Retrieve the telemetry packets.
 // - Write the telemetry packets through the USB interface.
 // The packet data buffer used for telecommand and telemetry

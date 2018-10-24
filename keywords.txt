@@ -1,16 +1,77 @@
-ESAT_BatteryController	KEYWORD1
+# Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
+#
+# This file is part of Theia Space's ESAT EPS library.
+#
+# Theia Space's ESAT EPS library is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+#
+# Theia Space's ESAT EPS library is distributed in the hope that it
+# will be useful, but WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Theia Space's ESAT EPS library.  If not, see
+# <http://www.gnu.org/licenses/>.
 
-ESAT_DirectEnergyTransferSystem	KEYWORD1
 
-ESAT_EPS	KEYWORD1
+#######################################
+# Syntax Coloring Map For ESATEPS
+#######################################
 
-ESAT_EPSMeasurements	KEYWORD1
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
 
-ESAT_MaximumPowerPointTrackingDriver1	KEYWORD1
-ESAT_MaximumPowerPointTrackingDriver2	KEYWORD1
+ESAT_BatteryControllerClass	KEYWORD1
+ESAT_BatteryControllerFirmwareVersion	KEYWORD1
+ESAT_BatteryModuleHousekeepingTelemetryClass	KEYWORD1
+ESAT_DirectEnergyTransferSystemClass	KEYWORD1
+ESAT_EPSClass	KEYWORD1
+ESAT_EPSDisableTelemetryTelecommandClass	KEYWORD1
+ESAT_EPSEnableTelemetryTelecommandClass	KEYWORD1
+ESAT_EPSFixedModeTelecommandClass	KEYWORD1
+ESAT_EPSHousekeepingTelemetryClass	KEYWORD1
+ESAT_EPSLEDClass	KEYWORD1
+ESAT_EPSMaximumPowerPointTrackingModeTelecommandClass	KEYWORD1
+ESAT_EPSMeasurementsClass	KEYWORD1
+ESAT_EPSSweepModeTelecommandClass	KEYWORD1
+ESAT_EPSSwitch3V3LineTelecommandClass	KEYWORD1
+ESAT_EPSSwitch5VLineTelecommandClass	KEYWORD1
+ESAT_MaximumPowerPointTrackingDriver	KEYWORD1
+ESAT_PowerLineSwitch	KEYWORD1
+ESAT_SolarPanelThermometer	KEYWORD1
 
-ESAT_PowerLine3V3Switch	KEYWORD1
-ESAT_PowerLine5VSwitch	KEYWORD1
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
 
-ESAT_SolarPanel1Thermometer	KEYWORD1
-ESAT_SolarPanel2Thermometer	KEYWORD1
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+ESAT_BatteryController	KEYWORD2
+ESAT_BatteryModuleHousekeepingTelemetry	KEYWORD2
+ESAT_DirectEnergyTransferSystem	KEYWORD2
+ESAT_EPS	KEYWORD2
+ESAT_EPSDisableTelemetryTelecommand	KEYWORD2
+ESAT_EPSEnableTelemetryTelecommand	KEYWORD2
+ESAT_EPSFixedModeTelecommand	KEYWORD2
+ESAT_EPSHousekeepingTelemetry	KEYWORD2
+ESAT_EPSMaximumPowerPointTrackingModeTelecommand	KEYWORD2
+ESAT_EPSMeasurements	KEYWORD2
+ESAT_EPSSweepModeTelecommand	KEYWORD2
+ESAT_EPSSwitch3V3LineTelecommand	KEYWORD2
+ESAT_EPSSwitch5VLineTelecommand	KEYWORD2
+ESAT_MaximumPowerPointTrackingDriver1	KEYWORD2
+ESAT_MaximumPowerPointTrackingDriver2	KEYWORD2
+ESAT_PowerLine3V3Switch	KEYWORD2
+ESAT_PowerLine5VSwitch	KEYWORD2
+ESAT_SolarPanel1Thermometer	KEYWORD2
+ESAT_SolarPanel2Thermometer	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################

@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2017 Theia Space, Universidad Politécnica de Madrid
+ *
  * This file is part of Theia Space's ESAT EPS library.
  *
  * Theia Space's ESAT EPS library is free software: you can
@@ -16,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-hardware/ESAT_EPSMeasurements.h"
 
 // Number of samples for current measurements.
 static const byte currentSamples = 5;

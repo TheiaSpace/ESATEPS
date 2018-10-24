@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2018 Theia Space, Universidad Politécnica de Madrid
+ *
  * This file is part of Theia Space's ESAT EPS library.
  *
  * Theia Space's ESAT EPS library is free software: you can
@@ -16,48 +18,28 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSwitch3V3LineTelecommand.h"
+#include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
 
-ESAT_PowerLineSwitchClass::ESAT_PowerLineSwitchClass(const byte line):
-  line(line), state(OFF)
+boolean ESAT_EPSSwitch3V3LineTelecommandClass::handleUserData(ESAT_CCSDSPacket packet)
 {
-}
-
-void ESAT_PowerLineSwitchClass::begin()
-{
-  pinMode(line, OUTPUT);
-  write(state);
-}
-
-ESAT_PowerLineSwitchClass::SwitchState ESAT_PowerLineSwitchClass::read()
-{
-  return state;
-}
-
-void ESAT_PowerLineSwitchClass::toggle()
-{
-  if (state == ON)
+  const byte commandParameter = packet.readByte();
+  if (packet.triedToReadBeyondLength())
   {
-    write(OFF);
+    return false;
   }
   else
   {
-    write(ON);
+    if (commandParameter > 0)
+    {
+      ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
+    }
+    else
+    {
+      ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.OFF);
+    }
+    return true;
   }
 }
 
-void ESAT_PowerLineSwitchClass::write(const ESAT_PowerLineSwitchClass::SwitchState newState)
-{
-  state = newState;
-  if (state == ON)
-  {
-    digitalWrite(line, HIGH);
-  }
-  else
-  {
-    digitalWrite(line, LOW);
-  }
-}
-
-ESAT_PowerLineSwitchClass ESAT_PowerLine3V3Switch(EN3V3);
-ESAT_PowerLineSwitchClass ESAT_PowerLine5VSwitch(EN5V);
+ESAT_EPSSwitch3V3LineTelecommandClass ESAT_EPSSwitch3V3LineTelecommand;

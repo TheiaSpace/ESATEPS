@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
+ *
  * This file is part of Theia Space's ESAT EPS library.
  *
  * Theia Space's ESAT EPS library is free software: you can
@@ -16,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include "ESAT_SolarPanelThermometer.h"
+#include "ESAT_EPS-hardware/ESAT_SolarPanelThermometer.h"
 #include <Wire.h>
 
 // Address/register pairs.
@@ -30,23 +32,25 @@ static const byte solarPanel2SecondaryAddress = 0x1c;
 static const byte solarPanel2SecondaryRegister = 0x05;
 
 
-ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte primaryAddress,
-                                                                 const byte primaryRegister,
-                                                                 const byte secondaryAddress,
-                                                                 const byte secondaryRegister):
-  primaryAddress(primaryAddress),
-  primaryRegister(primaryRegister),
-  secondaryAddress(secondaryAddress),
-  secondaryRegister(secondaryRegister),
-  error(false),
-  previousError(false),
-  previousReading(0),
-  previousReadingTime(0)
+ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte thePrimaryAddress,
+                                                                 const byte thePrimaryRegister,
+                                                                 const byte theSecondaryAddress,
+                                                                 const byte theSecondaryRegister)
 {
+  primaryAddress = thePrimaryAddress;
+  primaryRegister = thePrimaryRegister;
+  secondaryAddress = theSecondaryAddress;
+  secondaryRegister = theSecondaryRegister;
+  error = false;
+  previousError = false;
+  previousReading = 0;
+  previousReadingTime = 0;
 }
 
 word ESAT_SolarPanelThermometerClass::read()
 {
+  // We support two different thermometer hardware implementations.
+  // We try one first and, if we fail, we try the second one.
   unsigned long currentReadingTime = millis();
   if ((currentReadingTime - previousReadingTime) < PERIOD)
   {
@@ -82,23 +86,23 @@ word ESAT_SolarPanelThermometerClass::read()
 word ESAT_SolarPanelThermometerClass::tryRead(const byte address,
                                               const byte registerNumber)
 {
-  Wire1.beginTransmission(address);
-  Wire1.write(registerNumber);
-  const byte writeStatus = Wire1.endTransmission();
+  WireEPS.beginTransmission(address);
+  WireEPS.write(registerNumber);
+  const byte writeStatus = WireEPS.endTransmission();
   if (writeStatus != 0)
   {
     successfulRead = false;
     return 0;
   }
-  const byte bytesRead = Wire1.requestFrom(int(address), 2);
+  const byte bytesRead = WireEPS.requestFrom(int(address), 2);
   if (bytesRead != 2)
   {
     successfulRead = false;
     return 0;
   }
   successfulRead = true;
-  const byte highByte = Wire1.read();
-  const byte lowByte = Wire1.read();
+  const byte highByte = WireEPS.read();
+  const byte lowByte = WireEPS.read();
   return word(highByte, lowByte);
 }
 

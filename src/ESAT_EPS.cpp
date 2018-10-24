@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
+ *
  * This file is part of Theia Space's ESAT EPS library.
  *
  * Theia Space's ESAT EPS library is free software: you can
@@ -19,203 +21,280 @@
 #include "ESAT_EPS.h"
 #include <ESAT_CCSDSPrimaryHeader.h>
 #include <ESAT_I2CSlave.h>
-#include <ESAT_KISSStream.h>
 #include <ESAT_Timestamp.h>
-#include <USBSerial.h>
 #include <Wire.h>
-#include "ESAT_BatteryController.h"
-#include "ESAT_DirectEnergyTransferSystem.h"
-#include "ESAT_EPSMeasurements.h"
-#include "ESAT_MaximumPowerPointTrackingDriver.h"
-#include "ESAT_PowerLineSwitch.h"
-#include "ESAT_SolarPanelThermometer.h"
+#include "ESAT_EPS-hardware/ESAT_BatteryController.h"
+#include "ESAT_EPS-hardware/ESAT_EPSLED.h"
+#include "ESAT_EPS-hardware/ESAT_EPSMeasurements.h"
+#include "ESAT_EPS-hardware/ESAT_MaximumPowerPointTrackingDriver.h"
+#include "ESAT_EPS-hardware/ESAT_PowerLineSwitch.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSDisableTelemetryTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSEnableTelemetryTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSFixedModeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSMaximumPowerPointTrackingModeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSetTimeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSweepModeTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSwitch3V3LineTelecommand.h"
+#include "ESAT_EPS-telecommands/ESAT_EPSSwitch5VLineTelecommand.h"
+#include "ESAT_EPS-telemetry/ESAT_BatteryModuleHousekeepingTelemetry.h"
+#include "ESAT_EPS-telemetry/ESAT_EPSHousekeepingTelemetry.h"
+
+void ESAT_EPSClass::addTelecommand(ESAT_CCSDSTelecommandPacketHandler& telecommand)
+{
+  telecommandPacketDispatcher.add(telecommand);
+}
+
+void ESAT_EPSClass::addTelemetry(ESAT_CCSDSTelemetryPacketContents& telemetry)
+{
+  telemetryPacketBuilder.add(telemetry);
+  enableTelemetry(telemetry.packetIdentifier());
+}
 
 void ESAT_EPSClass::begin()
 {
-  newTelemetryPacket = false;
-  telemetryPacketSequenceCount = 0;
-  telemetry = ESAT_CCSDSPacket(telemetryPacketData,
-                               TELEMETRY_PACKET_DATA_LENGTH);
-  usbTelecommandDecoder = ESAT_KISSStream(USB,
-                                          usbTelecommandBuffer,
-                                          sizeof(usbTelecommandBuffer));
+  beginTelemetry();
+  beginTelecommands();
+  beginHardware();
+}
+
+void ESAT_EPSClass::beginHardware()
+{
+  // We pass packets around the USB interface in KISS frames.
+  usbReader = ESAT_CCSDSPacketFromKISSFrameReader(Serial,
+                                                  usbTelecommandBuffer,
+                                                  sizeof(usbTelecommandBuffer));
+  usbWriter = ESAT_CCSDSPacketToKISSFrameWriter(Serial);
   ESAT_EPSMeasurements.begin();
   ESAT_MaximumPowerPointTrackingDriver1.begin();
   ESAT_MaximumPowerPointTrackingDriver2.begin();
   ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
   ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
   ESAT_PowerLine5VSwitch.begin();
-  ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.OFF);
+  ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.ON);
   ESAT_PowerLine3V3Switch.begin();
   ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
-  Wire1.begin();
-  Wire.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
-  USB.begin();
-  ESAT_I2CSlave.begin(Wire,
+  WireEPS.begin();
+  ESAT_BatteryController.writeDelayBetweenCommunications(byte(2));
+  ESAT_EPSLED.begin();
+  Serial.begin();
+  // We are a slave node at the OBC I2C interface.
+  WireOBC.begin(byte(APPLICATION_PROCESS_IDENTIFIER));
+  ESAT_I2CSlave.begin(WireOBC,
                       i2cTelecommandPacketData,
                       MAXIMUM_TELECOMMAND_PACKET_DATA_LENGTH,
                       i2cTelemetryPacketData,
-                      TELEMETRY_PACKET_DATA_LENGTH);
+                      MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH);
+}
+
+void ESAT_EPSClass::beginTelecommands()
+{
+  addTelecommand(ESAT_EPSSetTimeTelecommand);
+  addTelecommand(ESAT_EPSSwitch3V3LineTelecommand);
+  addTelecommand(ESAT_EPSSwitch5VLineTelecommand);
+  addTelecommand(ESAT_EPSMaximumPowerPointTrackingModeTelecommand);
+  addTelecommand(ESAT_EPSSweepModeTelecommand);
+  addTelecommand(ESAT_EPSFixedModeTelecommand);
+  addTelecommand(ESAT_EPSEnableTelemetryTelecommand);
+  addTelecommand(ESAT_EPSDisableTelemetryTelecommand);
+}
+
+void ESAT_EPSClass::beginTelemetry()
+{
+  addTelemetry(ESAT_EPSHousekeepingTelemetry);
+  enableTelemetry(ESAT_EPSHousekeepingTelemetry.packetIdentifier());
+  addTelemetry(ESAT_BatteryModuleHousekeepingTelemetry);
+  disableTelemetry(ESAT_BatteryModuleHousekeepingTelemetry.packetIdentifier());
+}
+
+void ESAT_EPSClass::disableTelemetry(const byte identifier)
+{
+  enabledTelemetry.clear(identifier);
+}
+
+void ESAT_EPSClass::enableTelemetry(const byte identifier)
+{
+  enabledTelemetry.set(identifier);
 }
 
 void ESAT_EPSClass::handleTelecommand(ESAT_CCSDSPacket& packet)
 {
-  packet.rewind();
-  const ESAT_CCSDSPrimaryHeader primaryHeader = packet.readPrimaryHeader();
-  if (primaryHeader.applicationProcessIdentifier
-      != APPLICATION_PROCESS_IDENTIFIER)
-  {
-    return;
-  }
-  if (primaryHeader.packetType != primaryHeader.TELECOMMAND)
-  {
-    return;
-  }
-  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
-  {
-    return;
-  }
-  const ESAT_CCSDSSecondaryHeader secondaryHeader =
-    packet.readSecondaryHeader();
-  if (secondaryHeader.majorVersionNumber < MAJOR_VERSION_NUMBER)
-  {
-    return;
-  }
-  switch (secondaryHeader.packetIdentifier)
-  {
-    case SWITCH_5V_LINE:
-      handleSwitch5VLineCommand(packet);
-      break;
-    case SWITCH_3V3_LINE:
-      handleSwitch3V3LineCommand(packet);
-      break;
-    case MAXIMUM_POWER_POINT_TRACKING_MODE:
-      handleMaximumPowerPointTrackingModeCommand(packet);
-      break;
-    case SWEEP_MODE:
-      handleSweepModeCommand(packet);
-      break;
-    case FIXED_MODE:
-      handleFixedModeCommand(packet);
-      break;
-    case SET_TIME:
-      handleSetTimeCommand(packet);
-      break;
-    default:
-      break;
-  }
-}
-
-void ESAT_EPSClass::handleFixedModeCommand(ESAT_CCSDSPacket& packet)
-{
-  const byte commandParameter = packet.readByte();
-  const byte dutyCycle = constrain(commandParameter, 0, 255);
-  ESAT_MaximumPowerPointTrackingDriver1.setFixedMode(dutyCycle);
-  ESAT_MaximumPowerPointTrackingDriver2.setFixedMode(dutyCycle);
-}
-
-void ESAT_EPSClass::handleMaximumPowerPointTrackingModeCommand(ESAT_CCSDSPacket& packet)
-{
-  ESAT_MaximumPowerPointTrackingDriver1.setMPPTMode();
-  ESAT_MaximumPowerPointTrackingDriver2.setMPPTMode();
-}
-
-void ESAT_EPSClass::handleSweepModeCommand(ESAT_CCSDSPacket& packet)
-{
-  ESAT_MaximumPowerPointTrackingDriver1.setSweepMode();
-  ESAT_MaximumPowerPointTrackingDriver2.setSweepMode();
-}
-
-void ESAT_EPSClass::handleSwitch3V3LineCommand(ESAT_CCSDSPacket& packet)
-{
-  const byte commandParameter = packet.readByte();
-  if (commandParameter > 0)
-  {
-    ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.ON);
-  }
-  else
-  {
-    ESAT_PowerLine3V3Switch.write(ESAT_PowerLine3V3Switch.OFF);
-  }
-}
-
-void ESAT_EPSClass::handleSwitch5VLineCommand(ESAT_CCSDSPacket& packet)
-{
-  const byte commandParameter = packet.readByte();
-  if (commandParameter > 0)
-  {
-    ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.ON);
-  }
-  else
-  {
-    ESAT_PowerLine5VSwitch.write(ESAT_PowerLine5VSwitch.OFF);
-  }
-}
-
-void ESAT_EPSClass::handleSetTimeCommand(ESAT_CCSDSPacket& packet)
-{
-  const ESAT_Timestamp timestamp = packet.readTimestamp();
-  clock.write(timestamp);
+  // We leave the complexity of handling telecommands to the
+  // telecommand packet dispatcher.
+  (void) telecommandPacketDispatcher.dispatch(packet);
 }
 
 boolean ESAT_EPSClass::readTelecommand(ESAT_CCSDSPacket& packet)
 {
-  packet.flush();
-  if (packet.capacity() < ESAT_CCSDSSecondaryHeader::LENGTH)
+  // There are two sources of telecommands:
+  // - the I2C interface;
+  // - the USB interface.
+  if (readTelecommandFromI2C(packet))
+  {
+    return true;
+  }
+  else
+  {
+    return readTelecommandFromUSB(packet);
+  }
+}
+
+boolean ESAT_EPSClass::readTelecommandFromI2C(ESAT_CCSDSPacket& packet)
+{
+  const boolean gotPacket = ESAT_I2CSlave.readPacket(packet);
+  if (gotPacket && packet.isTelecommand())
+  {
+    return true;
+  }
+  else
   {
     return false;
   }
-  boolean pendingTelecommand = ESAT_I2CSlave.readTelecommand(packet);
-  if (!pendingTelecommand)
-  {
-    pendingTelecommand = readTelecommandFromUSB(packet);
-  }
-  if (!pendingTelecommand)
-  {
-    return false;
-  }
-  const ESAT_CCSDSPrimaryHeader primaryHeader = packet.readPrimaryHeader();
-  if (primaryHeader.packetType != primaryHeader.TELECOMMAND)
-  {
-    return false;
-  }
-  if (primaryHeader.applicationProcessIdentifier
-      != APPLICATION_PROCESS_IDENTIFIER)
-  {
-    return false;
-  }
-  if (primaryHeader.packetDataLength < ESAT_CCSDSSecondaryHeader::LENGTH)
-  {
-    return false;
-  }
-  return true;
 }
 
 boolean ESAT_EPSClass::readTelecommandFromUSB(ESAT_CCSDSPacket& packet)
 {
-  const boolean gotFrame = usbTelecommandDecoder.receiveFrame();
-  if (!gotFrame)
+  const boolean gotPacket = usbReader.read(packet);
+  if (gotPacket && packet.isTelecommand())
+  {
+    return true;
+  }
+  else
   {
     return false;
   }
-  return packet.readFrom(usbTelecommandDecoder);
 }
 
 boolean ESAT_EPSClass::readTelemetry(ESAT_CCSDSPacket& packet)
 {
-  if (!newTelemetryPacket)
+  if (usbPendingTelemetry.available() > 0)
+  {
+    const byte identifier = byte(usbPendingTelemetry.readNext());
+    usbPendingTelemetry.clear(identifier);
+    return telemetryPacketBuilder.build(packet, identifier);
+  }
+  else
   {
     return false;
   }
-  newTelemetryPacket = false;
-  return telemetry.copyTo(packet);
 }
+
+void ESAT_EPSClass::respondToI2CRequest()
+{
+  const int requestedPacket = ESAT_I2CSlave.requestedPacket();
+  switch (requestedPacket)
+  {
+    case ESAT_I2CSlave.NO_PACKET_REQUESTED:
+      break;
+    case ESAT_I2CSlave.NEXT_TELEMETRY_PACKET_REQUESTED:
+      respondToNextPacketTelemetryRequest();
+      break;
+    case ESAT_I2CSlave.NEXT_TELECOMMAND_PACKET_REQUESTED:
+      respondToNextPacketTelecommandRequest();
+      break;
+    default:
+      respondToNamedPacketTelemetryRequest(byte(requestedPacket));
+      break;
+  }
+}
+
+void ESAT_EPSClass::respondToNamedPacketTelemetryRequest(const byte identifier)
+{
+  // We try to satisfy named-packet telemetry requests, but only for
+  // enabled telemetry packets.  If the requested packet isn't enabled
+  // or we don't recognise it, we reject the request.
+  byte packetData[MAXIMUM_TELEMETRY_PACKET_DATA_LENGTH];
+  ESAT_CCSDSPacket packet(packetData, sizeof(packetData));
+  const boolean enabled = enabledTelemetry.read(identifier);
+  if (!enabled)
+  {
+    ESAT_I2CSlave.rejectPacket();
+    return;
+  }
+  const boolean gotPacket =
+    telemetryPacketBuilder.build(packet, identifier);
+  if (gotPacket)
+  {
+    ESAT_I2CSlave.writePacket(packet);
+  }
+  else
+  {
+    ESAT_I2CSlave.rejectPacket();
+  }
+}
+
+void ESAT_EPSClass::respondToNextPacketTelecommandRequest()
+{
+  // We don't generate telecommands.
+  ESAT_I2CSlave.rejectPacket();
+}
+
+void ESAT_EPSClass::respondToNextPacketTelemetryRequest()
+{
+  // We only update the list of pending I2C telemetry packets
+  // with the contents of the buffered list when we receive
+  // a command to reset the telemetry queue.
+  if (ESAT_I2CSlave.telemetryQueueResetReceived())
+  {
+    i2cPendingTelemetry = i2cPendingTelemetryBuffer;
+    i2cPendingTelemetryBuffer.clearAll();
+  }
+  // Some pending I2C telemetry packet might have been disabled
+  // since the last I2C request.
+  i2cPendingTelemetry = i2cPendingTelemetry & enabledTelemetry;
+  // We try to satisfy requests until we run out of packets.
+  // Then, we just reject the request.
+  if (i2cPendingTelemetry.available() > 0)
+  {
+    const byte identifier = byte(i2cPendingTelemetry.readNext());
+    i2cPendingTelemetry.clear(identifier);
+    respondToNamedPacketTelemetryRequest(identifier);
+  }
+  else
+  {
+    ESAT_I2CSlave.rejectPacket();
+  }
+}
+
+void ESAT_EPSClass::setTime(const ESAT_Timestamp timestamp)
+{
+  clock.write(timestamp);
+}
+
+void ESAT_EPSClass::updatePendingTelemetryLists()
+{
+  // We have two pending telemetry lists to update:
+  // - The USB pending telemetry list, which is consumed
+  //   by readTelemetry().  This list contains the telemetry
+  //   packets that are currently available and enabled.
+  // - The I2C penging telemetry list buffer, which isn't
+  //   consumed by I2C requests directly, but goes to the
+  //   list of pending I2C telemetry when we receive a
+  //   telemetry queue reset command.  This list accumulates
+  //   the telemetry packets that are available and enabled
+  //   on each cycle.
+  const ESAT_FlagContainer availableTelemetry =
+    telemetryPacketBuilder.available();
+  const ESAT_FlagContainer availableAndEnabledTelemetry =
+    availableTelemetry & enabledTelemetry;
+  usbPendingTelemetry =
+    availableAndEnabledTelemetry;
+  i2cPendingTelemetryBuffer =
+    i2cPendingTelemetryBuffer | availableAndEnabledTelemetry;
+ }
 
 void ESAT_EPSClass::update()
 {
   updateMaximumPowerPointTracking();
-  updateTelemetry();
-  updateI2CTelemetry();
+  updatePendingTelemetryLists();
+  respondToI2CRequest();
+  updateLEDBrightness();
+}
+
+void ESAT_EPSClass::updateLEDBrightness()
+{
+  const word milliseconds = millis() % 1000;
+  const float brightness = (milliseconds / 1000.) * 100.;
+  ESAT_EPSLED.write(brightness);
 }
 
 void ESAT_EPSClass::updateMaximumPowerPointTracking()
@@ -224,102 +303,9 @@ void ESAT_EPSClass::updateMaximumPowerPointTracking()
   ESAT_MaximumPowerPointTrackingDriver2.update();
 }
 
-void ESAT_EPSClass::updateI2CTelemetry()
-{
-  const int packetIdentifier = ESAT_I2CSlave.requestedTelemetryPacket();
-  switch (packetIdentifier)
-  {
-    case ESAT_I2CSlave.NO_TELEMETRY_PACKET_REQUESTED:
-      break;
-    case HOUSEKEEPING:
-      (void) ESAT_I2CSlave.writeTelemetry(telemetry);
-      break;
-    default:
-      ESAT_I2CSlave.rejectTelemetryRequest();
-      break;
-  }
-}
-
-void ESAT_EPSClass::updateTelemetry()
-{
-  telemetry.flush();
-  // Primary header.
-  ESAT_CCSDSPrimaryHeader primaryHeader;
-  primaryHeader.packetVersionNumber = 0;
-  primaryHeader.packetType =
-    primaryHeader.TELEMETRY;
-  primaryHeader.secondaryHeaderFlag =
-    primaryHeader.SECONDARY_HEADER_IS_PRESENT;
-  primaryHeader.applicationProcessIdentifier =
-    APPLICATION_PROCESS_IDENTIFIER;
-  primaryHeader.sequenceFlags =
-    primaryHeader.UNSEGMENTED_USER_DATA;
-  primaryHeader.packetSequenceCount =
-    telemetryPacketSequenceCount;
-  telemetry.writePrimaryHeader(primaryHeader);
-  // Secondary header.
-  ESAT_CCSDSSecondaryHeader secondaryHeader;
-  secondaryHeader.preamble =
-    secondaryHeader.CALENDAR_SEGMENTED_TIME_CODE_MONTH_DAY_VARIANT_1_SECOND_RESOLUTION;
-  secondaryHeader.timestamp = clock.read();
-  secondaryHeader.majorVersionNumber = MAJOR_VERSION_NUMBER;
-  secondaryHeader.minorVersionNumber = MINOR_VERSION_NUMBER;
-  secondaryHeader.patchVersionNumber = PATCH_VERSION_NUMBER;
-  secondaryHeader.packetIdentifier = HOUSEKEEPING;
-  telemetry.writeSecondaryHeader(secondaryHeader);
-  // User data.
-  telemetry.writeWord(ESAT_EPSMeasurements.read3V3LineCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.read3V3LineVoltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.read5VLineCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.read5VLineVoltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readInputLineCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readInputLineVoltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1InputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1OutputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel1Voltage());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2InputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2OutputCurrent());
-  telemetry.writeWord(ESAT_EPSMeasurements.readSolarPanel2Voltage());
-  telemetry.writeByte(ESAT_PowerLine3V3Switch.read());
-  telemetry.writeByte(ESAT_PowerLine5VSwitch.read());
-  ESAT_BatteryController.error = false;
-  telemetry.writeWord(ESAT_BatteryController.readBatteryCurrent());
-  telemetry.writeWord(ESAT_BatteryController.readTotalBatteryVoltage());
-  telemetry.writeWord(ESAT_BatteryController.readBattery1Voltage());
-  telemetry.writeWord(ESAT_BatteryController.readBattery2Voltage());
-  telemetry.writeWord(ESAT_BatteryController.readBatteryTemperature());
-  telemetry.writeByte(ESAT_BatteryController.readBatteryStateOfCharge());
-  telemetry.writeByte(ESAT_BatteryController.error);
-  ESAT_SolarPanel1Thermometer.error = false;
-  telemetry.writeWord(ESAT_SolarPanel1Thermometer.read());
-  telemetry.writeByte(ESAT_SolarPanel1Thermometer.error);
-  ESAT_SolarPanel2Thermometer.error = false;
-  telemetry.writeWord(ESAT_SolarPanel2Thermometer.read());
-  telemetry.writeByte(ESAT_SolarPanel2Thermometer.error);
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver1.getMode());
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver1.getDutyCycle());
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver2.getMode());
-  telemetry.writeByte(ESAT_MaximumPowerPointTrackingDriver2.getDutyCycle());
-  ESAT_DirectEnergyTransferSystem.error = false;
-  telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readCurrent());
-  telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readVoltage());
-  telemetry.writeWord(ESAT_DirectEnergyTransferSystem.readShuntVoltage());
-  telemetry.writeByte(ESAT_DirectEnergyTransferSystem.error);
-  // End of user data
-  telemetryPacketSequenceCount = telemetryPacketSequenceCount + 1;
-  newTelemetryPacket = true;
-}
-
 void ESAT_EPSClass::writeTelemetry(ESAT_CCSDSPacket& packet)
 {
-  packet.rewind();
-  const unsigned long encoderBufferLength =
-    ESAT_KISSStream::frameLength(packet.length());
-  byte encoderBuffer[encoderBufferLength];
-  ESAT_KISSStream encoder(USB, encoderBuffer, encoderBufferLength);
-  (void) encoder.beginFrame();
-  (void) packet.writeTo(encoder);
-  (void) encoder.endFrame();
+  (void) usbWriter.unbufferedWrite(packet);
 }
 
 ESAT_EPSClass ESAT_EPS;
