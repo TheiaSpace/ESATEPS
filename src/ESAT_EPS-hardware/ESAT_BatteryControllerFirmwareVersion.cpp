@@ -31,4 +31,4 @@ boolean ESAT_BatteryControllerFirmwareVersion::writeTo(Stream& stream) const
   {
     return true;
   }
-};
+}
