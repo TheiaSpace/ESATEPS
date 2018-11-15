@@ -49,8 +49,8 @@ ESAT_SolarPanelThermometerClass::ESAT_SolarPanelThermometerClass(const byte theP
 
 word ESAT_SolarPanelThermometerClass::read()
 {
-  // We support two different thermometer hardware implementations.
-  // We try one first and, if we fail, we try the second one.
+  // Reads are rate-limited; calling read() too often just returns
+  // the last reading.
   unsigned long currentReadingTime = millis();
   if ((currentReadingTime - previousReadingTime) < PERIOD)
   {
@@ -58,6 +58,9 @@ word ESAT_SolarPanelThermometerClass::read()
     return previousReading;
   }
   previousReadingTime = currentReadingTime;
+  // We support two different thermometer hardware implementations.
+  // We try one first and, if we fail, we try the second one.
+  // We should signal an error only when both attempts fail.
   const word primaryTemperature =
     tryRead(primaryAddress, primaryRegister);
   if (successfulRead)
@@ -86,6 +89,9 @@ word ESAT_SolarPanelThermometerClass::read()
 word ESAT_SolarPanelThermometerClass::tryRead(const byte address,
                                               const byte registerNumber)
 {
+  // The temperature comes from an I2C device.  It is encoded as an
+  // uncalibrated 16-bit unsigned integer in big-endian format.  We
+  // leave the calibration step to the ground segment.
   WireEPS.beginTransmission(address);
   WireEPS.write(registerNumber);
   const byte writeStatus = WireEPS.endTransmission();
