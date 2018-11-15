@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Theia Space, Universidad Politécnica de Madrid
+ * Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
  *
  * This file is part of Theia Space's ESAT EPS library.
  *
@@ -28,6 +28,9 @@ static const byte voltageSamples = 1;
 
 void ESAT_EPSMeasurementsClass::begin()
 {
+  // We produce raw, uncalibrated values.  The ground segment software
+  // interprets those values under the assumption that they are
+  // referenced to 2.5 V, so we must use the 2.5 V voltage reference.
   analogReference(INTERNAL2V5);
   pinMode(I_3V3, INPUT);
   pinMode(V_3V3, INPUT);
