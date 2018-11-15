@@ -64,6 +64,10 @@ boolean ESAT_BatteryControllerClass::read(const word registerAddress,
                                           const byte byteArraySize,
                                           const Protocol theProtocol)
 {
+  // The battery controller device supports several communication
+  // protocols.  From a high-level standpoint, they all serve the
+  // same purpose: querying the battery controller device for a
+  // bunch of bytes stored at a given register.
   switch (theProtocol)
   {
     case BLOCK_PROTOCOL:
@@ -90,6 +94,9 @@ boolean ESAT_BatteryControllerClass::read(const word registerAddress,
 
 void ESAT_BatteryControllerClass::readBatteryModuleHousekeeping()
 {
+  // Reads are rate-limited; calling readBatteryModuleHousekeeping()
+  // too often just uses the last readings.  We group readings in two
+  // categories: BM housekeeping and EPS housekeeping.
   const unsigned long readingTime = millis();
   if ((readingTime - previousBatteryModuleHousekeepingReadingTime) <= PERIOD)
   {
@@ -297,6 +304,9 @@ unsigned long ESAT_BatteryControllerClass::readEnabledProtections()
 
 void ESAT_BatteryControllerClass::readEPSHousekeeping()
 {
+  // Reads are rate-limited; calling readEPSHousekeeping() too often
+  // just uses the last readings.  We group readings in two categories:
+  // BM housekeeping and EPS housekeeping.
   const unsigned long readingTime = millis();
   if ((readingTime - previousEPSHousekeepingReadingTime) <= PERIOD)
   {
@@ -366,6 +376,8 @@ word ESAT_BatteryControllerClass::readTotalBatteryVoltage()
 unsigned long ESAT_BatteryControllerClass::readUnsignedLong(const word registerAddress,
                                                             const Protocol theProtocol)
 {
+  // 32-bit unsigned integers (unsigned longs in Arduino parlance) are
+  // encoded in big-endian format in all supported protocols.
   byte byteArray[4];
   read(registerAddress, byteArray, sizeof(byteArray), theProtocol);
   return ESAT_Util.unsignedLong(byteArray[3],
@@ -520,6 +532,8 @@ boolean ESAT_BatteryControllerClass::readWithWordProtocol(const word registerAdd
 word ESAT_BatteryControllerClass::readWord(const word registerAddress,
                                            const Protocol theProtocol)
 {
+  // 16-bit integers (words in Arduino parlance) are encoded in
+  // big-endian format in all supported protocols.
   byte byteArray[2];
   read(registerAddress, byteArray, sizeof(byteArray), theProtocol);
   return word(byteArray[1], byteArray[0]);
