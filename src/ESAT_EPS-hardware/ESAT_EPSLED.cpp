@@ -19,12 +19,18 @@
 
 void ESAT_EPSLEDClass::begin()
 {
+  // To control the LED, it is necessary to configure the control
+  // line as an output.  In addition, we must start at a known
+  // configuration (0 % brightness, for example).
   pinMode(LED_CONTROL_LINE, OUTPUT);
   write(0);
 }
 
 void ESAT_EPSLEDClass::write(const float brightness)
 {
+  // The brigthness goes from 0 % to 100 %, but the duty
+  // cycle of the LED control line goes from 0 to 255,
+  // so it is necessary to scale the value.
   const byte dutyCycle = map(brightness, 0, 100, 0, 255);
   analogWrite(LED_CONTROL_LINE, dutyCycle);
 }

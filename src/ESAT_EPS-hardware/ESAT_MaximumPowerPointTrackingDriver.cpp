@@ -49,6 +49,9 @@ byte ESAT_MaximumPowerPointTrackingDriverClass::getMode()
 
 int ESAT_MaximumPowerPointTrackingDriverClass::gradientDirection()
 {
+  // The gradient direction of the MPPT mode is the sign of the derivative
+  // of the reading with respect to the duty cycle.  We approximate it by
+  // finite differences.
   const int reading = (analogRead(sensorPin) + analogRead(sensorPin)) / 2;
   const int readingIncrement = reading - previousReading;
   previousReading = reading;
@@ -103,11 +106,17 @@ void ESAT_MaximumPowerPointTrackingDriverClass::update()
 
 void ESAT_MaximumPowerPointTrackingDriverClass::updateFixedMode()
 {
+  // The fixed mode just sets the duty cycle (the operating point of
+  // the solar panel power regulator) to a fixed value.
   analogWrite(outputPin, dutyCycle);
 }
 
 void ESAT_MaximumPowerPointTrackingDriverClass::updateMPPTMode()
 {
+  // The MPPT mode tries to maximize the reading (a measurement of the
+  // output power of the solar panel) as a function of the duty cycle
+  // (the operating point of the solar panel power regulator) via a
+  // simple hill-climbing algorithm.
   const int direction = gradientDirection();
   if (direction > 0)
   {
@@ -123,6 +132,8 @@ void ESAT_MaximumPowerPointTrackingDriverClass::updateMPPTMode()
 
 void ESAT_MaximumPowerPointTrackingDriverClass::updateSweepMode()
 {
+  // The sweep mode just sweeps up and down the duty cycle (the
+  // operating point of the solar panel power regulator).
   if (dutyCycle == 0)
   {
     dutyCycleIncrement = 1;
