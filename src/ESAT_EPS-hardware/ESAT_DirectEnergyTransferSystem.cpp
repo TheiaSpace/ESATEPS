@@ -64,7 +64,7 @@ word ESAT_DirectEnergyTransferSystemClass::readConvertedValue()
   }
   const byte highByte = WireEPS.read();
   const byte lowByte = WireEPS.read();
-  return word(highByte, lowByte);
+  return (word(highByte, lowByte)>>4);
 }
 
 word ESAT_DirectEnergyTransferSystemClass::readCurrent()
