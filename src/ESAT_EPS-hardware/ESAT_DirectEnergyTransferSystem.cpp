@@ -48,6 +48,8 @@ word ESAT_DirectEnergyTransferSystemClass::readConvertedValue()
   // The reading comes from an I2C device.  It is encoded as an
   // uncalibrated 16-bit unsigned integer in big-endian format.  We
   // leave the calibration step to the ground segment.
+  // ADC result is left aligned, so it has to be shifted 4 positions
+  // to the right.
   WireEPS.beginTransmission(ADDRESS);
   WireEPS.write(CONVERSION_REGISTER);
   const byte writeStatus = WireEPS.endTransmission();
