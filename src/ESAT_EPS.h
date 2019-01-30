@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
+ * Copyright (C) 2017, 2018, 2019 Theia Space, Universidad Politécnica de Madrid
  *
  * This file is part of Theia Space's ESAT EPS library.
  *
@@ -105,7 +105,7 @@ class ESAT_EPSClass
     // Software version number.
     static const byte MAJOR_VERSION_NUMBER = 2;
     static const byte MINOR_VERSION_NUMBER = 1;
-    static const byte PATCH_VERSION_NUMBER = 0;
+    static const byte PATCH_VERSION_NUMBER = 1;
 
     // Set current time command size:
     // - Year (2 byte).
