@@ -1,4 +1,4 @@
-Copyright (C) 2017, 2018 Theia Space, Universidad Politécnica de Madrid
+﻿Copyright (C) 2017, 2018, 2019 Theia Space, Universidad Politécnica de Madrid
 
 This file is part of Theia Space's ESAT EPS library.
 
@@ -17,7 +17,7 @@ along with Theia Space's ESAT EPS library.  If not, see
 <http://www.gnu.org/licenses/>.
 
 
-ESAT EPS library version 2.1.0.
+ESAT EPS library version 2.1.1.
 
 Electrical Power Subsystem (EPS) for ESAT.
 
